@@ -160,6 +160,12 @@ export default function TopHeader() {
     if (result.siteObj) {
       setSelectedSite(result.siteObj);
     }
+    if (result.stationObj) {
+      setSelectedStation(result.stationObj);
+    }
+    if (result.assetObj) {
+      setSelectedAsset(result.assetObj);
+    }
     if (result.targetModule) {
       setActiveModule(result.targetModule);
     }
@@ -346,7 +352,16 @@ export default function TopHeader() {
                       return (
                         <div
                           key={`${item.category}-${item.id}`}
-                          onClick={() => handleSelectSearchResult(item)}
+                          onMouseDown={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            handleSelectSearchResult(item);
+                          }}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            handleSelectSearchResult(item);
+                          }}
                           style={{
                             padding: '10px 12px',
                             borderRadius: '8px',
@@ -572,7 +587,16 @@ export default function TopHeader() {
                     return (
                       <div
                         key={`mob-${item.category}-${item.id}`}
-                        onClick={() => handleSelectSearchResult(item)}
+                        onMouseDown={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          handleSelectSearchResult(item);
+                        }}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          handleSelectSearchResult(item);
+                        }}
                         style={{
                           padding: '10px 12px',
                           borderRadius: '8px',
