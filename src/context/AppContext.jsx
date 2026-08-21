@@ -23,7 +23,7 @@ export function AppProvider({ children }) {
   const [searchQuery, setSearchQuery] = useState('');
   
   // Enterprise Core Datasets
-  const [networks] = useState(NETWORKS_DATA);
+  const [networks, setNetworks] = useState(NETWORKS_DATA);
   const [sites, setSites] = useState(SITES_DATA);
   const [stations, setStations] = useState(STATIONS_DATA);
   const [assets, setAssets] = useState(ASSETS_DATA);
