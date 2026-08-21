@@ -98,6 +98,72 @@ body {
   overflow-x: hidden;
 }
 
+/* ==========================================================================
+   Custom Sleek Scrollbar Styling (Matches Dark Sidebar & Light Theme Canvas)
+   ========================================================================== */
+
+/* Universal Scrollbar Rules */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(148, 163, 184, 0.4) transparent;
+}
+
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.35);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.6);
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* Dark Sidebar Custom Scrollbar (#0F172A Matching) */
+.sidebar-container,
+.sidebar-container *,
+.sidebar-scroll-content {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.15) #0F172A;
+}
+
+.sidebar-container::-webkit-scrollbar,
+.sidebar-container *::-webkit-scrollbar,
+.sidebar-scroll-content::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+.sidebar-container::-webkit-scrollbar-track,
+.sidebar-container *::-webkit-scrollbar-track,
+.sidebar-scroll-content::-webkit-scrollbar-track {
+  background: #0F172A !important;
+}
+
+.sidebar-container::-webkit-scrollbar-thumb,
+.sidebar-container *::-webkit-scrollbar-thumb,
+.sidebar-scroll-content::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.18) !important;
+  border-radius: 9999px;
+}
+
+.sidebar-container::-webkit-scrollbar-thumb:hover,
+.sidebar-container *::-webkit-scrollbar-thumb:hover,
+.sidebar-scroll-content::-webkit-scrollbar-thumb:hover {
+  background: rgba(52, 211, 153, 0.5) !important;
+}
+
 /* Headings & Text Wrap */
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-heading);

@@ -209,7 +209,7 @@ export default function Sidebar() {
         </div>
 
         {/* Dark Navigation Group Items */}
-        <div style={{ flex: 1, padding: isSidebarCollapsed ? '12px 8px' : '18px 16px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <div className="sidebar-scroll-content" style={{ flex: 1, padding: isSidebarCollapsed ? '12px 8px' : '18px 16px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '16px' }}>
           {navGroups.map((group) => {
             const isGroupOpen = openGroupKey === group.key;
 
