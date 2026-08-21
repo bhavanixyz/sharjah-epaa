@@ -72,60 +72,60 @@ export default function Dashboard() {
       </div>
 
       {/* Metric Floating KPI Cards Grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '18px' }}>
+      <div className="metric-cards-grid">
         
         {/* Metric 1 */}
-        <div className="glass-panel glass-panel-hover" style={{ padding: '20px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
-            <span style={{ fontSize: '0.76rem', fontWeight: 800, color: '#64748B', letterSpacing: '0.04em' }}>MONITORING NETWORKS</span>
-            <div style={{ padding: '10px', borderRadius: '10px', background: 'linear-gradient(135deg, rgba(37, 99, 235, 0.1) 0%, rgba(59, 130, 246, 0.2) 100%)', color: '#2563EB' }}>
+        <div className="glass-panel glass-panel-hover metric-card">
+          <div className="metric-card-header">
+            <span className="metric-title">MONITORING NETWORKS</span>
+            <div className="metric-icon-box" style={{ background: 'linear-gradient(135deg, rgba(37, 99, 235, 0.1) 0%, rgba(59, 130, 246, 0.2) 100%)', color: '#2563EB' }}>
               <Network size={22} />
             </div>
           </div>
-          <div style={{ fontSize: '1.75rem', fontWeight: 800, color: '#0F172A' }}>{networks.length} Domains</div>
-          <div style={{ fontSize: '0.76rem', color: '#00A878', marginTop: '6px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '4px' }}>
+          <div className="metric-value">{networks.length} Domains</div>
+          <div className="metric-subtitle" style={{ color: '#00A878' }}>
             <CheckCircle size={14} /> 100% Telemetry Online
           </div>
         </div>
 
         {/* Metric 2 */}
-        <div className="glass-panel glass-panel-hover" style={{ padding: '20px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
-            <span style={{ fontSize: '0.76rem', fontWeight: 800, color: '#64748B', letterSpacing: '0.04em' }}>MONITORING STATIONS</span>
-            <div style={{ padding: '10px', borderRadius: '10px', background: 'linear-gradient(135deg, rgba(0, 168, 120, 0.1) 0%, rgba(13, 186, 139, 0.2) 100%)', color: '#00A878' }}>
+        <div className="glass-panel glass-panel-hover metric-card">
+          <div className="metric-card-header">
+            <span className="metric-title">MONITORING STATIONS</span>
+            <div className="metric-icon-box" style={{ background: 'linear-gradient(135deg, rgba(0, 168, 120, 0.1) 0%, rgba(13, 186, 139, 0.2) 100%)', color: '#00A878' }}>
               <MapPin size={22} />
             </div>
           </div>
-          <div style={{ fontSize: '1.75rem', fontWeight: 800, color: '#0F172A' }}>{totalSites} Sites</div>
-          <div style={{ fontSize: '0.76rem', color: criticalSites > 0 ? '#DC2626' : '#00A878', marginTop: '6px', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '4px' }}>
+          <div className="metric-value">{totalSites} Sites</div>
+          <div className="metric-subtitle" style={{ color: criticalSites > 0 ? '#DC2626' : '#00A878' }}>
             <AlertTriangle size={14} /> {criticalSites} Require Inspection
           </div>
         </div>
 
         {/* Metric 3 */}
-        <div className="glass-panel glass-panel-hover" style={{ padding: '20px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
-            <span style={{ fontSize: '0.76rem', fontWeight: 800, color: '#64748B', letterSpacing: '0.04em' }}>EQUIPMENT ASSETS</span>
-            <div style={{ padding: '10px', borderRadius: '10px', background: 'linear-gradient(135deg, rgba(8, 145, 178, 0.1) 0%, rgba(6, 182, 212, 0.2) 100%)', color: '#0891B2' }}>
+        <div className="glass-panel glass-panel-hover metric-card">
+          <div className="metric-card-header">
+            <span className="metric-title">EQUIPMENT ASSETS</span>
+            <div className="metric-icon-box" style={{ background: 'linear-gradient(135deg, rgba(8, 145, 178, 0.1) 0%, rgba(6, 182, 212, 0.2) 100%)', color: '#0891B2' }}>
               <Cpu size={22} />
             </div>
           </div>
-          <div style={{ fontSize: '1.75rem', fontWeight: 800, color: '#0F172A' }}>{assets.length} Analyzers</div>
-          <div style={{ fontSize: '0.76rem', color: '#0891B2', marginTop: '6px', fontWeight: 700 }}>
+          <div className="metric-value">{assets.length} Analyzers</div>
+          <div className="metric-subtitle" style={{ color: '#0891B2' }}>
             {activeAssets} Active in Field
           </div>
         </div>
 
         {/* Metric 4 */}
-        <div className="glass-panel glass-panel-hover" style={{ padding: '20px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
-            <span style={{ fontSize: '0.76rem', fontWeight: 800, color: '#64748B', letterSpacing: '0.04em' }}>OPEN WORK ORDERS</span>
-            <div style={{ padding: '10px', borderRadius: '10px', background: 'linear-gradient(135deg, rgba(220, 38, 38, 0.1) 0%, rgba(239, 68, 68, 0.2) 100%)', color: '#DC2626' }}>
+        <div className="glass-panel glass-panel-hover metric-card">
+          <div className="metric-card-header">
+            <span className="metric-title">OPEN WORK ORDERS</span>
+            <div className="metric-icon-box" style={{ background: 'linear-gradient(135deg, rgba(220, 38, 38, 0.1) 0%, rgba(239, 68, 68, 0.2) 100%)', color: '#DC2626' }}>
               <Wrench size={22} />
             </div>
           </div>
-          <div style={{ fontSize: '1.75rem', fontWeight: 800, color: '#0F172A' }}>{openWOs} Active</div>
-          <div style={{ fontSize: '0.76rem', color: '#DC2626', marginTop: '6px', fontWeight: 700 }}>
+          <div className="metric-value">{openWOs} Active</div>
+          <div className="metric-subtitle" style={{ color: '#DC2626' }}>
             2 Urgent Critical SLA
           </div>
         </div>

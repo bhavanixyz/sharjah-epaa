@@ -18,68 +18,64 @@ export default function MetricsOverview() {
     <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
       
       {/* Key Metrics Grid */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
-        gap: '20px'
-      }}>
+      <div className="metric-cards-grid">
         
         {/* KPI 1 */}
-        <div className="glass-panel glass-panel-hover" style={{ padding: '20px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
-            <span style={{ fontSize: '0.82rem', color: 'var(--text-muted)', fontWeight: 600 }}>PROPOSAL PIPELINE</span>
-            <div style={{ padding: '8px', borderRadius: '10px', background: 'rgba(59, 130, 246, 0.15)', color: 'var(--primary-light)' }}>
+        <div className="glass-panel glass-panel-hover metric-card">
+          <div className="metric-card-header">
+            <span className="metric-title">PROPOSAL PIPELINE</span>
+            <div className="metric-icon-box" style={{ background: 'rgba(59, 130, 246, 0.15)', color: 'var(--primary-light)' }}>
               <DollarSign size={20} />
             </div>
           </div>
-          <div style={{ fontSize: '1.8rem', fontWeight: 800, color: '#fff', marginBottom: '6px' }}>$4.25 M</div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.8rem', color: 'var(--accent-emerald)' }}>
+          <div className="metric-value">$4.25 M</div>
+          <div className="metric-subtitle" style={{ color: 'var(--accent-emerald)' }}>
             <ArrowUpRight size={16} />
             <span style={{ fontWeight: 700 }}>+18.4%</span> vs last month
           </div>
         </div>
 
         {/* KPI 2 */}
-        <div className="glass-panel glass-panel-hover" style={{ padding: '20px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
-            <span style={{ fontSize: '0.82rem', color: 'var(--text-muted)', fontWeight: 600 }}>ACTIVE PROPOSALS</span>
-            <div style={{ padding: '8px', borderRadius: '10px', background: 'rgba(6, 182, 212, 0.15)', color: 'var(--accent-cyan)' }}>
+        <div className="glass-panel glass-panel-hover metric-card">
+          <div className="metric-card-header">
+            <span className="metric-title">ACTIVE PROPOSALS</span>
+            <div className="metric-icon-box" style={{ background: 'rgba(6, 182, 212, 0.15)', color: 'var(--accent-cyan)' }}>
               <FileCheck size={20} />
             </div>
           </div>
-          <div style={{ fontSize: '1.8rem', fontWeight: 800, color: '#fff', marginBottom: '6px' }}>14 Drafts</div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.8rem', color: 'var(--accent-cyan)' }}>
+          <div className="metric-value">14 Drafts</div>
+          <div className="metric-subtitle" style={{ color: 'var(--accent-cyan)' }}>
             <Clock size={16} />
-            <span>Avg response time: 3.2 days</span>
+            <span>Avg response: 3.2 days</span>
           </div>
         </div>
 
         {/* KPI 3 */}
-        <div className="glass-panel glass-panel-hover" style={{ padding: '20px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
-            <span style={{ fontSize: '0.82rem', color: 'var(--text-muted)', fontWeight: 600 }}>COMPONENT REUSE RATE</span>
-            <div style={{ padding: '8px', borderRadius: '10px', background: 'rgba(139, 92, 246, 0.15)', color: 'var(--accent-purple)' }}>
+        <div className="glass-panel glass-panel-hover metric-card">
+          <div className="metric-card-header">
+            <span className="metric-title">REUSE RATE</span>
+            <div className="metric-icon-box" style={{ background: 'rgba(139, 92, 246, 0.15)', color: 'var(--accent-purple)' }}>
               <Layers size={20} />
             </div>
           </div>
-          <div style={{ fontSize: '1.8rem', fontWeight: 800, color: '#fff', marginBottom: '6px' }}>86.5%</div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.8rem', color: 'var(--accent-purple)' }}>
+          <div className="metric-value">86.5%</div>
+          <div className="metric-subtitle" style={{ color: 'var(--accent-purple)' }}>
             <ArrowUpRight size={16} />
             <span style={{ fontWeight: 700 }}>+5.2%</span> modular efficiency
           </div>
         </div>
 
         {/* KPI 4 */}
-        <div className="glass-panel glass-panel-hover" style={{ padding: '20px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
-            <span style={{ fontSize: '0.82rem', color: 'var(--text-muted)', fontWeight: 600 }}>COMPLIANCE & AUDIT</span>
-            <div style={{ padding: '8px', borderRadius: '10px', background: 'rgba(16, 185, 129, 0.15)', color: 'var(--accent-emerald)' }}>
+        <div className="glass-panel glass-panel-hover metric-card">
+          <div className="metric-card-header">
+            <span className="metric-title">COMPLIANCE</span>
+            <div className="metric-icon-box" style={{ background: 'rgba(16, 185, 129, 0.15)', color: 'var(--accent-emerald)' }}>
               <ShieldCheck size={20} />
             </div>
           </div>
-          <div style={{ fontSize: '1.8rem', fontWeight: 800, color: '#fff', marginBottom: '6px' }}>Grade A+</div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.8rem', color: 'var(--accent-emerald)' }}>
-            <span>100% WCAG 2.1 AA Compliant</span>
+          <div className="metric-value">Grade A+</div>
+          <div className="metric-subtitle" style={{ color: 'var(--accent-emerald)' }}>
+            <span>100% WCAG 2.1 AA</span>
           </div>
         </div>
 

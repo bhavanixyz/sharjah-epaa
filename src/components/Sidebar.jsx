@@ -117,7 +117,7 @@ export default function Sidebar() {
         position: 'sticky',
         top: 0,
         height: '100vh',
-        width: isSidebarCollapsed ? '72px' : '265px',
+        width: isSidebarCollapsed ? '72px' : '272px',
         background: 'linear-gradient(180deg, #0F172A 0%, #1E293B 100%)',
         borderRight: '1px solid rgba(255, 255, 255, 0.08)',
         display: 'flex',
@@ -153,10 +153,10 @@ export default function Sidebar() {
             </div>
             {!isSidebarCollapsed && (
               <div>
-                <h1 style={{ fontSize: '1.08rem', fontWeight: 800, color: '#FFFFFF', lineHeight: 1.1 }}>
+                <h1 style={{ fontSize: '1.08rem', fontWeight: 800, color: '#FFFFFF', lineHeight: 1.1, whiteSpace: 'nowrap' }}>
                   Sharjah EPA
                 </h1>
-                <p style={{ fontSize: '0.68rem', color: '#34D399', fontWeight: 700, letterSpacing: '0.02em' }}>
+                <p style={{ fontSize: '0.68rem', color: '#34D399', fontWeight: 700, letterSpacing: '0.02em', whiteSpace: 'nowrap' }}>
                   Command Platform
                 </p>
               </div>
@@ -209,7 +209,7 @@ export default function Sidebar() {
         </div>
 
         {/* Dark Navigation Group Items */}
-        <div className="sidebar-scroll-content" style={{ flex: 1, padding: isSidebarCollapsed ? '12px 8px' : '18px 16px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <div className="sidebar-scroll-content" style={{ flex: 1, padding: isSidebarCollapsed ? '12px 8px' : '16px 14px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '14px' }}>
           {navGroups.map((group) => {
             const isGroupOpen = openGroupKey === group.key;
 
@@ -221,8 +221,8 @@ export default function Sidebar() {
                     <div 
                       onClick={() => toggleGroup(group.key)}
                       style={{
-                        fontSize: '13px',
-                        fontWeight: isGroupOpen ? 700 : 500,
+                        fontSize: '12.5px',
+                        fontWeight: isGroupOpen ? 700 : 600,
                         color: isGroupOpen ? '#34D399' : '#CBD5E1',
                         marginBottom: '6px',
                         padding: '7px 10px',
@@ -233,10 +233,11 @@ export default function Sidebar() {
                         cursor: 'pointer',
                         userSelect: 'none',
                         transition: 'all 0.15s ease',
-                        background: isGroupOpen ? 'rgba(52, 211, 153, 0.12)' : 'transparent'
+                        background: isGroupOpen ? 'rgba(52, 211, 153, 0.12)' : 'transparent',
+                        whiteSpace: 'nowrap'
                       }}
                     >
-                      <span>{group.group}</span>
+                      <span style={{ whiteSpace: 'nowrap' }}>{group.group}</span>
                       {isGroupOpen ? (
                         <ChevronUp size={16} color="#34D399" />
                       ) : (
@@ -247,8 +248,8 @@ export default function Sidebar() {
                     {/* Sub-Items List with Left Vertical Trunk Line */}
                     {isGroupOpen && (
                       <div style={{
-                        paddingLeft: '18px',
-                        marginLeft: '14px',
+                        paddingLeft: '10px',
+                        marginLeft: '8px',
                         borderLeft: '2px solid rgba(255, 255, 255, 0.12)',
                         display: 'flex',
                         flexDirection: 'column',
@@ -266,26 +267,28 @@ export default function Sidebar() {
                                 alignItems: 'center',
                                 justifyContent: 'space-between',
                                 width: '100%',
-                                padding: '7px 10px',
+                                padding: '8px 10px',
+                                minHeight: '36px',
                                 borderRadius: '8px',
                                 border: 'none',
-                                fontSize: '12px',
+                                fontSize: '12.5px',
                                 fontWeight: isActive ? 700 : 400,
                                 cursor: 'pointer',
                                 transition: 'all 0.15s ease',
                                 background: isActive ? 'linear-gradient(90deg, rgba(0, 168, 120, 0.3) 0%, rgba(0, 168, 120, 0.15) 100%)' : 'transparent',
-                                color: isActive ? '#FFFFFF' : '#94A3B8',
-                                borderLeft: isActive ? '3px solid #00A878' : '3px solid transparent'
+                                color: isActive ? '#FFFFFF' : '#CBD5E1',
+                                borderLeft: isActive ? '3px solid #00A878' : '3px solid transparent',
+                                whiteSpace: 'nowrap'
                               }}
                             >
-                              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                <Icon size={15} color={isActive ? '#34D399' : '#64748B'} />
-                                <span>{item.label}</span>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', overflow: 'hidden', whiteSpace: 'nowrap' }}>
+                                <Icon size={16} color={isActive ? '#34D399' : '#94A3B8'} style={{ flexShrink: 0 }} />
+                                <span style={{ whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>{item.label}</span>
                               </div>
 
-                              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexShrink: 0, marginLeft: '4px' }}>
                                 {item.badge && (
-                                  <span className="badge badge-normal" style={{ fontSize: '0.58rem', padding: '1px 5px', background: 'rgba(52, 211, 153, 0.2)', color: '#34D399', border: '1px solid rgba(52, 211, 153, 0.4)' }}>
+                                  <span className="badge badge-normal" style={{ fontSize: '0.58rem', padding: '1px 5px', background: 'rgba(52, 211, 153, 0.2)', color: '#34D399', border: '1px solid rgba(52, 211, 153, 0.4)', whiteSpace: 'nowrap' }}>
                                     {item.badge}
                                   </span>
                                 )}
@@ -297,7 +300,8 @@ export default function Sidebar() {
                                     fontSize: '0.64rem',
                                     fontWeight: 800,
                                     padding: '2px 6px',
-                                    borderRadius: '10px'
+                                    borderRadius: '10px',
+                                    whiteSpace: 'nowrap'
                                   }}>
                                     {item.count}
                                   </span>

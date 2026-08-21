@@ -37,7 +37,7 @@ export default function GisMap() {
     : sites.filter(s => s.networkId === filterNetwork);
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '18px', height: 'calc(100vh - 110px)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '18px', minHeight: 'calc(100vh - 120px)', width: '100%' }}>
       
       {/* GIS Header & Layer Filter Bar */}
       <div className="glass-panel page-header-card">
@@ -86,7 +86,7 @@ export default function GisMap() {
       <div className={selectedSite ? 'gis-map-grid' : ''} style={{ flex: 1, display: 'grid', gridTemplateColumns: selectedSite ? undefined : '1fr', gap: '18px', position: 'relative' }}>
         
         {/* Leaflet GIS Map Container */}
-        <div className="glass-panel" style={{ overflow: 'hidden', position: 'relative' }}>
+        <div className="glass-panel" style={{ overflow: 'hidden', position: 'relative', minHeight: '400px', flex: 1 }}>
           <MapContainer 
             center={[25.25, 55.70]} 
             zoom={9} 

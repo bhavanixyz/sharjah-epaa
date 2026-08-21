@@ -799,7 +799,9 @@ export const NOTIFICATIONS_DATA = [
     message: 'Marine Sonde reading dropped below 5.0 mg/L threshold.',
     time: '12 mins ago',
     severity: 'critical',
-    read: false
+    read: false,
+    targetModule: 'gis',
+    siteId: 'site-khor-kalba'
   },
   {
     id: 'notif-2',
@@ -807,7 +809,9 @@ export const NOTIFICATIONS_DATA = [
     message: 'Tariq Al-Mansoori uploaded gas calibration zero log.',
     time: '45 mins ago',
     severity: 'info',
-    read: false
+    read: false,
+    targetModule: 'maintenance',
+    workOrderId: 'WO-2026-089'
   },
   {
     id: 'notif-3',
@@ -815,7 +819,8 @@ export const NOTIFICATIONS_DATA = [
     message: 'Current stock is 2 (below minimum safety threshold of 5).',
     time: '2 hours ago',
     severity: 'warning',
-    read: true
+    read: true,
+    targetModule: 'inventory'
   }
 ];
 

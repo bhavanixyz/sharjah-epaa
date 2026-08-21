@@ -71,7 +71,7 @@ export default function WorkOrderModal() {
             />
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+          <div className="card-grid-2">
             <div>
               <label style={{ fontSize: '0.78rem', fontWeight: 700, color: '#4B5563', marginBottom: '4px', display: 'block' }}>TARGET SITE</label>
               <select 
@@ -95,7 +95,7 @@ export default function WorkOrderModal() {
             </div>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+          <div className="card-grid-2">
             <div>
               <label style={{ fontSize: '0.78rem', fontWeight: 700, color: '#4B5563', marginBottom: '4px', display: 'block' }}>PRIORITY LEVEL</label>
               <select 

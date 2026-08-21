@@ -168,7 +168,7 @@ export default function InventoryProcurement() {
                 <input type="text" required placeholder="e.g. PTFE 47mm Membrane Filters (Pack of 50)" className="input-field" value={name} onChange={(e) => setName(e.target.value)} />
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+              <div className="card-grid-2">
                 <div>
                   <label style={{ fontSize: '0.78rem', fontWeight: 700, color: '#4B5563', marginBottom: '4px', display: 'block' }}>SKU CODE</label>
                   <input type="text" placeholder="e.g. SKU-EPA-9088" className="input-field" value={sku} onChange={(e) => setSku(e.target.value)} />
@@ -184,7 +184,7 @@ export default function InventoryProcurement() {
                 </div>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+              <div className="card-grid-2">
                 <div>
                   <label style={{ fontSize: '0.78rem', fontWeight: 700, color: '#4B5563', marginBottom: '4px', display: 'block' }}>INITIAL QUANTITY</label>
                   <input type="number" className="input-field" value={quantity} onChange={(e) => setQuantity(e.target.value)} />
@@ -195,7 +195,7 @@ export default function InventoryProcurement() {
                 </div>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '10px' }}>
+              <div className="card-grid-3">
                 <div>
                   <label style={{ fontSize: '0.78rem', fontWeight: 700, color: '#4B5563', marginBottom: '4px', display: 'block' }}>UNIT COST</label>
                   <input type="text" className="input-field" value={unitCost} onChange={(e) => setUnitCost(e.target.value)} />

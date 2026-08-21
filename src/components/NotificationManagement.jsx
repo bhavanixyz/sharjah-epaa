@@ -1,14 +1,50 @@
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
-import { Bell, Check } from 'lucide-react';
+import { Bell, Check, ArrowRight } from 'lucide-react';
 
 export default function NotificationManagement() {
-  const { notifications, markNotificationRead } = useApp();
+  const { notifications, markNotificationRead, setActiveModule, setSelectedSite, sites } = useApp();
   const [filterSeverity, setFilterSeverity] = useState('ALL');
 
   const filteredNotifs = filterSeverity === 'ALL' 
     ? notifications 
     : notifications.filter(n => n.severity === filterSeverity);
+
+  const handleNotificationClick = (n) => {
+    markNotificationRead(n.id);
+
+    let targetMod = n.targetModule;
+    let targetSiteId = n.siteId;
+
+    if (!targetMod) {
+      const titleLower = n.title.toLowerCase();
+      const msgLower = n.message.toLowerCase();
+
+      if (titleLower.includes('khor kalba') || msgLower.includes('khor kalba') || titleLower.includes('alarm')) {
+        targetMod = 'gis';
+        targetSiteId = 'site-khor-kalba';
+      } else if (titleLower.includes('work order') || titleLower.includes('wo-')) {
+        targetMod = 'maintenance';
+      } else if (titleLower.includes('stock') || msgLower.includes('stock') || titleLower.includes('inventory')) {
+        targetMod = 'inventory';
+      } else if (titleLower.includes('calibration')) {
+        targetMod = 'calibration';
+      } else if (titleLower.includes('requisition') || titleLower.includes('pr-')) {
+        targetMod = 'procurement';
+      }
+    }
+
+    if (targetSiteId) {
+      const siteObj = sites.find(s => s.id === targetSiteId);
+      if (siteObj) {
+        setSelectedSite(siteObj);
+      }
+    }
+
+    if (targetMod) {
+      setActiveModule(targetMod);
+    }
+  };
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
@@ -49,6 +85,7 @@ export default function NotificationManagement() {
         {filteredNotifs.map((n) => (
           <div 
             key={n.id}
+            onClick={() => handleNotificationClick(n)}
             className="glass-panel glass-panel-hover"
             style={{
               padding: '16px 20px',
@@ -58,7 +95,8 @@ export default function NotificationManagement() {
               flexWrap: 'wrap',
               gap: '12px',
               borderLeft: n.severity === 'critical' ? '4px solid #DC2626' : n.severity === 'warning' ? '4px solid #D97706' : '4px solid #2563EB',
-              background: n.read ? '#FFFFFF' : '#E6F6F2'
+              background: n.read ? '#FFFFFF' : '#E6F6F2',
+              cursor: 'pointer'
             }}
           >
             <div style={{ display: 'flex', alignItems: 'flex-start', gap: '14px', flex: 1, minWidth: 0 }}>
@@ -79,13 +117,21 @@ export default function NotificationManagement() {
                   </span>
                 </div>
                 <p style={{ fontSize: '0.8rem', color: '#6B7280' }}>{n.message}</p>
-                <div style={{ fontSize: '0.72rem', color: '#9CA3AF', marginTop: '6px' }}>{n.time}</div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginTop: '6px' }}>
+                  <span style={{ fontSize: '0.72rem', color: '#9CA3AF' }}>{n.time}</span>
+                  <span style={{ fontSize: '0.72rem', color: '#00A878', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    View target details <ArrowRight size={12} />
+                  </span>
+                </div>
               </div>
             </div>
 
             {!n.read && (
               <button 
-                onClick={() => markNotificationRead(n.id)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  markNotificationRead(n.id);
+                }}
                 className="btn btn-secondary" 
                 style={{ padding: '6px 12px', fontSize: '0.74rem' }}
               >

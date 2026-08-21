@@ -144,7 +144,7 @@ export default function CalibrationManagement() {
                 <input type="text" required placeholder="e.g. Horiba APNA-370 Ambient NOx Analyzer" className="input-field" value={assetName} onChange={(e) => setAssetName(e.target.value)} />
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+              <div className="card-grid-2">
                 <div>
                   <label style={{ fontSize: '0.78rem', fontWeight: 700, color: '#4B5563', marginBottom: '4px', display: 'block' }}>STATION SITE</label>
                   <select className="input-field" value={siteName} onChange={(e) => setSiteName(e.target.value)}>
@@ -165,7 +165,7 @@ export default function CalibrationManagement() {
                 </div>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+              <div className="card-grid-2">
                 <div>
                   <label style={{ fontSize: '0.78rem', fontWeight: 700, color: '#4B5563', marginBottom: '4px', display: 'block' }}>PERFORMED BY</label>
                   <input type="text" className="input-field" value={performedBy} onChange={(e) => setPerformedBy(e.target.value)} />
