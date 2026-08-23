@@ -610,6 +610,11 @@ p, span, div, strong, label {
 }
 
 /* Header Responsive Search Layout */
+.glass-header {
+  position: relative;
+  z-index: 9999 !important;
+}
+
 .header-container {
   display: flex;
   flex-direction: column;

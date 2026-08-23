@@ -31,6 +31,7 @@ export default function TopHeader() {
 
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const searchRef = useRef(null);
+  const notifRef = useRef(null);
 
   const unreadCount = notifications.filter(n => !n.read).length;
 
@@ -211,19 +212,22 @@ export default function TopHeader() {
     setActiveModule(targetMod);
   };
 
-  // Close search dropdown on click outside
+  // Close search and notification dropdowns on click outside
   useEffect(() => {
     function handleClickOutside(event) {
       if (searchRef.current && !searchRef.current.contains(event.target)) {
         setIsSearchOpen(false);
       }
+      if (notifRef.current && !notifRef.current.contains(event.target)) {
+        setIsNotifDrawerOpen(false);
+      }
     }
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+  }, [setIsNotifDrawerOpen]);
 
   return (
-    <header className="glass-header" style={{ padding: '12px 18px' }}>
+    <header className="glass-header" style={{ padding: '12px 18px', position: 'relative', zIndex: 99999 }}>
       <div className="header-container">
         
         {/* Main Header Row */}
@@ -430,7 +434,7 @@ export default function TopHeader() {
             </button>
 
             {/* Notifications Trigger */}
-            <div style={{ position: 'relative' }}>
+            <div ref={notifRef} style={{ position: 'relative' }}>
               <button 
                 onClick={() => setIsNotifDrawerOpen(!isNotifDrawerOpen)}
                 style={{
@@ -477,22 +481,34 @@ export default function TopHeader() {
                   position: 'absolute',
                   top: '50px',
                   right: '0',
-                  width: '340px',
+                  width: '350px',
                   maxWidth: '90vw',
-                  zIndex: 1000,
+                  zIndex: 999999,
                   padding: '16px',
-                  boxShadow: 'var(--shadow-glass-lg)'
+                  background: '#FFFFFF',
+                  borderRadius: '14px',
+                  boxShadow: '0 20px 40px rgba(15, 23, 42, 0.22), 0 4px 16px rgba(0, 0, 0, 0.08)',
+                  border: '1px solid #E2E8F0'
                 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
                     <h4 style={{ fontSize: '0.9rem', fontWeight: 800, color: '#0F172A' }}>Alerts & Notifications</h4>
                     <span style={{ fontSize: '0.72rem', color: '#64748B' }}>{unreadCount} Unread</span>
                   </div>
 
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxHeight: '300px', overflowY: 'auto' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxHeight: '320px', overflowY: 'auto' }}>
                     {notifications.map((n) => (
                       <div 
                         key={n.id}
-                        onClick={() => handleNotificationClick(n)}
+                        onMouseDown={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          handleNotificationClick(n);
+                        }}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          handleNotificationClick(n);
+                        }}
                         style={{
                           padding: '10px 12px',
                           borderRadius: '8px',
