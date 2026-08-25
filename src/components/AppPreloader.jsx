@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import logoNew from '../assets/LOGO.new.png';
+import logoEmblem from '../assets/logo-emblem-transparent.png';
 
 export default function AppPreloader({ onLoaded }) {
   const [fade, setFade] = useState(false);
@@ -42,18 +42,15 @@ export default function AppPreloader({ onLoaded }) {
       >
         <div
           style={{
-            width: '180px',
-            padding: '16px',
-            background: 'rgba(255, 255, 255, 0.95)',
-            borderRadius: '16px',
-            boxShadow: '0 20px 40px rgba(0,0,0,0.4)',
+            width: '140px',
+            height: '140px',
             animation: 'pulseGlow 2s infinite ease-in-out',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center'
           }}
         >
-          <img src={logoNew} alt="Sharjah EPAA Logo" style={{ width: '100%', height: 'auto', display: 'block' }} />
+          <img src={logoEmblem} alt="Sharjah EPAA Logo" style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block' }} />
         </div>
 
         <div style={{ textAlign: 'center' }}>
