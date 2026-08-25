@@ -400,9 +400,15 @@ p, span, div, strong, label {
 .table-responsive {
   width: 100%;
   max-width: 100%;
+  max-height: calc(100vh - 280px);
+  min-height: 380px;
   overflow-x: auto;
+  overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   border-radius: var(--radius-md);
+  position: relative;
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
 }
 
 .epa-table {
@@ -410,6 +416,35 @@ p, span, div, strong, label {
   border-collapse: separate;
   border-spacing: 0;
   background: #FFFFFF;
+}
+
+.epa-table thead {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  background: #F8FAFC;
+}
+
+.epa-table thead tr {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+}
+
+.epa-table thead tr:nth-child(1) th {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  background: #F8FAFC !important;
+  box-shadow: 0 2px 4px rgba(15, 23, 42, 0.05);
+}
+
+.epa-table thead tr:nth-child(2) th {
+  position: sticky;
+  top: 42px;
+  z-index: 29;
+  background: #F8FAFC !important;
+  box-shadow: 0 2px 4px rgba(15, 23, 42, 0.05);
 }
 
 .epa-table th {

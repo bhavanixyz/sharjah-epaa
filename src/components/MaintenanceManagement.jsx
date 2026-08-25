@@ -487,7 +487,7 @@ export default function MaintenanceManagement() {
 
         {/* View Mode 1: Table View (Now with CONTACT PERSON and CALL columns) */}
         {viewMode === 'table' && (
-          <div className="table-responsive" style={{ width: '100%', overflowX: 'auto' }}>
+          <div className="table-responsive">
             <table className="epa-table">
               <thead>
                 <tr>
