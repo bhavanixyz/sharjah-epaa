@@ -1,18 +1,19 @@
 import React, { useEffect, useState } from 'react';
-import logoEmblem from '../assets/logo-emblem-transparent.png';
+import loadingLogo from '../assets/loading-logo.png';
 
-export default function AppPreloader({ onLoaded }) {
+export default function AppPreloader({ isLoading, onComplete, onLoaded }) {
   const [fade, setFade] = useState(false);
 
   useEffect(() => {
     const timer = setTimeout(() => {
       setFade(true);
       setTimeout(() => {
+        if (onComplete) onComplete();
         if (onLoaded) onLoaded();
       }, 500);
     }, 1200);
     return () => clearTimeout(timer);
-  }, [onLoaded]);
+  }, [onComplete, onLoaded]);
 
   return (
     <div
@@ -42,15 +43,19 @@ export default function AppPreloader({ onLoaded }) {
       >
         <div
           style={{
-            width: '140px',
-            height: '140px',
+            width: '520px',
+            maxWidth: '92vw',
+            padding: '28px 40px',
+            background: '#FFFFFF',
+            borderRadius: '24px',
+            boxShadow: '0 25px 50px rgba(0,0,0,0.5)',
             animation: 'pulseGlow 2s infinite ease-in-out',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center'
           }}
         >
-          <img src={logoEmblem} alt="Sharjah EPAA Logo" style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block' }} />
+          <img src={loadingLogo} alt="Sharjah EPAA Government Logo" style={{ width: '100%', height: 'auto', display: 'block' }} />
         </div>
 
         <div style={{ textAlign: 'center' }}>

@@ -32,7 +32,7 @@ import QRCodeDialog from './QRCodeDialog';
 export default function AssetsManagement() {
   const { assets, setIsWoModalOpen, targetSearchResult, isDateInRange, dateFilter, triggerExportSuccess } = useApp();
   const [searchAsset, setSearchAsset] = useState('');
-  const [viewMode, setViewMode] = useState('cards'); // 'table', 'cards', or 'map'
+  const [viewMode, setViewMode] = useState('table'); // 'table', 'cards', or 'map'
   const [sortField, setSortField] = useState('serialNo');
   const [sortDirection, setSortDirection] = useState('asc');
   const [selectedAssetIds, setSelectedAssetIds] = useState([]);

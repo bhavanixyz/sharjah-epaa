@@ -120,8 +120,16 @@ export default function StationsManagement() {
   // Pagination calculations
   const totalRecords = sortedStations.length;
   const totalPages = Math.max(1, Math.ceil(totalRecords / pageSize));
-  const startIndex = (currentPage - 1) * pageSize;
+  const safeCurrentPage = Math.min(currentPage, totalPages);
+  const startIndex = (safeCurrentPage - 1) * pageSize;
+  const endIndex = Math.min(startIndex + pageSize, totalRecords);
   const paginatedStations = sortedStations.slice(startIndex, startIndex + pageSize);
+
+  // Check if all items on current page are selected
+  const isAllPaginatedSelected = useMemo(() => {
+    if (paginatedStations.length === 0) return false;
+    return paginatedStations.every(s => selectedStationIds.includes(s.id));
+  }, [paginatedStations, selectedStationIds]);
 
   // Toggle Single Row Selection
   const handleToggleSelectRow = (id) => {
@@ -129,15 +137,18 @@ export default function StationsManagement() {
       prev.includes(id) ? prev.filter(item => item !== id) : [...prev, id]
     );
   };
+  const toggleSelectRow = handleToggleSelectRow;
 
   // Toggle All Filtered Rows Selection
   const handleToggleSelectAll = () => {
-    if (selectedStationIds.length === paginatedStations.length) {
-      setSelectedStationIds([]);
+    if (isAllPaginatedSelected) {
+      setSelectedStationIds(prev => prev.filter(id => !paginatedStations.some(ps => ps.id === id)));
     } else {
-      setSelectedStationIds(paginatedStations.map(s => s.id));
+      const newIds = new Set([...selectedStationIds, ...paginatedStations.map(s => s.id)]);
+      setSelectedStationIds(Array.from(newIds));
     }
   };
+  const toggleSelectAll = handleToggleSelectAll;
 
   // Column Sort Toggle Helper
   const handleSort = (field) => {
@@ -147,6 +158,11 @@ export default function StationsManagement() {
       setSortField(field);
       setSortDirection('asc');
     }
+  };
+
+  const renderSortIcon = (field) => {
+    if (sortField !== field) return <ArrowUpDown size={12} style={{ color: '#94A3B8', opacity: 0.6 }} />;
+    return sortDirection === 'asc' ? <ArrowUp size={13} style={{ color: '#00A878' }} /> : <ArrowDown size={13} style={{ color: '#00A878' }} />;
   };
 
   // Export handler (CSV / PDF)

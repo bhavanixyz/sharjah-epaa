@@ -37,15 +37,15 @@ import { useApp } from '../context/AppContext';
 
 export default function KpiDetailModal({ kpiData, modalData, onClose, onApplyFilter }) {
   const { triggerExportSuccess } = useApp();
-  const data = kpiData || modalData;
-  if (!data) return null;
-
-  const { title, value, category, breakdown = [], trendHistory = [], color = '#00A878' } = data;
-
   const [dateRange, setDateRange] = useState('30D'); // '7D', '15D', '30D', 'CUSTOM'
   const [chartView, setChartView] = useState('area'); // 'area', 'bar', 'donut'
   const [searchQuery, setSearchQuery] = useState('');
   const [isRefreshing, setIsRefreshing] = useState(false);
+
+  const data = kpiData || modalData;
+  if (!data) return null;
+
+  const { title = 'KPI Details', value = '', category = '', breakdown = [], trendHistory = [], color = '#00A878' } = data;
 
   // Default Chart History if not supplied
   const historyData = trendHistory.length > 0 ? trendHistory : defaultHistory;
@@ -53,7 +53,7 @@ export default function KpiDetailModal({ kpiData, modalData, onClose, onApplyFil
 
   // Filter breakdown items
   const filteredBreakdown = breakdownItems.filter(item => 
-    item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    (item.name && item.name.toLowerCase().includes(searchQuery.toLowerCase())) ||
     (item.value && item.value.toLowerCase().includes(searchQuery.toLowerCase())) ||
     (item.status && item.status.toLowerCase().includes(searchQuery.toLowerCase()))
   );
@@ -64,6 +64,7 @@ export default function KpiDetailModal({ kpiData, modalData, onClose, onApplyFil
       setIsRefreshing(false);
     }, 600);
   };
+  const handleRefreshData = handleRefresh;
 
   const handleExportFormat = (format) => {
     const fileName = `${title.replace(/\s+/g, '_')}_KPI_Analysis.${format.toLowerCase()}`;

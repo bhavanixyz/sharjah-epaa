@@ -24,8 +24,8 @@ export function AppProvider({ children }) {
   const [activeTab, setActiveTab] = useState('Executive Dashboard');
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Global Date Filter State (Default: TODAY)
-  const [dateFilter, setDateFilter] = useState('TODAY');
+  // Global Date Filter State (Default: ALL)
+  const [dateFilter, setDateFilter] = useState('ALL');
   const [startDate, setStartDate] = useState('2026-08-25');
   const [endDate, setEndDate] = useState('2026-08-25');
   

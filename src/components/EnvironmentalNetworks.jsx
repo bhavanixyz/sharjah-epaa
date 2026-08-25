@@ -20,7 +20,7 @@ export default function EnvironmentalNetworks() {
   const [activeKpi, setActiveKpi] = useState(null);
 
   // Category View Options & Pagination State
-  const [viewMode, setViewMode] = useState('tree'); // 'tree' | 'table' | 'map'
+  const [viewMode, setViewMode] = useState('table'); // 'tree' | 'table' | 'map'
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
 

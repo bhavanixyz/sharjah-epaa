@@ -31,8 +31,8 @@ export const NETWORKS_DATA = [
     healthScore: 91,
     icon: 'Waves',
     color: '#06b6d4',
-    date: '2026-08-24',
-    lastAuditDate: '2026-08-24'
+    date: '2026-08-25',
+    lastAuditDate: '2026-08-25'
   },
   {
     id: 'net-gapn',
@@ -46,8 +46,8 @@ export const NETWORKS_DATA = [
     healthScore: 84,
     icon: 'Droplets',
     color: '#10b981',
-    date: '2026-08-21',
-    lastAuditDate: '2026-08-21'
+    date: '2026-08-25',
+    lastAuditDate: '2026-08-25'
   },
   {
     id: 'net-anmn',
@@ -61,8 +61,8 @@ export const NETWORKS_DATA = [
     healthScore: 98,
     icon: 'Volume2',
     color: '#8b5cf6',
-    date: '2026-08-16',
-    lastAuditDate: '2026-08-16'
+    date: '2026-08-25',
+    lastAuditDate: '2026-08-25'
   },
   {
     id: 'net-splen',
@@ -76,8 +76,8 @@ export const NETWORKS_DATA = [
     healthScore: 94,
     icon: 'Trees',
     color: '#f59e0b',
-    date: '2026-08-12',
-    lastAuditDate: '2026-08-12'
+    date: '2026-08-25',
+    lastAuditDate: '2026-08-25'
   },
   {
     id: 'net-indmn',
@@ -91,8 +91,8 @@ export const NETWORKS_DATA = [
     healthScore: 78,
     icon: 'Activity',
     color: '#ef4444',
-    date: '2026-08-05',
-    lastAuditDate: '2026-08-05'
+    date: '2026-08-25',
+    lastAuditDate: '2026-08-25'
   },
   {
     id: 'net-ocnmn',
@@ -106,8 +106,53 @@ export const NETWORKS_DATA = [
     healthScore: 82,
     icon: 'Waves',
     color: '#0284c7',
-    date: '2026-07-28',
-    lastAuditDate: '2026-07-28'
+    date: '2026-08-25',
+    lastAuditDate: '2026-08-25'
+  },
+  {
+    id: 'net-soil-01',
+    code: 'SEMN',
+    name: 'Agricultural Soil Salinity & Erosion Monitoring',
+    type: 'Soil & Terrestrial',
+    location: 'Central Agricultural Zone',
+    status: 'Operational',
+    totalStations: 6,
+    activeAssets: 18,
+    healthScore: 92,
+    icon: 'Layers',
+    color: '#d97706',
+    date: '2026-08-25',
+    lastAuditDate: '2026-08-25'
+  },
+  {
+    id: 'net-rad-01',
+    code: 'ERMN',
+    name: 'Environmental Gamma Radiation Network',
+    type: 'Radiation Monitoring',
+    location: 'Sharjah Territory & Borders',
+    status: 'Operational',
+    totalStations: 4,
+    activeAssets: 12,
+    healthScore: 99,
+    icon: 'Shield',
+    color: '#6366f1',
+    date: '2026-08-25',
+    lastAuditDate: '2026-08-25'
+  },
+  {
+    id: 'net-bio-01',
+    code: 'BRTN',
+    name: 'Protected Reserves & Biosphere Telemetry Network',
+    type: 'Biodiversity Telemetry',
+    location: 'Mleiha & Wasit Protected Sanctuaries',
+    status: 'Operational',
+    totalStations: 7,
+    activeAssets: 28,
+    healthScore: 95,
+    icon: 'Trees',
+    color: '#059669',
+    date: '2026-08-25',
+    lastAuditDate: '2026-08-25'
   }
 ];
 
@@ -143,8 +188,8 @@ export const SITES_DATA = [
     protectedStatus: 'Ramsar Wetland Site',
     stationsCount: 2,
     assetsCount: 8,
-    lastMaintenance: '2026-08-24',
-    date: '2026-08-24',
+    lastMaintenance: '2026-08-25',
+    date: '2026-08-25',
     assignedEngineer: 'Fatima Al-Zahra',
     openTickets: 0
   },
@@ -161,8 +206,8 @@ export const SITES_DATA = [
     protectedStatus: 'Strict Nature Reserve',
     stationsCount: 2,
     assetsCount: 7,
-    lastMaintenance: '2026-08-21',
-    date: '2026-08-21',
+    lastMaintenance: '2026-08-25',
+    date: '2026-08-25',
     assignedEngineer: 'Rashid Al-Kaitoob',
     openTickets: 2
   },
@@ -179,8 +224,8 @@ export const SITES_DATA = [
     protectedStatus: 'Aquifer Conservation Area',
     stationsCount: 2,
     assetsCount: 6,
-    lastMaintenance: '2026-08-16',
-    date: '2026-08-16',
+    lastMaintenance: '2026-08-25',
+    date: '2026-08-25',
     assignedEngineer: 'Aisha Al-Husseini',
     openTickets: 0
   },
@@ -197,8 +242,8 @@ export const SITES_DATA = [
     protectedStatus: 'Environmental Emission Buffer',
     stationsCount: 2,
     assetsCount: 9,
-    lastMaintenance: '2026-08-11',
-    date: '2026-08-11',
+    lastMaintenance: '2026-08-25',
+    date: '2026-08-25',
     assignedEngineer: 'Mohammed Al-Shehhi',
     openTickets: 2
   },
@@ -215,8 +260,8 @@ export const SITES_DATA = [
     protectedStatus: 'Industrial Marine Buffer',
     stationsCount: 2,
     assetsCount: 6,
-    lastMaintenance: '2026-08-05',
-    date: '2026-08-05',
+    lastMaintenance: '2026-08-25',
+    date: '2026-08-25',
     assignedEngineer: 'Saeed Al-Mutawa',
     openTickets: 1
   },
@@ -233,8 +278,8 @@ export const SITES_DATA = [
     protectedStatus: 'UNESCO Heritage & Desert Reserve',
     stationsCount: 1,
     assetsCount: 4,
-    lastMaintenance: '2026-07-28',
-    date: '2026-07-28',
+    lastMaintenance: '2026-08-25',
+    date: '2026-08-25',
     assignedEngineer: 'Omar Al-Qasimi',
     openTickets: 0
   },
@@ -251,10 +296,82 @@ export const SITES_DATA = [
     protectedStatus: 'Protected Marine Island',
     stationsCount: 1,
     assetsCount: 5,
-    lastMaintenance: '2026-06-18',
-    date: '2026-06-18',
+    lastMaintenance: '2026-08-25',
+    date: '2026-08-25',
     assignedEngineer: 'Khalid Al-Nuaimi',
     openTickets: 3
+  },
+  {
+    id: 'site-sajaa',
+    networkId: 'net-indmn',
+    networkName: 'Industrial Emissions & Buffer Zone Network',
+    name: 'Sajaa Industrial Buffer Zone',
+    code: 'SEPA-SITE-009',
+    zone: 'Sajaa Industrial Area',
+    lat: 25.2980,
+    lng: 55.6120,
+    status: 'Normal',
+    protectedStatus: 'Industrial Buffer Reserve',
+    stationsCount: 2,
+    assetsCount: 7,
+    lastMaintenance: '2026-08-25',
+    date: '2026-08-25',
+    assignedEngineer: 'Mohammed Al-Shehhi',
+    openTickets: 1
+  },
+  {
+    id: 'site-mleiha-south',
+    networkId: 'net-splen',
+    networkName: 'Soil & Protected Land Ecosystem Network',
+    name: 'Fossil Rock Geological Sanctuary',
+    code: 'SEPA-SITE-010',
+    zone: 'Mleiha Desert Zone',
+    lat: 25.1410,
+    lng: 55.8320,
+    status: 'Normal',
+    protectedStatus: 'Geological Protected Site',
+    stationsCount: 1,
+    assetsCount: 4,
+    lastMaintenance: '2026-08-25',
+    date: '2026-08-25',
+    assignedEngineer: 'Omar Al-Qasimi',
+    openTickets: 0
+  },
+  {
+    id: 'site-khor-east',
+    networkId: 'net-ocnmn',
+    networkName: 'Eastern Gulf Offshore Oceanographic Network',
+    name: 'Dibba Al-Hisn Coastal Observatory',
+    code: 'SEPA-SITE-011',
+    zone: 'East Coast Offshore Region',
+    lat: 25.6190,
+    lng: 56.2750,
+    status: 'Normal',
+    protectedStatus: 'Coastal Buffer Zone',
+    stationsCount: 2,
+    assetsCount: 5,
+    lastMaintenance: '2026-08-25',
+    date: '2026-08-25',
+    assignedEngineer: 'Rashid Al-Kaitoob',
+    openTickets: 0
+  },
+  {
+    id: 'site-kalba-lagoon',
+    networkId: 'net-mcwmn',
+    networkName: 'Marine & Coastal Water Quality Network',
+    name: 'Kalba Creek & Tidal Lagoon Station',
+    code: 'SEPA-SITE-012',
+    zone: 'Kalba Tidal Estuary',
+    lat: 25.0340,
+    lng: 56.3520,
+    status: 'Warning',
+    protectedStatus: 'Estuarine Sanctuary',
+    stationsCount: 1,
+    assetsCount: 6,
+    lastMaintenance: '2026-08-25',
+    date: '2026-08-25',
+    assignedEngineer: 'Rashid Al-Kaitoob',
+    openTickets: 1
   }
 ];
 
@@ -295,8 +412,8 @@ export const STATIONS_DATA = [
     o3: '18.5 ppb',
     temp: '33.0 °C',
     humidity: '52%',
-    date: '2026-08-24',
-    lastInspectionDate: '2026-08-24',
+    date: '2026-08-25',
+    lastInspectionDate: '2026-08-25',
     assignedEngineer: 'Fatima Al-Zahra'
   },
   {
@@ -314,8 +431,8 @@ export const STATIONS_DATA = [
     ph: '8.15',
     temp: '29.8 °C',
     humidity: '64%',
-    date: '2026-08-21',
-    lastInspectionDate: '2026-08-21',
+    date: '2026-08-25',
+    lastInspectionDate: '2026-08-25',
     assignedEngineer: 'Rashid Al-Kaitoob'
   },
   {
@@ -332,8 +449,8 @@ export const STATIONS_DATA = [
     ecConductivity: '1,840 µS/cm',
     temp: '35.2 °C',
     humidity: '40%',
-    date: '2026-08-16',
-    lastInspectionDate: '2026-08-16',
+    date: '2026-08-25',
+    lastInspectionDate: '2026-08-25',
     assignedEngineer: 'Aisha Al-Husseini'
   },
   {
@@ -351,9 +468,144 @@ export const STATIONS_DATA = [
     ph: '7.95',
     temp: '32.1 °C',
     humidity: '72%',
-    date: '2026-07-28',
-    lastInspectionDate: '2026-07-28',
+    date: '2026-08-25',
+    lastInspectionDate: '2026-08-25',
     assignedEngineer: 'Khalid Al-Nuaimi'
+  },
+  {
+    id: 'stn-006',
+    code: 'STN-AQ-03',
+    name: 'Al Hamriyah Industrial Air Monitoring Station',
+    siteId: 'site-al-hamriyah',
+    siteName: 'Al Hamriyah Coastal Buffer Site',
+    type: 'Fixed Air Monitoring Shelter',
+    powerSource: 'Grid Power with Battery Backup',
+    telemetry: '4G LTE Gateway',
+    status: 'Active',
+    aqi: 54,
+    pm25: '18.6 µg/m³',
+    no2: '24.8 ppb',
+    o3: '31.0 ppb',
+    temp: '34.2 °C',
+    humidity: '61%',
+    date: '2026-08-25',
+    lastInspectionDate: '2026-08-25',
+    assignedEngineer: 'Mohammed Al-Shehhi'
+  },
+  {
+    id: 'stn-007',
+    code: 'STN-MR-03',
+    name: 'Khorfakkan Port Marine Telemetry Post',
+    siteId: 'site-khorfakkan',
+    siteName: 'Khorfakkan Port & Coastal Zone',
+    type: 'Coastal Pier Station',
+    powerSource: 'Solar PV Array',
+    telemetry: '4G LTE Industrial Gateway',
+    status: 'Active',
+    salinity: '37.8 PSU',
+    dissolvedOxygen: '7.1 mg/L',
+    ph: '8.20',
+    temp: '28.5 °C',
+    humidity: '68%',
+    date: '2026-08-25',
+    lastInspectionDate: '2026-08-25',
+    assignedEngineer: 'Saeed Al-Mutawa'
+  },
+  {
+    id: 'stn-008',
+    code: 'STN-IND-01',
+    name: 'Sajaa Industrial Emissions Vault',
+    siteId: 'site-sajaa',
+    siteName: 'Sajaa Industrial Buffer Zone',
+    type: 'Fixed Enclosure Station',
+    powerSource: 'Grid Power & UPS',
+    telemetry: 'Fiber-Optic & 4G Failover',
+    status: 'Active',
+    aqi: 68,
+    pm25: '24.1 µg/m³',
+    no2: '32.5 ppb',
+    o3: '14.2 ppb',
+    temp: '36.0 °C',
+    humidity: '45%',
+    date: '2026-08-25',
+    lastInspectionDate: '2026-08-25',
+    assignedEngineer: 'Mohammed Al-Shehhi'
+  },
+  {
+    id: 'stn-009',
+    code: 'STN-SOIL-01',
+    name: 'Mleiha Desert Microclimate Observatory',
+    siteId: 'site-mleiha',
+    siteName: 'Mleiha Archaeological Biosphere',
+    type: 'Compact Solar Field Post',
+    powerSource: '100% Off-Grid Solar PV',
+    telemetry: 'Satellite NB-IoT',
+    status: 'Active',
+    aqi: 32,
+    pm25: '9.8 µg/m³',
+    no2: '6.2 ppb',
+    o3: '22.0 ppb',
+    temp: '38.5 °C',
+    humidity: '32%',
+    date: '2026-08-25',
+    lastInspectionDate: '2026-08-25',
+    assignedEngineer: 'Omar Al-Qasimi'
+  },
+  {
+    id: 'stn-010',
+    code: 'STN-AQ-04',
+    name: 'University City Ambient AQ Post',
+    siteId: 'site-al-majaz',
+    siteName: 'Al Majaz Waterfront Site',
+    type: 'Fixed Post Station',
+    powerSource: 'Dual Grid & Solar Hybrid',
+    telemetry: '4G LTE Industrial Gateway',
+    status: 'Active',
+    aqi: 35,
+    pm25: '10.2 µg/m³',
+    no2: '14.5 ppb',
+    o3: '20.8 ppb',
+    temp: '32.0 °C',
+    humidity: '55%',
+    date: '2026-08-25',
+    lastInspectionDate: '2026-08-25',
+    assignedEngineer: 'Tariq Al-Mansoori'
+  },
+  {
+    id: 'stn-011',
+    code: 'STN-MR-04',
+    name: 'Kalba Creek Hydro-Acoustic Station',
+    siteId: 'site-kalba-lagoon',
+    siteName: 'Kalba Creek & Tidal Lagoon Station',
+    type: 'Submersible Estuary Vault',
+    powerSource: 'Solar PV & Li-Fe Batteries',
+    telemetry: 'NB-IoT Wireless Stream',
+    status: 'Active',
+    salinity: '36.5 PSU',
+    dissolvedOxygen: '6.8 mg/L',
+    ph: '8.10',
+    temp: '30.1 °C',
+    humidity: '65%',
+    date: '2026-08-25',
+    lastInspectionDate: '2026-08-25',
+    assignedEngineer: 'Rashid Al-Kaitoob'
+  },
+  {
+    id: 'stn-012',
+    code: 'STN-RAD-01',
+    name: 'Border Gamma Radiation Sentinel Post',
+    siteId: 'site-khor-east',
+    siteName: 'Dibba Al-Hisn Coastal Observatory',
+    type: 'Ruggedized Weatherproof Post',
+    powerSource: 'Solar & Emergency Fuel Cell',
+    telemetry: 'Encrypted Satellite Stream',
+    status: 'Active',
+    radiationLevel: '0.12 µSv/h',
+    temp: '31.0 °C',
+    humidity: '59%',
+    date: '2026-08-25',
+    lastInspectionDate: '2026-08-25',
+    assignedEngineer: 'Rashid Al-Kaitoob'
   }
 ];
 
@@ -370,10 +622,11 @@ export const ASSETS_DATA = [
     status: 'Active',
     healthScore: 94,
     installDate: '2022-03-15',
-    lastCalibrated: '2026-07-10',
-    nextCalibration: '2026-10-10',
+    lastCalibrated: '2026-08-25',
+    nextCalibration: '2026-11-25',
     warrantyStatus: 'Valid until 2027-03-15',
-    componentsCount: 4
+    componentsCount: 4,
+    date: '2026-08-25'
   },
   {
     id: 'ast-002',
@@ -387,10 +640,11 @@ export const ASSETS_DATA = [
     status: 'Active',
     healthScore: 98,
     installDate: '2023-01-20',
-    lastCalibrated: '2026-08-01',
-    nextCalibration: '2026-11-01',
+    lastCalibrated: '2026-08-25',
+    nextCalibration: '2026-11-25',
     warrantyStatus: 'Valid until 2026-12-31',
-    componentsCount: 3
+    componentsCount: 3,
+    date: '2026-08-25'
   },
   {
     id: 'ast-003',
@@ -404,10 +658,11 @@ export const ASSETS_DATA = [
     status: 'Degraded',
     healthScore: 68,
     installDate: '2021-09-10',
-    lastCalibrated: '2026-05-15',
-    nextCalibration: '2026-08-15 (OVERDUE)',
+    lastCalibrated: '2026-08-25',
+    nextCalibration: '2026-11-25',
     warrantyStatus: 'Expired (AMC Active)',
-    componentsCount: 7
+    componentsCount: 7,
+    date: '2026-08-25'
   },
   {
     id: 'ast-004',
@@ -421,10 +676,11 @@ export const ASSETS_DATA = [
     status: 'Under Maintenance',
     healthScore: 52,
     installDate: '2020-11-05',
-    lastCalibrated: '2026-04-10',
-    nextCalibration: '2026-10-10',
+    lastCalibrated: '2026-08-25',
+    nextCalibration: '2026-11-25',
     warrantyStatus: 'Under AMC Service',
-    componentsCount: 5
+    componentsCount: 5,
+    date: '2026-08-25'
   },
   {
     id: 'ast-005',
@@ -438,10 +694,11 @@ export const ASSETS_DATA = [
     status: 'Active',
     healthScore: 92,
     installDate: '2023-05-18',
-    lastCalibrated: '2026-06-22',
-    nextCalibration: '2026-12-22',
+    lastCalibrated: '2026-08-25',
+    nextCalibration: '2026-11-25',
     warrantyStatus: 'Valid until 2026-11-30',
-    componentsCount: 2
+    componentsCount: 2,
+    date: '2026-08-25'
   },
   {
     id: 'ast-006',
@@ -455,10 +712,119 @@ export const ASSETS_DATA = [
     status: 'Active',
     healthScore: 88,
     installDate: '2022-08-01',
-    lastCalibrated: '2026-07-28',
-    nextCalibration: '2026-10-28',
+    lastCalibrated: '2026-08-25',
+    nextCalibration: '2026-11-25',
     warrantyStatus: 'Valid until 2027-08-01',
-    componentsCount: 4
+    componentsCount: 4,
+    date: '2026-08-25'
+  },
+  {
+    id: 'ast-007',
+    serialNo: 'TSC-TE5170-4491',
+    name: 'Tisch High Volume PM10 Air Sampler',
+    category: 'Particulate Monitor',
+    siteId: 'site-sajaa',
+    siteName: 'Sajaa Industrial Buffer Zone',
+    manufacturer: 'Tisch Environmental',
+    model: 'TE-5170 Volumetric Flow',
+    status: 'Active',
+    healthScore: 95,
+    installDate: '2023-04-12',
+    lastCalibrated: '2026-08-25',
+    nextCalibration: '2026-11-25',
+    warrantyStatus: 'Valid until 2027-04-12',
+    componentsCount: 3,
+    date: '2026-08-25'
+  },
+  {
+    id: 'ast-008',
+    serialNo: 'HRB-APNA370-1120',
+    name: 'Horiba APNA-370 Ambient NO2 Monitor',
+    category: 'Gas Analyzer',
+    siteId: 'site-al-majaz',
+    siteName: 'Al Majaz Waterfront Site',
+    manufacturer: 'Horiba Instruments',
+    model: 'APNA-370 Cross-Flow Modulated',
+    status: 'Active',
+    healthScore: 91,
+    installDate: '2022-10-05',
+    lastCalibrated: '2026-08-25',
+    nextCalibration: '2026-11-25',
+    warrantyStatus: 'Valid until 2026-10-05',
+    componentsCount: 4,
+    date: '2026-08-25'
+  },
+  {
+    id: 'ast-009',
+    serialNo: 'VAI-WXT536-8831',
+    name: 'Vaisala Microclimate Beacon WXT536',
+    category: 'Meteorological Sensor',
+    siteId: 'site-mleiha',
+    siteName: 'Mleiha Archaeological Biosphere',
+    manufacturer: 'Vaisala',
+    model: 'WXT536 Ultrasonic Wind & Rain',
+    status: 'Active',
+    healthScore: 96,
+    installDate: '2023-09-01',
+    lastCalibrated: '2026-08-25',
+    nextCalibration: '2026-11-25',
+    warrantyStatus: 'Valid until 2026-09-01',
+    componentsCount: 2,
+    date: '2026-08-25'
+  },
+  {
+    id: 'ast-010',
+    serialNo: 'AE-AQM65-6621',
+    name: 'Aeroqual AQM 65 Compact Air Quality Post',
+    category: 'Air Quality Post',
+    siteId: 'site-khorfakkan',
+    siteName: 'Khorfakkan Port & Coastal Zone',
+    manufacturer: 'Aeroqual',
+    model: 'AQM 65 Micro-Station',
+    status: 'Active',
+    healthScore: 89,
+    installDate: '2022-11-20',
+    lastCalibrated: '2026-08-25',
+    nextCalibration: '2026-11-25',
+    warrantyStatus: 'Valid until 2026-11-20',
+    componentsCount: 5,
+    date: '2026-08-25'
+  },
+  {
+    id: 'ast-011',
+    serialNo: 'OTT-RLS-3301',
+    name: 'OTT RLS Radar Water Level Transducer',
+    category: 'Hydrological Sensor',
+    siteId: 'site-al-dhaid',
+    siteName: 'Al Dhaid Hydrological Basin',
+    manufacturer: 'OTT HydroMet',
+    model: 'RLS 24GHz Pulse Radar',
+    status: 'Active',
+    healthScore: 97,
+    installDate: '2023-02-14',
+    lastCalibrated: '2026-08-25',
+    nextCalibration: '2026-11-25',
+    warrantyStatus: 'Valid until 2027-02-14',
+    componentsCount: 2,
+    date: '2026-08-25'
+  },
+  {
+    id: 'ast-012',
+    serialNo: 'HACH-SC200-9921',
+    name: 'Hach SC200 Multi-Parameter Water Controller',
+    category: 'Water Controller',
+    siteId: 'site-kalba-lagoon',
+    siteName: 'Kalba Creek & Tidal Lagoon Station',
+    manufacturer: 'Hach Company',
+    model: 'SC200 Universal Digital',
+    status: 'Active',
+    healthScore: 93,
+    installDate: '2022-06-18',
+    lastCalibrated: '2026-08-25',
+    nextCalibration: '2026-11-25',
+    warrantyStatus: 'Valid until 2026-06-18',
+    componentsCount: 3,
+    date: '2026-08-25'
   }
 ];
 
@@ -475,6 +841,7 @@ export const WORK_ORDERS_DATA = [
     contactPhone: '+971 50 492 8812',
     createdDate: '2026-08-25',
     dueDate: '2026-08-25',
+    date: '2026-08-25',
     type: 'Corrective Maintenance',
     slaTimeRemaining: '4 Hours (Today Urgent)',
     description: 'High NOx spike anomaly detected during morning cycle. Replace sampling pump diaphragm immediately.'
@@ -491,6 +858,7 @@ export const WORK_ORDERS_DATA = [
     contactPhone: '+971 50 882 1104',
     createdDate: '2026-08-25',
     dueDate: '2026-08-26',
+    date: '2026-08-25',
     type: 'Routine Inspection',
     slaTimeRemaining: '18 Hours',
     description: 'Verify 24V solar battery output and telemetry logger connectivity to Sharjah central cloud.'
@@ -505,8 +873,9 @@ export const WORK_ORDERS_DATA = [
     assignedTo: 'Rashid Al-Kaitoob',
     contactPerson: 'Eng. Rashid Al-Kaitoob',
     contactPhone: '+971 50 318 4490',
-    createdDate: '2026-08-24',
+    createdDate: '2026-08-25',
     dueDate: '2026-08-27',
+    date: '2026-08-25',
     type: 'Preventive Maintenance',
     slaTimeRemaining: '28 Hours',
     description: 'Clean dissolved oxygen optical wiper and calibrate salinity sensor against certified standard.'
@@ -521,8 +890,9 @@ export const WORK_ORDERS_DATA = [
     assignedTo: 'Khalid Al-Nuaimi',
     contactPerson: 'Eng. Khalid Al-Nuaimi',
     contactPhone: '+971 55 621 0938',
-    createdDate: '2026-08-22',
-    dueDate: '2026-08-25',
+    createdDate: '2026-08-25',
+    dueDate: '2026-08-28',
+    date: '2026-08-25',
     type: 'Firmware & Software',
     slaTimeRemaining: '82 Hours',
     description: 'Update 4G IoT Gateway firmware to v4.2.1 to enable encrypted MQTT telemetry stream to EPA Cloud.'
@@ -537,8 +907,9 @@ export const WORK_ORDERS_DATA = [
     assignedTo: 'Rashid Al-Kaitoob',
     contactPerson: 'Eng. Rashid Al-Kaitoob',
     contactPhone: '+971 50 318 4490',
-    createdDate: '2026-08-20',
-    dueDate: '2026-08-22',
+    createdDate: '2026-08-25',
+    dueDate: '2026-08-27',
+    date: '2026-08-25',
     type: 'Corrective Maintenance',
     slaTimeRemaining: 'Completed on Time',
     description: 'Dissolved oxygen reading anomaly detected. Clean bio-fouling guard and replace glass electrode.'
@@ -553,8 +924,9 @@ export const WORK_ORDERS_DATA = [
     assignedTo: 'Tariq Al-Mansoori',
     contactPerson: 'Eng. Tariq Al-Mansoori',
     contactPhone: '+971 50 492 8812',
-    createdDate: '2026-08-18',
-    dueDate: '2026-08-23',
+    createdDate: '2026-08-25',
+    dueDate: '2026-08-28',
+    date: '2026-08-25',
     type: 'Preventive Maintenance',
     slaTimeRemaining: '38 Hours',
     description: 'Perform standard zero gas and 100ppm NOx span drift check according to EPA SOP-AQ-04.'
@@ -569,8 +941,9 @@ export const WORK_ORDERS_DATA = [
     assignedTo: 'Mohammed Al-Shehhi',
     contactPerson: 'Eng. Mohammed Al-Shehhi',
     contactPhone: '+971 50 743 5521',
-    createdDate: '2026-08-14',
-    dueDate: '2026-08-28',
+    createdDate: '2026-08-25',
+    dueDate: '2026-08-30',
+    date: '2026-08-25',
     type: 'Routine Inspection',
     slaTimeRemaining: '140 Hours',
     description: 'Verify mass flow controller accuracy using certified bubble flowmeter standard.'
@@ -585,8 +958,9 @@ export const WORK_ORDERS_DATA = [
     assignedTo: 'Fatima Al-Zahra',
     contactPerson: 'Eng. Fatima Al-Zahra',
     contactPhone: '+971 50 882 1104',
-    createdDate: '2026-08-08',
-    dueDate: '2026-08-14',
+    createdDate: '2026-08-25',
+    dueDate: '2026-08-27',
+    date: '2026-08-25',
     type: 'Inspection',
     slaTimeRemaining: 'Completed on Time',
     description: 'Checked 400W solar panel voltage output, cleaned dust, and tested 24V gel battery discharge rate.'
@@ -594,15 +968,16 @@ export const WORK_ORDERS_DATA = [
   {
     id: 'WO-2026-062',
     title: 'Monthly Multi-Gas Bench Diagnostic & Flowmeter Audit',
-    siteName: 'University City Academic Air Station',
+    siteName: 'Al Majaz Waterfront Site',
     assetName: 'Thermo Fisher 42i NOx Analyzer',
     priority: 'Medium',
     status: 'Completed',
     assignedTo: 'Tariq Al-Mansoori',
     contactPerson: 'Eng. Tariq Al-Mansoori',
     contactPhone: '+971 50 492 8812',
-    createdDate: '2026-08-02',
-    dueDate: '2026-08-06',
+    createdDate: '2026-08-25',
+    dueDate: '2026-08-27',
+    date: '2026-08-25',
     type: 'Preventive Maintenance',
     slaTimeRemaining: 'Completed on Time',
     description: 'Bench audit performed according to EPA Quality Assurance guidelines.'
@@ -610,18 +985,87 @@ export const WORK_ORDERS_DATA = [
   {
     id: 'WO-2026-045',
     title: 'Quarterly Met Sensor Barometric Pressure Recalibration',
-    siteName: 'Al Dhaid Agricultural Research Station',
-    assetName: 'Vaisala WXT536 Weather Transmitter',
+    siteName: 'Al Dhaid Hydrological Basin',
+    assetName: 'Vaisala Weather Transmitter WXT530',
     priority: 'Low',
     status: 'Completed',
     assignedTo: 'Hassan Al-Zahabi',
     contactPerson: 'Eng. Hassan Al-Zahabi',
     contactPhone: '+971 50 771 9021',
-    createdDate: '2026-07-22',
-    dueDate: '2026-07-28',
+    createdDate: '2026-08-25',
+    dueDate: '2026-08-28',
+    date: '2026-08-25',
     type: 'Calibration',
     slaTimeRemaining: 'Completed on Time',
     description: 'Field verification against digital reference barometer.'
+  },
+  {
+    id: 'WO-2026-103',
+    title: 'Emergency PM10 High-Volume Sampler Filter Swap',
+    siteName: 'Sajaa Industrial Buffer Zone',
+    assetName: 'Tisch High Volume PM10 Air Sampler',
+    priority: 'Critical',
+    status: 'Open',
+    assignedTo: 'Mohammed Al-Shehhi',
+    contactPerson: 'Eng. Mohammed Al-Shehhi',
+    contactPhone: '+971 50 743 5521',
+    createdDate: '2026-08-25',
+    dueDate: '2026-08-25',
+    date: '2026-08-25',
+    type: 'Corrective Maintenance',
+    slaTimeRemaining: '6 Hours (Today Urgent)',
+    description: 'High particulate loading alert triggered during industrial dust event. Replace filter cassette.'
+  },
+  {
+    id: 'WO-2026-104',
+    title: 'Radar Water Level Transducer Recalibration',
+    siteName: 'Al Dhaid Hydrological Basin',
+    assetName: 'OTT RLS Radar Water Level Transducer',
+    priority: 'Medium',
+    status: 'In Progress',
+    assignedTo: 'Aisha Al-Husseini',
+    contactPerson: 'Eng. Aisha Al-Husseini',
+    contactPhone: '+971 50 994 2210',
+    createdDate: '2026-08-25',
+    dueDate: '2026-08-27',
+    date: '2026-08-25',
+    type: 'Preventive Maintenance',
+    slaTimeRemaining: '22 Hours',
+    description: 'Perform laser distance reference check to verify borehole static water level precision.'
+  },
+  {
+    id: 'WO-2026-105',
+    title: 'Ozone Analyzer Sample Cell Cleaning & Leak Check',
+    siteName: 'Al Hamriyah Coastal Buffer Site',
+    assetName: 'Teledyne API T400 Photometric Ozone Analyzer',
+    priority: 'High',
+    status: 'Open',
+    assignedTo: 'Mohammed Al-Shehhi',
+    contactPerson: 'Eng. Mohammed Al-Shehhi',
+    contactPhone: '+971 50 743 5521',
+    createdDate: '2026-08-25',
+    dueDate: '2026-08-27',
+    date: '2026-08-25',
+    type: 'Preventive Maintenance',
+    slaTimeRemaining: '34 Hours',
+    description: 'Clean quartz optical window and test vacuum manifold for zero air leak.'
+  },
+  {
+    id: 'WO-2026-106',
+    title: 'Off-Grid Solar PV Array Dust Cleaning & Voltage Audit',
+    siteName: 'Mleiha Archaeological Biosphere',
+    assetName: 'Vaisala Microclimate Beacon WXT536',
+    priority: 'Low',
+    status: 'Completed',
+    assignedTo: 'Omar Al-Qasimi',
+    contactPerson: 'Eng. Omar Al-Qasimi',
+    contactPhone: '+971 50 551 0922',
+    createdDate: '2026-08-25',
+    dueDate: '2026-08-27',
+    date: '2026-08-25',
+    type: 'Routine Inspection',
+    slaTimeRemaining: 'Completed on Time',
+    description: 'Cleaned solar panels, verified 14.2V float charge rate, and inspected mounting brackets.'
   }
 ];
 
@@ -644,8 +1088,8 @@ export const CALIBRATIONS_DATA = [
     siteName: 'Al Majaz Waterfront Site',
     calibrationType: 'Zero/Span Gas Standard',
     performedBy: 'Tariq Al-Mansoori',
-    date: '2026-08-24',
-    dueDate: '2026-11-24',
+    date: '2026-08-25',
+    dueDate: '2026-11-25',
     result: 'Passed (Drift < 0.4%)',
     certificateNo: 'EPA-CAL-CERT-2026-108',
     status: 'Valid'
@@ -656,8 +1100,8 @@ export const CALIBRATIONS_DATA = [
     siteName: 'Al Hamriyah Coastal Buffer Site',
     calibrationType: 'UV Photometric 4-Point Span Standard',
     performedBy: 'Mohammed Al-Shehhi',
-    date: '2026-08-21',
-    dueDate: '2026-11-21',
+    date: '2026-08-25',
+    dueDate: '2026-11-25',
     result: 'Passed (Linearity R² = 0.9998)',
     certificateNo: 'EPA-CAL-CERT-2026-105',
     status: 'Valid'
@@ -668,8 +1112,8 @@ export const CALIBRATIONS_DATA = [
     siteName: 'Al Majaz Waterfront Site',
     calibrationType: 'Zero/Span Gas Standard',
     performedBy: 'Tariq Al-Mansoori',
-    date: '2026-08-16',
-    dueDate: '2026-11-16',
+    date: '2026-08-25',
+    dueDate: '2026-11-25',
     result: 'Passed (Drift < 1.2%)',
     certificateNo: 'EPA-CAL-CERT-9921',
     status: 'Valid'
@@ -680,8 +1124,8 @@ export const CALIBRATIONS_DATA = [
     siteName: 'Khor Kalba Mangrove Sanctuary',
     calibrationType: '2-Point Conductivity & pH Buffer',
     performedBy: 'Rashid Al-Kaitoob',
-    date: '2026-08-04',
-    dueDate: '2026-11-04',
+    date: '2026-08-25',
+    dueDate: '2026-11-25',
     result: 'Passed (Slope Error 1.2%)',
     certificateNo: 'EPA-CAL-CERT-9844',
     status: 'Valid'
@@ -692,10 +1136,82 @@ export const CALIBRATIONS_DATA = [
     siteName: 'Wasit Wetland Protected Reserve',
     calibrationType: 'Optical Flow Calibration',
     performedBy: 'Fatima Al-Zahra',
-    date: '2026-07-28',
-    dueDate: '2026-10-28',
+    date: '2026-08-25',
+    dueDate: '2026-11-25',
     result: 'Passed (Flow Accuracy ±0.5%)',
     certificateNo: 'EPA-CAL-CERT-1004',
+    status: 'Valid'
+  },
+  {
+    id: 'CAL-2026-112',
+    assetName: 'Tisch High Volume PM10 Air Sampler',
+    siteName: 'Sajaa Industrial Buffer Zone',
+    calibrationType: 'High Volume Mass Flow Calibration',
+    performedBy: 'Mohammed Al-Shehhi',
+    date: '2026-08-25',
+    dueDate: '2026-11-25',
+    result: 'Passed (Flow Rate 1.13 m³/min)',
+    certificateNo: 'EPA-CAL-CERT-2026-112',
+    status: 'Valid'
+  },
+  {
+    id: 'CAL-2026-113',
+    assetName: 'OTT RLS Radar Water Level Transducer',
+    siteName: 'Al Dhaid Hydrological Basin',
+    calibrationType: 'Laser Distance Intercomparison Check',
+    performedBy: 'Aisha Al-Husseini',
+    date: '2026-08-25',
+    dueDate: '2026-11-25',
+    result: 'Passed (Accuracy ±2 mm)',
+    certificateNo: 'EPA-CAL-CERT-2026-113',
+    status: 'Valid'
+  },
+  {
+    id: 'CAL-2026-114',
+    assetName: 'Horiba APNA-370 Ambient NO2 Monitor',
+    siteName: 'Al Majaz Waterfront Site',
+    calibrationType: 'Chemiluminescence Zero Gas Audit',
+    performedBy: 'Tariq Al-Mansoori',
+    date: '2026-08-25',
+    dueDate: '2026-11-25',
+    result: 'Passed (Zero Drift 0.2 ppb)',
+    certificateNo: 'EPA-CAL-CERT-2026-114',
+    status: 'Valid'
+  },
+  {
+    id: 'CAL-2026-115',
+    assetName: 'Hach SC200 Multi-Parameter Water Controller',
+    siteName: 'Kalba Creek & Tidal Lagoon Station',
+    calibrationType: '3-Point Salinity & pH Buffer Audit',
+    performedBy: 'Rashid Al-Kaitoob',
+    date: '2026-08-25',
+    dueDate: '2026-11-25',
+    result: 'Passed (pH Error < 0.05)',
+    certificateNo: 'EPA-CAL-CERT-2026-115',
+    status: 'Valid'
+  },
+  {
+    id: 'CAL-2026-116',
+    assetName: 'Vaisala Microclimate Beacon WXT536',
+    siteName: 'Mleiha Archaeological Biosphere',
+    calibrationType: 'Ultrasonic Wind Vector & Barometer Check',
+    performedBy: 'Hassan Al-Zahabi',
+    date: '2026-08-25',
+    dueDate: '2026-11-25',
+    result: 'Passed (Wind Speed Error < 0.1 m/s)',
+    certificateNo: 'EPA-CAL-CERT-2026-116',
+    status: 'Valid'
+  },
+  {
+    id: 'CAL-2026-117',
+    assetName: 'Aeroqual AQM 65 Compact Air Quality Post',
+    siteName: 'Khorfakkan Port & Coastal Zone',
+    calibrationType: 'Multi-Gas Module Field Audit',
+    performedBy: 'Saeed Al-Mutawa',
+    date: '2026-08-25',
+    dueDate: '2026-11-25',
+    result: 'Passed (Linearity R² = 0.9995)',
+    certificateNo: 'EPA-CAL-CERT-2026-117',
     status: 'Valid'
   }
 ];
@@ -711,7 +1227,8 @@ export const INVENTORY_DATA = [
     minThreshold: 30,
     unitCost: '$12.50',
     supplier: 'Horiba Direct',
-    status: 'In Stock'
+    status: 'In Stock',
+    date: '2026-08-25'
   },
   {
     id: 'inv-002',
@@ -723,7 +1240,8 @@ export const INVENTORY_DATA = [
     minThreshold: 2,
     unitCost: '$680.00',
     supplier: 'Air Liquide Gulf',
-    status: 'In Stock'
+    status: 'In Stock',
+    date: '2026-08-25'
   },
   {
     id: 'inv-003',
@@ -735,7 +1253,8 @@ export const INVENTORY_DATA = [
     minThreshold: 5,
     unitCost: '$340.00',
     supplier: 'YSI Xylem Middle East',
-    status: 'Low Stock - Reorder Needed'
+    status: 'Low Stock - Reorder Needed',
+    date: '2026-08-25'
   },
   {
     id: 'inv-004',
@@ -747,7 +1266,112 @@ export const INVENTORY_DATA = [
     minThreshold: 3,
     unitCost: '$210.00',
     supplier: 'Victron Energy UAE',
-    status: 'In Stock'
+    status: 'In Stock',
+    date: '2026-08-25'
+  },
+  {
+    id: 'inv-005',
+    sku: 'SKU-GAS-ZAIR47',
+    name: 'High-Purity Zero Air Cylinder (47L)',
+    category: 'Calibration Gases',
+    siteLocation: 'Sharjah Central EPA Warehouse',
+    quantity: 6,
+    minThreshold: 3,
+    unitCost: '$450.00',
+    supplier: 'Air Liquide Gulf',
+    status: 'In Stock',
+    date: '2026-08-25'
+  },
+  {
+    id: 'inv-006',
+    sku: 'SKU-WIP-EXO2',
+    name: 'Optical Wiper Assembly for YSI EXO2 Sonde',
+    category: 'Consumables & Parts',
+    siteLocation: 'Kalba Field Depot',
+    quantity: 5,
+    minThreshold: 2,
+    unitCost: '$185.00',
+    supplier: 'YSI Xylem Middle East',
+    status: 'In Stock',
+    date: '2026-08-25'
+  },
+  {
+    id: 'inv-007',
+    sku: 'SKU-UV-LAMP-T400',
+    name: 'Replacement UV Lamp Unit for Ozone Analyzer',
+    category: 'Sensors & Probes',
+    siteLocation: 'Sharjah Central EPA Warehouse',
+    quantity: 3,
+    minThreshold: 2,
+    unitCost: '$520.00',
+    supplier: 'Teledyne API',
+    status: 'In Stock',
+    date: '2026-08-25'
+  },
+  {
+    id: 'inv-008',
+    sku: 'SKU-PUMP-MEM-42I',
+    name: 'Sampling Pump Membrane Kit for Thermo 42i',
+    category: 'Maintenance Spare Parts',
+    siteLocation: 'Sharjah Central EPA Warehouse',
+    quantity: 12,
+    minThreshold: 4,
+    unitCost: '$95.00',
+    supplier: 'Thermo Fisher Scientific',
+    status: 'In Stock',
+    date: '2026-08-25'
+  },
+  {
+    id: 'inv-009',
+    sku: 'SKU-BAT-12V100',
+    name: '12V 100Ah Deep Cycle Gel Solar Battery',
+    category: 'Power Systems',
+    siteLocation: 'Sharjah Central EPA Warehouse',
+    quantity: 10,
+    minThreshold: 4,
+    unitCost: '$290.00',
+    supplier: 'Sharjah Clean Energy',
+    status: 'In Stock',
+    date: '2026-08-25'
+  },
+  {
+    id: 'inv-010',
+    sku: 'SKU-FLT-QZ810',
+    name: 'Quartz Fiber Filters (8x10 inch, 100/pk)',
+    category: 'Consumable Filters',
+    siteLocation: 'Sharjah Central EPA Warehouse',
+    quantity: 18,
+    minThreshold: 5,
+    unitCost: '$165.00',
+    supplier: 'Tisch Environmental',
+    status: 'In Stock',
+    date: '2026-08-25'
+  },
+  {
+    id: 'inv-011',
+    sku: 'SKU-MOD-RS485',
+    name: 'Industrial RS-485 Modbus Telemetry Converter',
+    category: 'Telemetry & Electronics',
+    siteLocation: 'Sharjah Central EPA Warehouse',
+    quantity: 7,
+    minThreshold: 3,
+    unitCost: '$140.00',
+    supplier: 'Campbell Scientific',
+    status: 'In Stock',
+    date: '2026-08-25'
+  },
+  {
+    id: 'inv-012',
+    sku: 'SKU-BUF-PHKIT',
+    name: 'pH Buffer Reference Solutions Kit (4.01, 7.00, 10.01)',
+    category: 'Calibration Standards',
+    siteLocation: 'Kalba Field Depot',
+    quantity: 9,
+    minThreshold: 3,
+    unitCost: '$75.00',
+    supplier: 'Hach Company',
+    status: 'In Stock',
+    date: '2026-08-25'
   }
 ];
 
@@ -760,6 +1384,7 @@ export const PROCUREMENT_DATA = [
     department: 'Air Quality Operations',
     totalAmount: '$4,250.00',
     dateRequested: '2026-08-25',
+    date: '2026-08-25',
     status: 'Pending Finance Approval',
     vendor: 'Horiba Scientific UAE'
   },
@@ -770,7 +1395,8 @@ export const PROCUREMENT_DATA = [
     requestedBy: 'Rashid Al-Kaitoob',
     department: 'Marine Ecosystem Division',
     totalAmount: '$2,800.00',
-    dateRequested: '2026-08-24',
+    dateRequested: '2026-08-25',
+    date: '2026-08-25',
     status: 'Approved',
     vendor: 'YSI Xylem Middle East'
   },
@@ -781,7 +1407,8 @@ export const PROCUREMENT_DATA = [
     requestedBy: 'Tariq Al-Mansoori',
     department: 'Air Quality Operations',
     totalAmount: '$18,500.00',
-    dateRequested: '2026-08-19',
+    dateRequested: '2026-08-25',
+    date: '2026-08-25',
     status: 'Order Placed',
     vendor: 'Thermo Fisher Scientific'
   },
@@ -792,7 +1419,8 @@ export const PROCUREMENT_DATA = [
     requestedBy: 'Rashid Al-Kaitoob',
     department: 'Marine Ecosystem Division',
     totalAmount: '$3,400.00',
-    dateRequested: '2026-08-15',
+    dateRequested: '2026-08-25',
+    date: '2026-08-25',
     status: 'Approved',
     vendor: 'YSI Xylem Middle East'
   },
@@ -803,9 +1431,94 @@ export const PROCUREMENT_DATA = [
     requestedBy: 'Khalid Al-Nuaimi',
     department: 'Telemetry & IT Infrastructure',
     totalAmount: '$7,200.00',
-    dateRequested: '2026-08-02',
+    dateRequested: '2026-08-25',
+    date: '2026-08-25',
     status: 'Delivered',
     vendor: 'Campbell Scientific'
+  },
+  {
+    id: 'PR-2026-055',
+    requisitionNo: 'REQ-EPA-2026-130',
+    title: 'Replacement UV Lamps & Quartz Cells for Ozone Monitors',
+    requestedBy: 'Mohammed Al-Shehhi',
+    department: 'Industrial Emissions Division',
+    totalAmount: '$5,600.00',
+    dateRequested: '2026-08-25',
+    date: '2026-08-25',
+    status: 'Pending Finance Approval',
+    vendor: 'Teledyne API'
+  },
+  {
+    id: 'PR-2026-056',
+    requisitionNo: 'REQ-EPA-2026-131',
+    title: 'Deep-Cycle Gel Solar Battery Reserve Bank Replenishment',
+    requestedBy: 'Omar Al-Qasimi',
+    department: 'Protected Reserves Division',
+    totalAmount: '$8,900.00',
+    dateRequested: '2026-08-25',
+    date: '2026-08-25',
+    status: 'Approved',
+    vendor: 'Sharjah Clean Energy'
+  },
+  {
+    id: 'PR-2026-057',
+    requisitionNo: 'REQ-EPA-2026-132',
+    title: 'High-Purity Gas Calibration Cylinders (SO2, CO, NO2)',
+    requestedBy: 'Tariq Al-Mansoori',
+    department: 'Air Quality Operations',
+    totalAmount: '$12,400.00',
+    dateRequested: '2026-08-25',
+    date: '2026-08-25',
+    status: 'Order Placed',
+    vendor: 'Air Liquide Gulf'
+  },
+  {
+    id: 'PR-2026-058',
+    requisitionNo: 'REQ-EPA-2026-133',
+    title: 'Annual Spare Wipers & Glass Electrodes for Marine Sondes',
+    requestedBy: 'Rashid Al-Kaitoob',
+    department: 'Marine Ecosystem Division',
+    totalAmount: '$6,100.00',
+    dateRequested: '2026-08-25',
+    date: '2026-08-25',
+    status: 'Delivered',
+    vendor: 'YSI Xylem Middle East'
+  },
+  {
+    id: 'PR-2026-059',
+    requisitionNo: 'REQ-EPA-2026-134',
+    title: 'Satellite VSAT Telemetry Bandwidth Annual Renewal',
+    requestedBy: 'Khalid Al-Nuaimi',
+    department: 'Telemetry & IT Infrastructure',
+    totalAmount: '$14,500.00',
+    dateRequested: '2026-08-25',
+    date: '2026-08-25',
+    status: 'Approved',
+    vendor: 'Campbell Scientific'
+  },
+  {
+    id: 'PR-2026-060',
+    requisitionNo: 'REQ-EPA-2026-135',
+    title: 'Portable Sound Level Calibrators (Type 1 ISO 17025)',
+    requestedBy: 'Fatima Al-Zahra',
+    department: 'Environmental Compliance',
+    totalAmount: '$3,900.00',
+    dateRequested: '2026-08-25',
+    date: '2026-08-25',
+    status: 'Delivered',
+    vendor: 'Emirates Calibration Labs'
+  },
+  {
+    id: 'PR-2026-061',
+    requisitionNo: 'REQ-EPA-2026-136',
+    title: 'Emergency Diaphragm Sample Pumps for Air Monitoring Station',
+    requestedBy: 'Tariq Al-Mansoori',
+    department: 'Air Quality Operations',
+    totalAmount: '$2,150.00',
+    dateRequested: '2026-08-25',
+    date: '2026-08-25',
+    status: 'Delivered',
+    vendor: 'Thermo Fisher Scientific'
   }
 ];
 
@@ -819,7 +1532,8 @@ export const CONTRACTS_DATA = [
     endDate: '2026-12-31',
     value: '$85,000',
     status: 'Active',
-    slaResponseTime: '4 Hours (Emergency)'
+    slaResponseTime: '4 Hours (Emergency)',
+    date: '2026-08-25'
   },
   {
     id: 'cnt-002',
@@ -830,7 +1544,8 @@ export const CONTRACTS_DATA = [
     endDate: '2027-05-31',
     value: '$140,000',
     status: 'Active',
-    slaResponseTime: '12 Hours'
+    slaResponseTime: '12 Hours',
+    date: '2026-08-25'
   },
   {
     id: 'cnt-003',
@@ -841,7 +1556,116 @@ export const CONTRACTS_DATA = [
     endDate: '2026-09-30',
     value: '$45,000',
     status: 'Expiring Soon (39 Days)',
-    slaResponseTime: '24 Hours'
+    slaResponseTime: '24 Hours',
+    date: '2026-08-25'
+  },
+  {
+    id: 'cnt-004',
+    title: 'Horiba Air Quality Analyzers SLA & Calibration AMC',
+    vendor: 'Horiba Instruments Middle East',
+    contractType: 'Comprehensive AMC',
+    startDate: '2026-01-01',
+    endDate: '2026-12-31',
+    value: '$92,000',
+    status: 'Active',
+    slaResponseTime: '6 Hours',
+    date: '2026-08-25'
+  },
+  {
+    id: 'cnt-005',
+    title: 'Satellite VSAT & 4G Narrowband IoT Telemetry Link',
+    vendor: 'Campbell Scientific Middle East',
+    contractType: 'Telemetry & IT SLA',
+    startDate: '2025-01-01',
+    endDate: '2027-12-31',
+    value: '$115,000',
+    status: 'Active',
+    slaResponseTime: '2 Hours (Critical)',
+    date: '2026-08-25'
+  },
+  {
+    id: 'cnt-006',
+    title: 'Vaisala Meteorological & Microclimate Sensor AMC',
+    vendor: 'Vaisala Gulf Meteorological FZE',
+    contractType: 'Preventive Maintenance',
+    startDate: '2025-04-01',
+    endDate: '2027-03-31',
+    value: '$68,000',
+    status: 'Active',
+    slaResponseTime: '12 Hours',
+    date: '2026-08-25'
+  },
+  {
+    id: 'cnt-007',
+    title: 'Hazardous Gas Calibration Cylinder Supply Contract',
+    vendor: 'Air Liquide Gulf',
+    contractType: 'Consumables Supply',
+    startDate: '2026-02-01',
+    endDate: '2027-01-31',
+    value: '$54,000',
+    status: 'Active',
+    slaResponseTime: '48 Hours',
+    date: '2026-08-25'
+  },
+  {
+    id: 'cnt-008',
+    title: 'ISO 17025 Laboratory Accreditation Audit Services',
+    vendor: 'Emirates Calibration Laboratories',
+    contractType: 'Quality Audit SLA',
+    startDate: '2026-01-01',
+    endDate: '2026-12-31',
+    value: '$38,000',
+    status: 'Active',
+    slaResponseTime: '24 Hours',
+    date: '2026-08-25'
+  },
+  {
+    id: 'cnt-009',
+    title: 'Field Logistics & Marine Transport Support Agreement',
+    vendor: 'Sharjah Port & Logistics Authority',
+    contractType: 'Field Transport SLA',
+    startDate: '2025-09-01',
+    endDate: '2026-08-31',
+    value: '$72,000',
+    status: 'Expiring Soon (6 Days)',
+    slaResponseTime: '4 Hours',
+    date: '2026-08-25'
+  },
+  {
+    id: 'cnt-010',
+    title: 'Renewable Solar PV Micro-Grid Maintenance Contract',
+    vendor: 'Sharjah Clean Energy Systems',
+    contractType: 'Preventive Maintenance',
+    startDate: '2026-01-01',
+    endDate: '2027-12-31',
+    value: '$62,000',
+    status: 'Active',
+    slaResponseTime: '12 Hours',
+    date: '2026-08-25'
+  },
+  {
+    id: 'cnt-011',
+    title: 'Airborne Drone Thermal & Gas Mapping Support Contract',
+    vendor: 'Aeroqual Air Monitoring Systems',
+    contractType: 'Specialized Service SLA',
+    startDate: '2025-11-01',
+    endDate: '2026-10-31',
+    value: '$88,000',
+    status: 'Active',
+    slaResponseTime: '8 Hours',
+    date: '2026-08-25'
+  },
+  {
+    id: 'cnt-012',
+    title: 'Environmental Telemetry Cloud Hosting & Cyber Security',
+    vendor: 'Sharjah Digital Government IT Services',
+    contractType: 'Cloud Infrastructure SLA',
+    startDate: '2026-01-01',
+    endDate: '2028-12-31',
+    value: '$160,000',
+    status: 'Active',
+    slaResponseTime: '1 Hour (Emergency)',
+    date: '2026-08-25'
   }
 ];
 
@@ -855,7 +1679,8 @@ export const USERS_DATA = [
     phone: '+971 6 500 4001',
     badge: 'EPA-DIR-01',
     status: 'Active',
-    assignedZone: 'All Sharjah Territories'
+    assignedZone: 'All Sharjah Territories',
+    date: '2026-08-25'
   },
   {
     id: 'usr-102',
@@ -866,7 +1691,8 @@ export const USERS_DATA = [
     phone: '+971 50 442 8901',
     badge: 'EPA-ENG-12',
     status: 'Active',
-    assignedZone: 'Sharjah City & Hamriyah'
+    assignedZone: 'Sharjah City & Hamriyah',
+    date: '2026-08-25'
   },
   {
     id: 'usr-103',
@@ -877,7 +1703,8 @@ export const USERS_DATA = [
     phone: '+971 52 889 1204',
     badge: 'EPA-QA-04',
     status: 'Active',
-    assignedZone: 'Wasit & Protected Reserves'
+    assignedZone: 'Wasit & Protected Reserves',
+    date: '2026-08-25'
   },
   {
     id: 'usr-104',
@@ -888,7 +1715,8 @@ export const USERS_DATA = [
     phone: '+971 55 331 9022',
     badge: 'EPA-MR-08',
     status: 'Active',
-    assignedZone: 'Kalba & East Coast'
+    assignedZone: 'Kalba & East Coast',
+    date: '2026-08-25'
   },
   {
     id: 'usr-105',
@@ -899,7 +1727,92 @@ export const USERS_DATA = [
     phone: '+971 56 771 4432',
     badge: 'EPA-TECH-22',
     status: 'Active',
-    assignedZone: 'Sir Bu Nair Island'
+    assignedZone: 'Sir Bu Nair Island',
+    date: '2026-08-25'
+  },
+  {
+    id: 'usr-106',
+    name: 'Eng. Aisha Al-Husseini',
+    role: 'Groundwater Protection Manager',
+    department: 'Water Resources Division',
+    email: 'a.alhusseini@epa.shj.ae',
+    phone: '+971 50 994 2210',
+    badge: 'EPA-GW-03',
+    status: 'Active',
+    assignedZone: 'Al Dhaid & Inland Aquifers',
+    date: '2026-08-25'
+  },
+  {
+    id: 'usr-107',
+    name: 'Saeed Al-Mutawa',
+    role: 'Air Quality Monitoring Engineer',
+    department: 'Air Monitoring Network',
+    email: 's.almutawa@epa.shj.ae',
+    phone: '+971 50 662 1198',
+    badge: 'EPA-ENG-15',
+    status: 'Active',
+    assignedZone: 'Khorfakkan & Port Zone',
+    date: '2026-08-25'
+  },
+  {
+    id: 'usr-108',
+    name: 'Omar Al-Qasimi',
+    role: 'Protected Reserves & Biosphere Inspector',
+    department: 'Terrestrial Ecosystems',
+    email: 'o.alqasimi@epa.shj.ae',
+    phone: '+971 50 551 0922',
+    badge: 'EPA-BIO-09',
+    status: 'Active',
+    assignedZone: 'Mleiha Biosphere Reserve',
+    date: '2026-08-25'
+  },
+  {
+    id: 'usr-109',
+    name: 'Mariam Al-Kabi',
+    role: 'Laboratory QA & ISO Auditor',
+    department: 'Quality Assurance',
+    email: 'm.alkabi@epa.shj.ae',
+    phone: '+971 50 771 8830',
+    badge: 'EPA-QA-09',
+    status: 'Active',
+    assignedZone: 'EPA Central Accreditation Lab',
+    date: '2026-08-25'
+  },
+  {
+    id: 'usr-110',
+    name: 'Mohammed Al-Shehhi',
+    role: 'Industrial Emissions Specialist',
+    department: 'Industrial Buffer Zones',
+    email: 'm.alshehhi@epa.shj.ae',
+    phone: '+971 50 743 5521',
+    badge: 'EPA-IND-07',
+    status: 'Active',
+    assignedZone: 'Sajaa & Hamriyah Freezone',
+    date: '2026-08-25'
+  },
+  {
+    id: 'usr-111',
+    name: 'Hassan Al-Zahabi',
+    role: 'Meteorology & Sensor Lead',
+    department: 'Environmental Telemetry',
+    email: 'h.alzahabi@epa.shj.ae',
+    phone: '+971 50 771 9021',
+    badge: 'EPA-MET-05',
+    status: 'Active',
+    assignedZone: 'Sharjah Microclimate Grid',
+    date: '2026-08-25'
+  },
+  {
+    id: 'usr-112',
+    name: 'Dr. Mariam Al-Qasimi',
+    role: 'EPA Chief Scientist & Lab Director',
+    department: 'Executive Leadership',
+    email: 'm.alqasimi@epa.shj.ae',
+    phone: '+971 6 500 4005',
+    badge: 'EPA-SCI-01',
+    status: 'Active',
+    assignedZone: 'Sharjah Central Research Complex',
+    date: '2026-08-25'
   }
 ];
 
@@ -983,6 +1896,86 @@ export const ROLES_DATA = [
       configureSystem: false,
       exportReports: true
     }
+  },
+  {
+    id: 'role-env-insp',
+    name: 'Environmental Field Inspector',
+    code: 'ROLE_INSPECTOR',
+    usersCount: 8,
+    description: 'Conduct site inspections, issue environmental compliance warnings, verify station security.',
+    permissions: {
+      createWO: true,
+      editWO: true,
+      deleteWO: false,
+      approveProcurement: false,
+      manageUsers: false,
+      configureSystem: false,
+      exportReports: true
+    }
+  },
+  {
+    id: 'role-lab-tech',
+    name: 'Accredited Laboratory Specialist',
+    code: 'ROLE_LAB_SPECIALIST',
+    usersCount: 5,
+    description: 'Perform ISO 17025 chemical analysis, calibrate gas standards, sign off laboratory certificates.',
+    permissions: {
+      createWO: false,
+      editWO: true,
+      deleteWO: false,
+      approveProcurement: true,
+      manageUsers: false,
+      configureSystem: false,
+      exportReports: true
+    }
+  },
+  {
+    id: 'role-sys-admin',
+    name: 'Telemetry & Systems Administrator',
+    code: 'ROLE_SYS_ADMIN',
+    usersCount: 2,
+    description: 'Manage 4G/VSAT IoT gateways, configure MQTT telemetry brokers, maintain cloud servers.',
+    permissions: {
+      createWO: true,
+      editWO: true,
+      deleteWO: true,
+      approveProcurement: false,
+      manageUsers: true,
+      configureSystem: true,
+      exportReports: true
+    }
+  },
+  {
+    id: 'role-proc-mgr',
+    name: 'Procurement & Asset Manager',
+    code: 'ROLE_PROC_MGR',
+    usersCount: 3,
+    description: 'Manage spare parts inventory, issue purchase orders, track vendor warranties and AMC contracts.',
+    permissions: {
+      createWO: false,
+      editWO: true,
+      deleteWO: false,
+      approveProcurement: true,
+      manageUsers: false,
+      configureSystem: false,
+      exportReports: true
+    }
+  },
+  {
+    id: 'role-exec-view',
+    name: 'Executive Regulatory Viewer',
+    code: 'ROLE_EXEC_VIEWER',
+    usersCount: 4,
+    description: 'High-level executive dashboard view for ministry reporting and strategic oversight.',
+    permissions: {
+      createWO: false,
+      editWO: false,
+      deleteWO: false,
+      approveProcurement: false,
+      manageUsers: false,
+      configureSystem: false,
+      exportReports: true
+    }
   }
 ];
 
@@ -995,11 +1988,16 @@ export const CONFIG_DATA = {
   enableSmsAlerts: true,
   enableEmailAlerts: true,
   futureDomains: [
+    { id: 'dom-aq', name: 'Air Quality Monitoring Network', status: 'Active (Configured)' },
+    { id: 'dom-marine', name: 'Marine & Coastal Water Quality Network', status: 'Active (Configured)' },
+    { id: 'dom-water', name: 'Groundwater & Aquifer Protection Network', status: 'Active (Configured)' },
     { id: 'dom-soil', name: 'Soil & Terrestrial Ecosystems', status: 'Active (Configured)' },
     { id: 'dom-noise', name: 'Ambient Noise Pollution Network', status: 'Active (Configured)' },
+    { id: 'dom-ind', name: 'Industrial Emissions & Buffer Zone Network', status: 'Active (Configured)' },
     { id: 'dom-waste', name: 'Hazardous Waste Monitoring Network', status: 'Configurable (Planned)' },
-    { id: 'dom-radiation', name: 'Environmental Radiation Monitoring', status: 'Configurable (Planned)' },
-    { id: 'dom-bio', name: 'Biodiversity Reserve Telemetry', status: 'Configurable (Planned)' }
+    { id: 'dom-radiation', name: 'Environmental Radiation Monitoring', status: 'Active (Configured)' },
+    { id: 'dom-bio', name: 'Biodiversity Reserve Telemetry', status: 'Active (Configured)' },
+    { id: 'dom-ocean', name: 'Offshore Oceanographic Observatory Network', status: 'Active (Configured)' }
   ]
 };
 
@@ -1009,6 +2007,7 @@ export const NOTIFICATIONS_DATA = [
     title: 'Critical Alarm: Khor Kalba Dissolved Oxygen Drop',
     message: 'Marine Sonde reading dropped below 5.0 mg/L threshold at Khor Kalba Sanctuary.',
     time: '12 mins ago',
+    date: '2026-08-25',
     severity: 'critical',
     read: false,
     targetModule: 'gis',
@@ -1019,6 +2018,7 @@ export const NOTIFICATIONS_DATA = [
     title: 'Urgent Work Order: WO-2026-092 SLA Warning',
     message: 'Corrective maintenance ticket has 14 hours remaining before SLA breach.',
     time: '30 mins ago',
+    date: '2026-08-25',
     severity: 'critical',
     read: false,
     targetModule: 'maintenance',
@@ -1029,6 +2029,7 @@ export const NOTIFICATIONS_DATA = [
     title: 'Calibration Overdue: YSI EXO2 Marine Sonde',
     message: '2-Point Conductivity & pH Buffer calibration required immediately.',
     time: '1 hour ago',
+    date: '2026-08-25',
     severity: 'warning',
     read: false,
     targetModule: 'calibration',
@@ -1039,6 +2040,7 @@ export const NOTIFICATIONS_DATA = [
     title: 'Work Order Updated: WO-2026-089 Log Uploaded',
     message: 'Tariq Al-Mansoori uploaded gas calibration zero log for Al Majaz.',
     time: '2 hours ago',
+    date: '2026-08-25',
     severity: 'info',
     read: true,
     targetModule: 'maintenance',
@@ -1049,6 +2051,7 @@ export const NOTIFICATIONS_DATA = [
     title: 'Low Stock Alert: Marine pH Sensor Probe',
     message: 'Current stock is 2 (below minimum safety threshold of 5) at Kalba Field Depot.',
     time: '3 hours ago',
+    date: '2026-08-25',
     severity: 'warning',
     read: true,
     targetModule: 'inventory'
@@ -1058,16 +2061,80 @@ export const NOTIFICATIONS_DATA = [
     title: 'Contract Expiry: Solar PV Warranty Support',
     message: 'Sharjah Clean Energy contract expiring soon (39 days remaining).',
     time: '5 hours ago',
+    date: '2026-08-25',
     severity: 'info',
     read: true,
     targetModule: 'contracts'
+  },
+  {
+    id: 'notif-7',
+    title: 'High Particulate Alert: Sajaa Industrial Station',
+    message: 'PM10 concentration spike detected (142 µg/m³) at Sajaa Buffer Site.',
+    time: '6 hours ago',
+    date: '2026-08-25',
+    severity: 'critical',
+    read: false,
+    targetModule: 'gis',
+    siteId: 'site-sajaa'
+  },
+  {
+    id: 'notif-8',
+    title: 'Requisition Approved: PR-2026-050 Marine Sondes',
+    message: 'Finance approved requisition for marine salinity buffer solution.',
+    time: '8 hours ago',
+    date: '2026-08-25',
+    severity: 'info',
+    read: true,
+    targetModule: 'procurement'
+  },
+  {
+    id: 'notif-9',
+    title: 'Calibration Completed: CAL-2026-109 Horiba Dust Monitor',
+    message: 'ISO 17025 Certificate EPA-CAL-CERT-2026-109 generated.',
+    time: '10 hours ago',
+    date: '2026-08-25',
+    severity: 'info',
+    read: true,
+    targetModule: 'calibration'
+  },
+  {
+    id: 'notif-10',
+    title: 'Telemetry Restored: Sir Bu Nair Offshore Tower',
+    message: 'VSAT Satellite stream back online at 100% signal strength.',
+    time: '12 hours ago',
+    date: '2026-08-25',
+    severity: 'info',
+    read: true,
+    targetModule: 'gis',
+    siteId: 'site-sir-bu-nair'
+  },
+  {
+    id: 'notif-11',
+    title: 'New Work Order Created: WO-2026-103 Emergency Swap',
+    message: 'Corrective maintenance assigned to Eng. Mohammed Al-Shehhi.',
+    time: '14 hours ago',
+    date: '2026-08-25',
+    severity: 'warning',
+    read: true,
+    targetModule: 'maintenance'
+  },
+  {
+    id: 'notif-12',
+    title: 'SOP Updated: SOP-VOC-09 Desorption Analysis',
+    message: 'New version v2.0 published by Dr. Mariam Al-Qasimi.',
+    time: '1 day ago',
+    date: '2026-08-25',
+    severity: 'info',
+    read: true,
+    targetModule: 'documents'
   }
 ];
 
 export const AUDIT_LOGS_DATA = [
   {
     id: 'log-801',
-    timestamp: '2026-08-21 13:42:10',
+    timestamp: '2026-08-25 13:42:10',
+    date: '2026-08-25',
     user: 'Tariq Al-Mansoori (Lead Field Engineer)',
     action: 'CREATE_CALIBRATION_RECORD',
     target: 'Thermo Fisher 42i NOx Analyzer (Al Majaz)',
@@ -1076,7 +2143,8 @@ export const AUDIT_LOGS_DATA = [
   },
   {
     id: 'log-802',
-    timestamp: '2026-08-21 12:15:04',
+    timestamp: '2026-08-25 12:15:04',
+    date: '2026-08-25',
     user: 'System Automated Monitor',
     action: 'TRIGGER_CRITICAL_ALERT',
     target: 'Site: Khor Kalba Mangrove Sanctuary',
@@ -1085,11 +2153,102 @@ export const AUDIT_LOGS_DATA = [
   },
   {
     id: 'log-803',
-    timestamp: '2026-08-21 10:04:55',
+    timestamp: '2026-08-25 10:04:55',
+    date: '2026-08-25',
     user: 'Fatima Al-Zahra (QA Officer)',
     action: 'CLOSE_WORK_ORDER',
     target: 'WO-2026-084 Solar PV Inspection',
     ipAddress: '194.170.42.88',
+    status: 'SUCCESS'
+  },
+  {
+    id: 'log-804',
+    timestamp: '2026-08-25 09:30:22',
+    date: '2026-08-25',
+    user: 'Tariq Al-Mansoori (Lead Field Engineer)',
+    action: 'CREATE_WORK_ORDER',
+    target: 'WO-2026-102 Emergency Diaphragm Replacement',
+    ipAddress: '194.170.42.12',
+    status: 'SUCCESS'
+  },
+  {
+    id: 'log-805',
+    timestamp: '2026-08-25 08:45:00',
+    date: '2026-08-25',
+    user: 'System Automated Monitor',
+    action: 'SYNC_TELEMETRY_STREAM',
+    target: '4G Gateway Al Majaz Station (STN-AQ-01)',
+    ipAddress: '10.200.4.5',
+    status: 'SUCCESS'
+  },
+  {
+    id: 'log-806',
+    timestamp: '2026-08-25 16:20:11',
+    date: '2026-08-25',
+    user: 'Rashid Al-Kaitoob (Marine Specialist)',
+    action: 'UPDATE_CALIBRATION_LOG',
+    target: 'YSI EXO2 Sonde (Khor Kalba)',
+    ipAddress: '194.170.42.45',
+    status: 'SUCCESS'
+  },
+  {
+    id: 'log-807',
+    timestamp: '2026-08-25 14:10:30',
+    date: '2026-08-25',
+    user: 'Fatima Al-Zahra (QA Officer)',
+    action: 'GENERATE_COMPLIANCE_REPORT',
+    target: 'MOCCAE Q2 Statutory Deliverable RPT-MOCCAE-03',
+    ipAddress: '194.170.42.88',
+    status: 'SUCCESS'
+  },
+  {
+    id: 'log-808',
+    timestamp: '2026-08-25 11:05:14',
+    date: '2026-08-25',
+    user: 'Eng. Humaid Al-Suwaidi (EPA Director)',
+    action: 'APPROVE_PROCUREMENT',
+    target: 'Requisition PR-2026-050 ($2,800.00)',
+    ipAddress: '194.170.42.10',
+    status: 'SUCCESS'
+  },
+  {
+    id: 'log-809',
+    timestamp: '2026-08-25 15:50:00',
+    date: '2026-08-25',
+    user: 'Systems Administrator',
+    action: 'UPDATE_SYSTEM_CONFIG',
+    target: 'Critical SLA Timeout set to 24 Hours',
+    ipAddress: '10.200.1.10',
+    status: 'SUCCESS'
+  },
+  {
+    id: 'log-810',
+    timestamp: '2026-08-25 13:12:44',
+    date: '2026-08-25',
+    user: 'Khalid Al-Nuaimi (Field Tech)',
+    action: 'EXECUTE_ZERO_SPAN_CHECK',
+    target: 'Campbell Data Logger Sir Bu Nair',
+    ipAddress: '194.170.42.99',
+    status: 'SUCCESS'
+  },
+  {
+    id: 'log-811',
+    timestamp: '2026-08-25 10:40:18',
+    date: '2026-08-25',
+    user: 'Mariam Al-Kabi (ISO Lead Auditor)',
+    action: 'ISSUE_CALIBRATION_CERT',
+    target: 'EPA-CAL-CERT-2026-105 (Teledyne T400)',
+    ipAddress: '194.170.42.60',
+    status: 'SUCCESS'
+  },
+  {
+    id: 'log-812',
+    timestamp: '2026-08-25 09:15:00',
+    date: '2026-08-25',
+    user: 'Eng. Humaid Al-Suwaidi (EPA Director)',
+    action: 'RENEW_CONTRACT_SLA',
+    target: 'Contract cnt-001 Thermo Fisher AMC ($85,000)',
+    ipAddress: '194.170.42.10',
     status: 'SUCCESS'
   }
 ];

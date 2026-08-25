@@ -24,8 +24,8 @@ export default function DocumentReporting() {
   const [showColumnFilters, setShowColumnFilters] = useState(false);
   const [columnFilters, setColumnFilters] = useState({});
 
-  // View mode state: 'charts' | 'table' (DEFAULT IS CHARTS VIEW)
-  const [viewMode, setViewMode] = useState('charts');
+  // View mode state: 'charts' | 'table' (DEFAULT IS TABLE VIEW)
+  const [viewMode, setViewMode] = useState('table');
 
   // Pagination state
   const [pageSize, setPageSize] = useState(10);
@@ -82,7 +82,7 @@ export default function DocumentReporting() {
       approvedBy: 'Eng. Tariq Al-Mansoori', 
       status: 'Traceable NIST', 
       desc: 'Calibration sequence execution for Teledyne NOx, SO2, CO, and Ozone photometric analyzers.', 
-      date: '2026-08-22' 
+      date: '2026-08-25' 
     },
     { 
       id: 'sop-3', 
@@ -95,7 +95,7 @@ export default function DocumentReporting() {
       approvedBy: 'Saeed Al-Mutawa', 
       status: 'Active', 
       desc: 'Coastal telemetry mooring, bio-fouling wiper replacement, and optical dissolved oxygen calibration.', 
-      date: '2026-08-20' 
+      date: '2026-08-25' 
     },
     { 
       id: 'sop-4', 
@@ -108,7 +108,7 @@ export default function DocumentReporting() {
       approvedBy: 'Sharjah Civil Defense', 
       status: 'Mandatory', 
       desc: 'Safe transportation, manifold regulator assembly, and leak test procedures for toxic calibration gases.', 
-      date: '2026-08-18' 
+      date: '2026-08-25' 
     },
     { 
       id: 'sop-5', 
@@ -121,7 +121,7 @@ export default function DocumentReporting() {
       approvedBy: 'Dr. Mariam Al-Qasimi', 
       status: 'Accredited', 
       desc: 'Sample identification, temperature-controlled transit, and tamper-evident custody logging procedures.', 
-      date: '2026-08-16' 
+      date: '2026-08-25' 
     },
     { 
       id: 'sop-6', 
@@ -134,7 +134,7 @@ export default function DocumentReporting() {
       approvedBy: 'Eng. Humaid Al-Suwaidi', 
       status: 'Active', 
       desc: 'Battery charge controller diagnostics, HVAC filter service, and grounding rod impedance checks.', 
-      date: '2026-08-14' 
+      date: '2026-08-25' 
     },
     { 
       id: 'sop-7', 
@@ -147,7 +147,7 @@ export default function DocumentReporting() {
       approvedBy: 'Systems Admin', 
       status: 'Active', 
       desc: 'Remote edge router configuration, VPN failover routing, and packet buffer retransmission protocols.', 
-      date: '2026-08-11' 
+      date: '2026-08-25' 
     },
     { 
       id: 'sop-8', 
@@ -160,7 +160,7 @@ export default function DocumentReporting() {
       approvedBy: 'Emergency Operations', 
       status: 'Critical', 
       desc: 'Drone thermal payload search, boom deployment protocols, and rapid hydrocarbon sensor telemetry.', 
-      date: '2026-08-08' 
+      date: '2026-08-25' 
     },
     { 
       id: 'sop-9', 
@@ -173,7 +173,7 @@ export default function DocumentReporting() {
       approvedBy: 'Senior Chemist', 
       status: 'Active', 
       desc: 'Canister sampling, cryo-trapping, and mass spectrometer calibration standards for benzene and toluene.', 
-      date: '2026-08-05' 
+      date: '2026-08-25' 
     },
     { 
       id: 'sop-10', 
@@ -186,7 +186,7 @@ export default function DocumentReporting() {
       approvedBy: 'Security Operations', 
       status: 'Active', 
       desc: 'Access badge auditing, intrusion alarm testing, and biometric logging inspection for all stations.', 
-      date: '2026-08-02' 
+      date: '2026-08-25' 
     }
   ], []);
 
@@ -212,7 +212,7 @@ export default function DocumentReporting() {
       category: 'Marine & Coastal Reports', 
       status: '98.2% Compliant', 
       desc: 'Coastal telemetry analysis, chlorophyll-a, turbidity, salinity, and dissolved oxygen index reporting.', 
-      date: '2026-08-24' 
+      date: '2026-08-25' 
     },
     { 
       id: 'rep-03', 
@@ -223,7 +223,7 @@ export default function DocumentReporting() {
       category: 'Statutory Ministry Submissions', 
       status: 'Submitted & Approved', 
       desc: 'Quarterly statutory greenhouse gas baseline and air shed inventory submitted to Federal Ministry of Environment.', 
-      date: '2026-08-23' 
+      date: '2026-08-25' 
     },
     { 
       id: 'rep-04', 
@@ -234,7 +234,7 @@ export default function DocumentReporting() {
       category: 'Industrial Emissions & Dust', 
       status: '100% Compliant', 
       desc: 'High-frequency VOC, SOx, and fugitive dust sensor logging from Hamriyah and Sajaa industrial zones.', 
-      date: '2026-08-21' 
+      date: '2026-08-25' 
     },
     { 
       id: 'rep-05', 
@@ -245,7 +245,7 @@ export default function DocumentReporting() {
       category: 'Statutory Ministry Submissions', 
       status: 'Certified', 
       desc: 'Traceable NIST gas standards, multi-point linearity checks, and automated calibration sequence telemetry.', 
-      date: '2026-08-19' 
+      date: '2026-08-25' 
     },
     { 
       id: 'rep-06', 
@@ -256,7 +256,7 @@ export default function DocumentReporting() {
       category: 'Air Quality Compliance', 
       status: '97.5% Compliant', 
       desc: 'Continuous dBA sound pressure level compliance logs from major residential and commercial traffic corridors.', 
-      date: '2026-08-17' 
+      date: '2026-08-25' 
     },
     { 
       id: 'rep-07', 
@@ -267,7 +267,7 @@ export default function DocumentReporting() {
       category: 'Statutory Ministry Submissions', 
       status: '99.1% Compliant', 
       desc: 'Audit of contractor response times, spare parts replenishment SLAs, and emergency station repair turnarounds.', 
-      date: '2026-08-15' 
+      date: '2026-08-25' 
     },
     { 
       id: 'rep-08', 
@@ -278,7 +278,7 @@ export default function DocumentReporting() {
       category: 'Marine & Coastal Reports', 
       status: 'Optimal Quality', 
       desc: 'Ecological monitoring of tidal flush, heavy metal traces, and aquatic health metrics in protected mangrove reserves.', 
-      date: '2026-08-12' 
+      date: '2026-08-25' 
     },
     { 
       id: 'rep-09', 
@@ -289,7 +289,7 @@ export default function DocumentReporting() {
       category: 'Industrial Emissions & Dust', 
       status: '100% Compliant', 
       desc: 'Quarry and port fugitive dust dispersion analysis with wind vector meteorological cross-referencing.', 
-      date: '2026-08-09' 
+      date: '2026-08-25' 
     },
     { 
       id: 'rep-10', 
@@ -298,9 +298,9 @@ export default function DocumentReporting() {
       type: 'PDF Document', 
       size: '6.4 MB', 
       category: 'Statutory Ministry Submissions', 
-      status: 'Audited', 
-      desc: 'Cryptographic activity logs, user logins, configuration alterations, and RBAC changes.', 
-      date: '2026-08-04' 
+      status: 'Certified', 
+      desc: 'Cryptographic audit log integrity verification, user permission changes, and data export activity logging.', 
+      date: '2026-08-25' 
     }
   ], []);
 
