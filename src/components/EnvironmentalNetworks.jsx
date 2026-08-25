@@ -86,17 +86,10 @@ export default function EnvironmentalNetworks() {
 
 
       {/* Network Tree & Details */}
-      <div className="grid-2-responsive" style={{ alignItems: 'start' }}>
+      <div className="grid-2-responsive">
         
-        {/* Left: Networks Tree Selector (Fixed / Sticky on Left) */}
-        <div className="glass-panel" style={{ 
-          padding: '20px', 
-          position: 'sticky', 
-          top: '20px', 
-          alignSelf: 'start',
-          maxHeight: 'calc(100vh - 110px)', 
-          overflowY: 'auto' 
-        }}>
+        {/* Left: Networks Tree Selector */}
+        <div className="glass-panel" style={{ padding: '20px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
             <h3 style={{ fontSize: '1rem', fontWeight: 700, margin: 0, display: 'flex', alignItems: 'center', gap: '8px', color: '#1F2937' }}>
               <Layers size={18} color="#00A878" /> Environmental Networks List

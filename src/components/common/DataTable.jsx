@@ -267,7 +267,7 @@ export default function DataTable({
       </div>
 
       {/* Main Table Layout */}
-      <div className="table-responsive">
+      <div className="table-responsive" style={{ border: '1px solid #E2E8F0', borderRadius: '8px', overflow: 'hidden' }}>
         <table className="epa-table">
           <thead>
             <tr>
