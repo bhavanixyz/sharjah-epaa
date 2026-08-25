@@ -344,13 +344,19 @@ export default function ChatAIWidget() {
     ]);
   };
 
+  const handleCloseAndClear = () => {
+    handleClear();
+    setIsExpanded(false);
+    setIsOpen(false);
+  };
+
   return (
     <>
       {/* Floating Trigger Button */}
       {!isOpen && (
         <button
           onClick={() => setIsOpen(true)}
-          title="Open Sharjah EPAA ChatAI Assistant"
+          title="Open EPA Intelligence AI Assistant"
           style={{
             position: 'fixed',
             bottom: '24px',
@@ -374,27 +380,31 @@ export default function ChatAIWidget() {
         </button>
       )}
 
-      {/* Main Chat Drawer */}
+      {/* Main Chat Drawer Container (Floating Card vs Right Side Panel) */}
       {isOpen && (
         <div
           style={{
             position: 'fixed',
             bottom: isExpanded ? '0' : '24px',
-            right: isExpanded ? '0' : '24px',
+            right: '0',
             top: isExpanded ? '0' : 'auto',
-            left: isExpanded ? '0' : 'auto',
-            width: isExpanded ? '100vw' : '450px',
+            width: isExpanded ? '520px' : '450px',
             height: isExpanded ? '100vh' : '630px',
-            maxWidth: isExpanded ? '100vw' : '92vw',
+            maxWidth: '100vw',
             maxHeight: isExpanded ? '100vh' : '88vh',
+            marginRight: isExpanded ? '0' : '24px',
             zIndex: 99999,
             background: '#FFFFFF',
             borderRadius: isExpanded ? '0' : '20px',
-            boxShadow: '0 25px 50px -12px rgba(15, 23, 42, 0.35)',
-            border: '1px solid #CBD5E1',
+            boxShadow: isExpanded 
+              ? '-12px 0 35px rgba(15, 23, 42, 0.25)' 
+              : '0 25px 50px -12px rgba(15, 23, 42, 0.35)',
+            border: isExpanded ? 'none' : '1px solid #CBD5E1',
+            borderLeft: isExpanded ? '1px solid #CBD5E1' : '1px solid #CBD5E1',
             display: 'flex',
             flexDirection: 'column',
             overflow: 'hidden',
+            transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
             animation: 'slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1)'
           }}
         >
@@ -403,35 +413,51 @@ export default function ChatAIWidget() {
             style={{
               background: 'linear-gradient(135deg, #0F172A 0%, #1E293B 100%)',
               color: '#FFFFFF',
-              padding: '16px 20px',
+              padding: '14px 18px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
               width: '100%'
             }}
           >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flex: 1, minWidth: 0 }}>
-              <div style={{ padding: '8px', background: 'rgba(0,168,120,0.25)', borderRadius: '10px', color: '#34D399', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <Bot size={20} />
+            {/* Header Title & Subtitle */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flex: 1, minWidth: 0 }}>
+              <div style={{ padding: '7px', background: 'rgba(0,168,120,0.25)', borderRadius: '9px', color: '#34D399', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Bot size={18} />
               </div>
               <div style={{ overflow: 'hidden', minWidth: 0 }}>
-                <h3 style={{ fontSize: '0.95rem', fontWeight: 800, margin: 0, color: '#FFFFFF', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>
-                  Sharjah EPAA Intelligence AI
+                <h3 style={{ fontSize: '0.92rem', fontWeight: 800, margin: 0, color: '#FFFFFF', whiteSpace: 'nowrap' }}>
+                  EPA Intelligence AI
                 </h3>
-                <span style={{ fontSize: '0.72rem', color: '#34D399', fontWeight: 600, display: 'block', marginTop: '2px' }}>
-                  ● Connected to EPA Telemetry Engine
+                <span style={{ fontSize: '0.70rem', color: '#34D399', fontWeight: 600, display: 'block', marginTop: '1px' }}>
+                  ● Live Telemetry Active
                 </span>
               </div>
             </div>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginLeft: 'auto', flexShrink: 0 }}>
-              <button 
-                onClick={() => setIsExpanded(!isExpanded)} 
-                style={{ background: 'rgba(255,255,255,0.08)', border: 'none', color: '#F8FAFC', cursor: 'pointer', padding: '6px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.15s ease' }}
-                title={isExpanded ? "Collapse Widget" : "Expand Widget"}
-              >
-                {isExpanded ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
-              </button>
+            {/* Action Buttons: Expand/Minimize, Clear, Close */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginLeft: 'auto', flexShrink: 0 }}>
+              
+              {/* Expand / Minimize Toggle */}
+              {isExpanded ? (
+                <button 
+                  onClick={() => setIsExpanded(false)} 
+                  style={{ background: 'rgba(255,255,255,0.08)', border: 'none', color: '#F8FAFC', cursor: 'pointer', padding: '6px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.15s ease' }}
+                  title="Minimize to Floating Card"
+                >
+                  <Minimize2 size={16} />
+                </button>
+              ) : (
+                <button 
+                  onClick={() => setIsExpanded(true)} 
+                  style={{ background: 'rgba(255,255,255,0.08)', border: 'none', color: '#F8FAFC', cursor: 'pointer', padding: '6px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.15s ease' }}
+                  title="Expand to Right Side Panel"
+                >
+                  <Maximize2 size={16} />
+                </button>
+              )}
+
+              {/* Clear Chat History Option */}
               <button 
                 onClick={handleClear} 
                 style={{ background: 'rgba(255,255,255,0.08)', border: 'none', color: '#F8FAFC', cursor: 'pointer', padding: '6px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.15s ease' }} 
@@ -439,10 +465,12 @@ export default function ChatAIWidget() {
               >
                 <Trash2 size={16} />
               </button>
+
+              {/* Close & Clear Option */}
               <button 
-                onClick={() => setIsOpen(false)} 
-                style={{ background: 'rgba(255,255,255,0.08)', border: 'none', color: '#F8FAFC', cursor: 'pointer', padding: '6px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.15s ease' }}
-                title="Close Assistant"
+                onClick={handleCloseAndClear} 
+                style={{ background: 'rgba(239,68,68,0.2)', border: 'none', color: '#FCA5A5', cursor: 'pointer', padding: '6px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.15s ease' }}
+                title="Close & Clear Chat"
               >
                 <X size={18} />
               </button>
