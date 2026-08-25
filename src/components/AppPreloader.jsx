@@ -11,9 +11,11 @@ export default function AppPreloader({ isLoading, onComplete, onLoaded }) {
         if (onComplete) onComplete();
         if (onLoaded) onLoaded();
       }, 500);
-    }, 1200);
+    }, 1000);
     return () => clearTimeout(timer);
-  }, [onComplete, onLoaded]);
+  }, []);
+
+  if (!isLoading && fade) return null;
 
   return (
     <div
