@@ -20,7 +20,13 @@ const AppContext = createContext();
 
 export function AppProvider({ children }) {
   const [activeModule, setActiveModule] = useState('dashboard');
+  const [activeTab, setActiveTab] = useState('Executive Dashboard');
   const [searchQuery, setSearchQuery] = useState('');
+
+  // Global Date Filter State
+  const [dateFilter, setDateFilter] = useState('7D');
+  const [startDate, setStartDate] = useState('2026-08-17');
+  const [endDate, setEndDate] = useState('2026-08-24');
   
   // Enterprise Core Datasets
   const [networks, setNetworks] = useState(NETWORKS_DATA);
@@ -94,7 +100,15 @@ export function AppProvider({ children }) {
   };
 
   const markNotificationRead = (id) => {
-    setNotifications(notifications.map(n => n.id === id ? { ...n, read: true } : n));
+    setNotifications(notifications.map(n => n.id === id ? { ...n, read: true, isRead: true } : n));
+  };
+
+  const markAllNotificationsRead = () => {
+    setNotifications(notifications.map(n => ({ ...n, read: true, isRead: true })));
+  };
+
+  const clearAllNotifications = () => {
+    setNotifications([]);
   };
 
   const toggleRolePermission = (roleId, permKey) => {
@@ -116,6 +130,8 @@ export function AppProvider({ children }) {
     <AppContext.Provider value={{
       activeModule,
       setActiveModule,
+      activeTab,
+      setActiveTab,
       searchQuery,
       setSearchQuery,
       networks,
@@ -143,6 +159,8 @@ export function AppProvider({ children }) {
       setConfig,
       notifications,
       markNotificationRead,
+      markAllNotificationsRead,
+      clearAllNotifications,
       auditLogs,
       selectedSite,
       setSelectedSite,
@@ -160,7 +178,13 @@ export function AppProvider({ children }) {
       isMobileMenuOpen,
       setIsMobileMenuOpen,
       toggleMobileMenu,
-      currentUser
+      currentUser,
+      dateFilter,
+      setDateFilter,
+      startDate,
+      setStartDate,
+      endDate,
+      setEndDate
     }}>
       {children}
     </AppContext.Provider>

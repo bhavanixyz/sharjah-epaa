@@ -1,3 +1,5 @@
+@import 'leaflet/dist/leaflet.css';
+
 /* ==========================================================================
    SHARJAH ENVIRONMENT PROTECTED AUTHORITY (SHARJAH EPA)
    Modern Environmental Operations Command Platform — Perfect Mobile Glass Theme
@@ -531,11 +533,11 @@ p, span, div, strong, label {
 
 .metric-subtitle {
   font-size: 0.76rem;
-  margin-top: 6px;
-  font-weight: 700;
-  display: flex;
-  align-items: center;
-  gap: 4px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
 }
 
 /* Mobile Drawer Backdrop Overlay */
@@ -617,8 +619,9 @@ p, span, div, strong, label {
 
 .header-container {
   display: flex;
-  flex-direction: column;
-  gap: 10px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
   width: 100%;
 }
 
@@ -830,5 +833,162 @@ p, span, div, strong, label {
     padding: 10px 10px !important;
     font-size: 0.78rem !important;
   }
+}
+
+/* ==========================================================================
+   INTERACTIVE KPIS AND CHARTS ENHANCEMENTS
+   ========================================================================== */
+
+/* Interactive KPI Card Container */
+.interactive-kpi-card {
+  position: relative;
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid var(--border-light);
+  overflow: hidden;
+}
+
+.interactive-kpi-card:hover {
+  transform: translateY(-4px) scale(1.015);
+  box-shadow: 0 12px 28px -4px rgba(0, 168, 120, 0.18), 0 4px 12px rgba(0, 0, 0, 0.05);
+  border-color: rgba(0, 168, 120, 0.4);
+}
+
+.interactive-kpi-card.kpi-active {
+  border: 2px solid var(--epa-primary) !important;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(230, 246, 242, 0.7) 100%) !important;
+  box-shadow: 0 14px 32px -4px rgba(0, 168, 120, 0.25), 0 0 0 4px rgba(0, 168, 120, 0.12) !important;
+}
+
+.interactive-kpi-card .kpi-expand-hint {
+  opacity: 0;
+  transform: translateY(4px);
+  transition: all 0.2s ease;
+}
+
+.interactive-kpi-card:hover .kpi-expand-hint {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Live Telemetry Pulse Animation */
+.pulse-live-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  background: rgba(0, 168, 120, 0.1);
+  border: 1px solid rgba(0, 168, 120, 0.3);
+  border-radius: 20px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #00A878;
+}
+
+.pulse-dot {
+  width: 8px;
+  height: 8px;
+  background-color: #00A878;
+  border-radius: 50%;
+  position: relative;
+}
+
+.pulse-dot::after {
+  content: '';
+  position: absolute;
+  top: -4px;
+  left: -4px;
+  width: 16px;
+  height: 16px;
+  background-color: rgba(0, 168, 120, 0.4);
+  border-radius: 50%;
+  animation: pulse-ring 1.8s infinite ease-out;
+}
+
+@keyframes pulse-ring {
+  0% {
+    transform: scale(0.5);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(2.2);
+    opacity: 0;
+  }
+}
+
+/* Chart Interactive Controls */
+.chart-pill-group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(241, 245, 249, 0.9);
+  padding: 4px;
+  border-radius: 10px;
+  border: 1px solid rgba(226, 232, 240, 0.8);
+}
+
+.chart-pill-btn {
+  padding: 5px 12px;
+  border-radius: 7px;
+  border: none;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: transparent;
+  color: #64748B;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.chart-pill-btn:hover {
+  color: #0F172A;
+  background: rgba(255, 255, 255, 0.6);
+}
+
+.chart-pill-btn.active {
+  background: #FFFFFF;
+  color: #00A878;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  font-weight: 800;
+}
+
+/* Number pulse animation on live metric update */
+.value-pulse {
+  animation: num-flash 0.5s ease-out;
+}
+
+@keyframes num-flash {
+  0% {
+    color: #00A878;
+    transform: scale(1.08);
+  }
+  100% {
+    color: inherit;
+    transform: scale(1);
+  }
+}
+/* Map Marker Pulse Animation */
+@keyframes mapPulseRing {
+  0% {
+    transform: scale(0.7);
+    opacity: 0.85;
+  }
+  70% {
+    transform: scale(2.2);
+    opacity: 0.15;
+  }
+  100% {
+    transform: scale(2.8);
+    opacity: 0;
+  }
+}
+
+/* Form Select Dropdown Padding Standardization */
+select {
+  padding-right: 36px !important;
+  cursor: pointer;
 }
 

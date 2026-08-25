@@ -49,34 +49,28 @@ export default function NotificationManagement() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
       
-      <div className="glass-panel page-header-card">
-        <div>
-          <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#1F2937' }}>EPA Alarm & Notification Center</h2>
-          <p style={{ fontSize: '0.8rem', color: '#6B7280' }}>Real-time telemetry threshold alarms, work order dispatches & system broadcast logs</p>
-        </div>
-
-        <div className="page-header-actions">
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', background: '#F8FAFC', padding: '4px', borderRadius: '8px', border: '1px solid #E5E7EB', maxWidth: '100%' }}>
-            {['ALL', 'critical', 'warning', 'info'].map((sev) => (
-              <button
-                key={sev}
-                onClick={() => setFilterSeverity(sev)}
-                style={{
-                  padding: '5px 10px',
-                  borderRadius: '6px',
-                  border: 'none',
-                  fontSize: '0.74rem',
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                  textTransform: 'capitalize',
-                  background: filterSeverity === sev ? '#00A878' : 'transparent',
-                  color: filterSeverity === sev ? '#FFFFFF' : '#4B5563'
-                }}
-              >
-                {sev}
-              </button>
-            ))}
-          </div>
+      {/* Top Filter Bar */}
+      <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', background: '#FFFFFF', padding: '4px', borderRadius: '8px', border: '1px solid #CBD5E1', maxWidth: '100%' }}>
+          {['ALL', 'critical', 'warning', 'info'].map((sev) => (
+            <button
+              key={sev}
+              onClick={() => setFilterSeverity(sev)}
+              style={{
+                padding: '5px 10px',
+                borderRadius: '6px',
+                border: 'none',
+                fontSize: '0.74rem',
+                fontWeight: 600,
+                cursor: 'pointer',
+                textTransform: 'capitalize',
+                background: filterSeverity === sev ? '#00A878' : 'transparent',
+                color: filterSeverity === sev ? '#FFFFFF' : '#4B5563'
+              }}
+            >
+              {sev}
+            </button>
+          ))}
         </div>
       </div>
 

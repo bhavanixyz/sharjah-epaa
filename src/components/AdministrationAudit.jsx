@@ -6,17 +6,6 @@ export default function AdministrationAudit() {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-      
-      <div className="glass-panel page-header-card">
-        <div>
-          <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#1F2937' }}>System Administration & Security Audit Trail</h2>
-          <p style={{ fontSize: '0.8rem', color: '#6B7280' }}>Role-based access control (RBAC), user activity logs & cryptographic audit records</p>
-        </div>
-        
-        <div className="page-header-actions">
-          <span className="badge badge-normal">ISO 27001 Security Standard</span>
-        </div>
-      </div>
 
       <div className="glass-panel table-responsive">
         <table className="epa-table">

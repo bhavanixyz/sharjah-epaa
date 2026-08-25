@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
 import { 
   LayoutDashboard, 
@@ -13,48 +13,38 @@ import {
   ShoppingBag, 
   FileCheck, 
   FileText, 
-  Bell, 
   BarChart3, 
-  Users, 
-  Shield, 
-  Settings, 
-  ShieldCheck, 
-  Trees, 
+  Contact,
+  Bell,
+  Users,
+  Shield,
+  Settings,
+  ShieldCheck,
+  LogOut,
   ChevronUp,
   ChevronDown, 
-  PanelLeftClose, 
-  PanelLeftOpen,
+  ChevronLeft,
+  ChevronRight,
   X
 } from 'lucide-react';
+
+import logoImg from '../assets/LOGO.new.png';
+import logoCollapseImg from '../assets/Logo collapse.png';
 
 export default function Sidebar() {
   const { 
     activeModule, 
     setActiveModule, 
-    workOrders, 
-    notifications, 
     isSidebarCollapsed, 
     toggleSidebar,
     isMobileMenuOpen,
-    setIsMobileMenuOpen
+    setIsMobileMenuOpen,
+    setActiveTab
   } = useApp();
 
-  // Core Operations ('operations') is open by default; single-open accordion behavior
+  // Single open group key ('operations', 'maintenance', or 'governance')
+  // Default to 'operations'
   const [openGroupKey, setOpenGroupKey] = useState('operations');
-
-  const toggleGroup = (groupKey) => {
-    setOpenGroupKey(prev => prev === groupKey ? null : groupKey);
-  };
-
-  const handleModuleSelect = (id) => {
-    setActiveModule(id);
-    if (isMobileMenuOpen) {
-      setIsMobileMenuOpen(false);
-    }
-  };
-
-  const openTicketsCount = workOrders.filter(w => w.status === 'Open' || w.status === 'In Progress').length;
-  const unreadNotifCount = notifications.filter(n => !n.read).length;
 
   const navGroups = [
     {
@@ -62,7 +52,7 @@ export default function Sidebar() {
       group: 'Core Operations',
       items: [
         { id: 'dashboard', label: 'Executive Dashboard', icon: LayoutDashboard },
-        { id: 'gis', label: 'GIS Command Center', icon: Map, badge: 'Live' },
+        { id: 'gis', label: 'GIS Command Center', icon: Map },
         { id: 'networks', label: 'Environmental Networks', icon: Network },
         { id: 'sites', label: 'Site Management', icon: Building2 },
         { id: 'stations', label: 'Station Management', icon: Radio },
@@ -73,27 +63,83 @@ export default function Sidebar() {
       key: 'maintenance',
       group: 'Maintenance & Procurement',
       items: [
-        { id: 'maintenance', label: 'Work Orders & SLA', icon: Wrench, count: openTicketsCount },
+        { id: 'maintenance', label: 'Work Orders & SLA', icon: Wrench, badge: '3', badgeType: 'count-red' },
         { id: 'calibration', label: 'Drift & Gas Calibration', icon: Target },
         { id: 'inventory', label: 'Inventory & Spare Parts', icon: Boxes },
         { id: 'procurement', label: 'Procurement & Orders', icon: ShoppingBag },
-        { id: 'contracts', label: 'Contracts & Warranty', icon: FileCheck }
+        { id: 'contracts', label: 'Contracts & Warranty', icon: FileCheck },
+        { id: 'providers', label: 'Service Providers / Contacts', icon: Contact }
       ]
     },
     {
-      key: 'governance',
-      group: 'Governance & Admin',
+      key: 'admin',
+      group: 'Admin',
       items: [
         { id: 'documents', label: 'Document SOPs', icon: FileText },
-        { id: 'notifications', label: 'Alarm & Notifications', icon: Bell, count: unreadNotifCount },
         { id: 'reports', label: 'EPA Compliance Reports', icon: BarChart3 },
         { id: 'users', label: 'User Directory', icon: Users },
         { id: 'roles', label: 'Role & RBAC Matrix', icon: Shield },
-        { id: 'config', label: 'System Configuration', icon: Settings },
         { id: 'audit', label: 'Security Audit Trail', icon: ShieldCheck }
       ]
     }
   ];
+
+  // Auto sync open group key when activeModule changes externally
+  useEffect(() => {
+    if (!activeModule) return;
+    const parentGroup = navGroups.find(g => g.items.some(i => i.id === activeModule));
+    if (parentGroup && parentGroup.key !== openGroupKey) {
+      setOpenGroupKey(parentGroup.key);
+    }
+  }, [activeModule]);
+
+  // Requirement 1 & 3:
+  // 1. Single dropdown open at a time (opening one closes others)
+  // 3. When category dropdown is opened, select first item as default
+  const toggleGroup = (group) => {
+    const isOpening = openGroupKey !== group.key;
+    const nextKey = isOpening ? group.key : null;
+    setOpenGroupKey(nextKey);
+
+    if (isOpening && group.items && group.items.length > 0) {
+      handleModuleSelect(group.items[0].id);
+    }
+  };
+
+  const handleModuleSelect = (id) => {
+    const tabMap = {
+      'dashboard': 'Executive Dashboard',
+      'gis': 'GIS Command Center',
+      'networks': 'Environmental Networks',
+      'sites': 'Site Management',
+      'stations': 'Station Management',
+      'assets': 'Asset Catalog & Equipment',
+      'maintenance': 'Work Orders & SLA',
+      'calibration': 'Drift & Gas Calibration',
+      'inventory': 'Inventory & Spare Parts',
+      'procurement': 'Procurement & Orders',
+      'contracts': 'Contracts & Warranty',
+      'providers': 'Service Providers / Contacts',
+      'documents': 'Document SOPs',
+      'notifications': 'Notification Center',
+      'reports': 'EPA Compliance Reports',
+      'users': 'User Directory',
+      'roles': 'Role & RBAC Matrix',
+      'audit': 'Security Audit Trail'
+    };
+
+    const targetTab = tabMap[id] || 'Dashboard';
+    if (setActiveTab) setActiveTab(targetTab);
+    if (setActiveModule) setActiveModule(id);
+
+    if (isMobileMenuOpen) {
+      setIsMobileMenuOpen(false);
+    }
+  };
+
+  const handleSignOut = () => {
+    alert('Successfully signed out of Sharjah EPAA Enterprise Session.');
+  };
 
   return (
     <>
@@ -128,64 +174,62 @@ export default function Sidebar() {
         boxShadow: '4px 0 24px rgba(0, 0, 0, 0.15)'
       }}>
         
-        {/* Dark Brand Header */}
+        {/* Expand/Collapse Toggle Button */}
+        <button
+          onClick={toggleSidebar}
+          className="desktop-sidebar-edge-toggle"
+          title={isSidebarCollapsed ? "Expand Navigation Bar" : "Collapse Navigation Bar"}
+          style={{
+            position: 'absolute',
+            top: '50%',
+            right: '-15px',
+            transform: 'translateY(-50%)',
+            width: '30px',
+            height: '30px',
+            borderRadius: '50%',
+            background: '#1E293B',
+            border: '1.5px solid rgba(0, 168, 120, 0.6)',
+            color: '#FFFFFF',
+            boxShadow: '0 4px 14px rgba(0, 0, 0, 0.4), 0 0 10px rgba(0, 168, 120, 0.25)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer',
+            zIndex: 1001,
+            transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)'
+          }}
+        >
+          {isSidebarCollapsed ? (
+            <ChevronRight size={18} color="#34D399" />
+          ) : (
+            <ChevronLeft size={18} color="#34D399" />
+          )}
+        </button>
+
+        {/* Brand Header with Dynamic Logos */}
         <div style={{
-          padding: isSidebarCollapsed ? '16px 12px' : '18px 20px',
+          padding: isSidebarCollapsed ? '16px 8px' : '16px 14px',
           borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
           display: 'flex',
           alignItems: 'center',
-          justifyContent: isSidebarCollapsed ? 'center' : 'space-between'
+          justifyContent: 'center'
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <div style={{
-              width: '40px',
-              height: '40px',
-              borderRadius: '12px',
-              background: 'linear-gradient(135deg, #00A878 0%, #0DBA8B 100%)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: '#FFFFFF',
-              boxShadow: '0 4px 14px rgba(0, 168, 120, 0.4)',
-              flexShrink: 0
-            }}>
-              <Trees size={22} />
-            </div>
-            {!isSidebarCollapsed && (
-              <div>
-                <h1 style={{ fontSize: '1.08rem', fontWeight: 800, color: '#FFFFFF', lineHeight: 1.1, whiteSpace: 'nowrap' }}>
-                  Sharjah EPA
-                </h1>
-                <p style={{ fontSize: '0.68rem', color: '#34D399', fontWeight: 700, letterSpacing: '0.02em', whiteSpace: 'nowrap' }}>
-                  Command Platform
-                </p>
-              </div>
-            )}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%', overflow: 'hidden' }}>
+            <img 
+              src={isSidebarCollapsed ? logoCollapseImg : logoImg} 
+              alt="Sharjah EPAA Logo" 
+              style={{
+                width: '100%',
+                height: 'auto',
+                maxHeight: isSidebarCollapsed ? '44px' : '64px',
+                objectFit: 'contain',
+                filter: 'drop-shadow(0 2px 8px rgba(0, 168, 120, 0.3))',
+                transition: 'all 0.25s ease'
+              }}
+            />
           </div>
 
-          {/* Desktop Toggle Button */}
-          {!isSidebarCollapsed && (
-            <button 
-              onClick={toggleSidebar}
-              className="desktop-toggle-btn"
-              style={{
-                background: 'transparent',
-                border: 'none',
-                color: '#94A3B8',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                padding: '6px',
-                borderRadius: '6px',
-                transition: 'all 0.15s ease'
-              }}
-              title="Collapse Sidebar"
-            >
-              <PanelLeftClose size={18} />
-            </button>
-          )}
-
-          {/* Mobile Close X Button */}
+          {/* Mobile Close Button */}
           <button 
             onClick={() => setIsMobileMenuOpen(false)}
             className="mobile-close-btn"
@@ -202,14 +246,13 @@ export default function Sidebar() {
               borderRadius: '8px',
               transition: 'all 0.15s ease'
             }}
-            title="Close Drawer"
           >
             <X size={18} />
           </button>
         </div>
 
-        {/* Dark Navigation Group Items */}
-        <div className="sidebar-scroll-content" style={{ flex: 1, padding: isSidebarCollapsed ? '12px 8px' : '16px 14px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '14px' }}>
+        {/* Navigation Group Items */}
+        <div className="sidebar-scroll-content" style={{ flex: 1, padding: isSidebarCollapsed ? '12px 8px' : '16px 14px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '10px' }}>
           {navGroups.map((group) => {
             const isGroupOpen = openGroupKey === group.key;
 
@@ -217,15 +260,15 @@ export default function Sidebar() {
               <div key={group.key}>
                 {!isSidebarCollapsed ? (
                   <>
-                    {/* Group Header Accordion Button */}
+                    {/* Category Header Accordion */}
                     <div 
-                      onClick={() => toggleGroup(group.key)}
+                      onClick={() => toggleGroup(group)}
                       style={{
-                        fontSize: '12.5px',
-                        fontWeight: isGroupOpen ? 700 : 600,
-                        color: isGroupOpen ? '#34D399' : '#CBD5E1',
+                        fontSize: '0.85rem',
+                        fontWeight: 700,
+                        color: '#34D399',
                         marginBottom: '6px',
-                        padding: '7px 10px',
+                        padding: '9px 12px',
                         borderRadius: '8px',
                         display: 'flex',
                         alignItems: 'center',
@@ -233,7 +276,7 @@ export default function Sidebar() {
                         cursor: 'pointer',
                         userSelect: 'none',
                         transition: 'all 0.15s ease',
-                        background: isGroupOpen ? 'rgba(52, 211, 153, 0.12)' : 'transparent',
+                        background: isGroupOpen ? 'rgba(0, 168, 120, 0.15)' : 'rgba(255, 255, 255, 0.04)',
                         whiteSpace: 'nowrap'
                       }}
                     >
@@ -245,7 +288,7 @@ export default function Sidebar() {
                       )}
                     </div>
 
-                    {/* Sub-Items List with Left Vertical Trunk Line */}
+                    {/* Sub-Items List */}
                     {isGroupOpen && (
                       <div style={{
                         paddingLeft: '10px',
@@ -253,7 +296,7 @@ export default function Sidebar() {
                         borderLeft: '2px solid rgba(255, 255, 255, 0.12)',
                         display: 'flex',
                         flexDirection: 'column',
-                        gap: '4px'
+                        gap: '3px'
                       }}>
                         {group.items.map((item) => {
                           const Icon = item.icon;
@@ -271,42 +314,58 @@ export default function Sidebar() {
                                 minHeight: '36px',
                                 borderRadius: '8px',
                                 border: 'none',
-                                fontSize: '12.5px',
+                                fontSize: '0.8rem',
                                 fontWeight: isActive ? 700 : 400,
                                 cursor: 'pointer',
                                 transition: 'all 0.15s ease',
-                                background: isActive ? 'linear-gradient(90deg, rgba(0, 168, 120, 0.3) 0%, rgba(0, 168, 120, 0.15) 100%)' : 'transparent',
+                                background: isActive ? 'linear-gradient(90deg, rgba(0, 168, 120, 0.35) 0%, rgba(0, 168, 120, 0.12) 100%)' : 'transparent',
                                 color: isActive ? '#FFFFFF' : '#CBD5E1',
                                 borderLeft: isActive ? '3px solid #00A878' : '3px solid transparent',
                                 whiteSpace: 'nowrap'
                               }}
                             >
-                              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', overflow: 'hidden', whiteSpace: 'nowrap' }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '9px', overflow: 'hidden', whiteSpace: 'nowrap' }}>
                                 <Icon size={16} color={isActive ? '#34D399' : '#94A3B8'} style={{ flexShrink: 0 }} />
                                 <span style={{ whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>{item.label}</span>
                               </div>
 
-                              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexShrink: 0, marginLeft: '4px' }}>
-                                {item.badge && (
-                                  <span className="badge badge-normal" style={{ fontSize: '0.58rem', padding: '1px 5px', background: 'rgba(52, 211, 153, 0.2)', color: '#34D399', border: '1px solid rgba(52, 211, 153, 0.4)', whiteSpace: 'nowrap' }}>
-                                    {item.badge}
-                                  </span>
-                                )}
-
-                                {item.count > 0 && (
-                                  <span style={{
-                                    background: item.id === 'notifications' ? '#2563EB' : '#EF4444',
-                                    color: '#FFFFFF',
-                                    fontSize: '0.64rem',
-                                    fontWeight: 800,
-                                    padding: '2px 6px',
-                                    borderRadius: '10px',
-                                    whiteSpace: 'nowrap'
-                                  }}>
-                                    {item.count}
-                                  </span>
-                                )}
-                              </div>
+                              {/* Notification / Status Badges */}
+                              {item.badge && (
+                                <div style={{ marginLeft: '6px', flexShrink: 0 }}>
+                                  {item.badgeType === 'count-red' && (
+                                    <span style={{ 
+                                      background: '#EF4444', 
+                                      color: '#FFFFFF', 
+                                      borderRadius: '50%', 
+                                      width: '18px', 
+                                      height: '18px', 
+                                      display: 'flex', 
+                                      alignItems: 'center', 
+                                      justifyContent: 'center', 
+                                      fontSize: '0.68rem', 
+                                      fontWeight: 800 
+                                    }}>
+                                      {item.badge}
+                                    </span>
+                                  )}
+                                  {item.badgeType === 'count-blue' && (
+                                    <span style={{ 
+                                      background: '#3B82F6', 
+                                      color: '#FFFFFF', 
+                                      borderRadius: '50%', 
+                                      width: '18px', 
+                                      height: '18px', 
+                                      display: 'flex', 
+                                      alignItems: 'center', 
+                                      justifyContent: 'center', 
+                                      fontSize: '0.68rem', 
+                                      fontWeight: 800 
+                                    }}>
+                                      {item.badge}
+                                    </span>
+                                  )}
+                                </div>
+                              )}
                             </button>
                           );
                         })}
@@ -322,10 +381,7 @@ export default function Sidebar() {
                       return (
                         <button
                           key={item.id}
-                          onClick={() => {
-                            handleModuleSelect(item.id);
-                            setOpenGroupKey(group.key);
-                          }}
+                          onClick={() => handleModuleSelect(item.id)}
                           title={item.label}
                           style={{
                             display: 'flex',
@@ -351,29 +407,38 @@ export default function Sidebar() {
           })}
         </div>
 
-        {/* Dark Footer */}
+        {/* Footer with Sign Out Action Button */}
         <div style={{
-          padding: '12px 16px',
+          padding: isSidebarCollapsed ? '12px 8px' : '12px 14px',
           borderTop: '1px solid rgba(255, 255, 255, 0.08)',
           background: 'rgba(15, 23, 42, 0.95)',
           display: 'flex',
           alignItems: 'center',
-          justifyContent: isSidebarCollapsed ? 'center' : 'space-between'
+          justifyContent: isSidebarCollapsed ? 'center' : 'flex-start'
         }}>
-          {isSidebarCollapsed ? (
-            <button 
-              onClick={toggleSidebar}
-              style={{ background: 'transparent', border: 'none', color: '#94A3B8', cursor: 'pointer' }}
-              title="Expand Sidebar"
-            >
-              <PanelLeftOpen size={20} />
-            </button>
-          ) : (
-            <div>
-              <div style={{ fontSize: '0.72rem', color: '#64748B', fontWeight: 600 }}>EPA Telemetry Engine</div>
-              <div style={{ fontSize: '0.68rem', color: '#34D399', fontWeight: 700 }}>● Connected (v5.0)</div>
-            </div>
-          )}
+          <button
+            onClick={handleSignOut}
+            style={{
+              width: '100%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: isSidebarCollapsed ? 'center' : 'flex-start',
+              gap: '10px',
+              padding: '8px 12px',
+              borderRadius: '8px',
+              border: '1px solid rgba(220, 38, 38, 0.3)',
+              background: 'rgba(220, 38, 38, 0.1)',
+              color: '#F87171',
+              fontSize: '0.8rem',
+              fontWeight: 700,
+              cursor: 'pointer',
+              transition: 'all 0.2s ease'
+            }}
+            title="Sign Out of EPA Session"
+          >
+            <LogOut size={16} color="#F87171" />
+            {!isSidebarCollapsed && <span>Sign Out</span>}
+          </button>
         </div>
 
       </aside>

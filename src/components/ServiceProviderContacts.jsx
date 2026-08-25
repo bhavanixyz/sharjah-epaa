@@ -1,18 +1,10 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
-import { useApp } from '../context/AppContext';
 import { 
   Search, 
-  Plus, 
-  Zap, 
-  Wifi, 
-  Wrench, 
-  Radio, 
-  CheckCircle2, 
-  AlertTriangle, 
+  Phone, 
+  Mail, 
+  Building, 
   Download, 
-  Table, 
-  LayoutGrid, 
-  Map, 
   ChevronDown, 
   ChevronLeft, 
   ChevronRight, 
@@ -26,17 +18,19 @@ import {
   CheckSquare, 
   Square, 
   X, 
-  MapPin 
+  UserCheck,
+  User,
+  Table,
+  Map
 } from 'lucide-react';
 import GisMap from './GisMap';
 
-export default function StationsManagement() {
-  const { stations, setIsWoModalOpen } = useApp();
-  const [searchStn, setSearchStn] = useState('');
-  const [viewMode, setViewMode] = useState('table'); // 'table', 'cards', or 'map'
-  const [sortField, setSortField] = useState('code');
+export default function ServiceProviderContacts() {
+  const [searchQuery, setSearchQuery] = useState('');
+  const [viewMode, setViewMode] = useState('table'); // 'table' or 'map'
+  const [sortField, setSortField] = useState('provider');
   const [sortDirection, setSortDirection] = useState('asc');
-  const [selectedStationIds, setSelectedStationIds] = useState([]);
+  const [selectedIds, setSelectedIds] = useState([]);
   const [isExportDropdownOpen, setIsExportDropdownOpen] = useState(false);
   const exportDropdownRef = useRef(null);
 
@@ -55,23 +49,39 @@ export default function StationsManagement() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Filter stations based on search
-  const filteredStations = useMemo(() => {
-    return stations.filter(s => {
-      const q = searchStn.toLowerCase();
+  const contacts = [
+    { id: 'sp-1', provider: 'Teledyne API Environmental', contactPerson: 'Mark Harrison', role: 'Chief Calibration Engineer', email: 'mharrison@teledyne-api.com', phone: '+1 858 657 9800', region: 'North America / Middle East', status: 'Active Vendor' },
+    { id: 'sp-2', provider: 'Horiba Instruments Middle East', contactPerson: 'Eng. Ahmed Al-Standard', role: 'Regional Maintenance Manager', email: 'ahmed.standard@horiba.ae', phone: '+971 4 883 7070', region: 'UAE & GCC Region', status: 'Active Vendor' },
+    { id: 'sp-3', provider: 'Thermo Fisher Scientific', contactPerson: 'David Miller', role: 'Gas Analyzer Specialist', email: 'david.miller@thermofisher.com', phone: '+971 4 457 1100', region: 'Global Field Support', status: 'Active Vendor' },
+    { id: 'sp-4', provider: 'Emirates Calibration Laboratories', contactPerson: 'Mariam Al-Kabi', role: 'ISO 17025 Lead Auditor', email: 'mariam@emicalib.ae', phone: '+971 6 534 2200', region: 'Sharjah Industrial', status: 'Active Vendor' },
+    { id: 'sp-5', provider: 'Vaisala Gulf Meteorological FZE', contactPerson: 'Hassan Al-Zahabi', role: 'Microclimate Technical Lead', email: 'h.alzahabi@vaisala.com', phone: '+971 4 881 9920', region: 'GCC Regional Office', status: 'Active Vendor' },
+    { id: 'sp-6', provider: 'YSI Xylem Water Solutions', contactPerson: 'Dr. Sarah Jenkins', role: 'Marine Sonde Calibration Lead', email: 's.jenkins@xylem.com', phone: '+971 4 347 5588', region: 'Middle East & North Africa', status: 'Active Vendor' },
+    { id: 'sp-7', provider: 'Campbell Scientific Middle East', contactPerson: 'Omar Al-Sabah', role: 'Telemetry & Data Logger Engineer', email: 'o.alsabah@campbellsci.ae', phone: '+971 6 557 4100', region: 'Sharjah Freezone', status: 'Active Vendor' },
+    { id: 'sp-8', provider: 'Endress+Hauser Water Analytics', contactPerson: 'Kambiz Rostami', role: 'Flow Sensor Specialist', email: 'kambiz.rostami@endress.com', phone: '+971 4 810 5000', region: 'UAE Support Hub', status: 'Active Vendor' },
+    { id: 'sp-9', provider: 'Aeroqual Air Monitoring Systems', contactPerson: 'Rachel Adams', role: 'Ambient AQ Sensor Auditor', email: 'r.adams@aeroqual.com', phone: '+971 4 329 1100', region: 'Middle East Division', status: 'Active Vendor' },
+    { id: 'sp-10', provider: 'Tisch Environmental Inc.', contactPerson: 'Michael O\'Connor', role: 'High Volume Air Sampler Lead', email: 'moconnor@tisch-env.com', phone: '+1 513 467 9000', region: 'Global Technical Support', status: 'Active Vendor' },
+    { id: 'sp-11', provider: 'OTT HydroMet GCC', contactPerson: 'Khalifa Al-Hajri', role: 'Hydrological Station Specialist', email: 'k.alhajri@otthydromet.com', phone: '+971 4 338 9090', region: 'GCC & Oman Territory', status: 'Active Vendor' },
+    { id: 'sp-12', provider: 'Hach Water Analytics Middle East', contactPerson: 'Fatima Al-Rumaithi', role: 'Water Quality Chemist', email: 'falrumaithi@hach.com', phone: '+971 4 887 6677', region: 'Sharjah & Northern Emirates', status: 'Active Vendor' }
+  ];
+
+  // Filter contacts based on search query
+  const filteredContacts = useMemo(() => {
+    return contacts.filter(c => {
+      const q = searchQuery.toLowerCase();
       return (
-        (s.name && s.name.toLowerCase().includes(q)) ||
-        (s.code && s.code.toLowerCase().includes(q)) ||
-        (s.siteName && s.siteName.toLowerCase().includes(q)) ||
-        (s.type && s.type.toLowerCase().includes(q)) ||
-        (s.assignedEngineer && s.assignedEngineer.toLowerCase().includes(q))
+        (c.provider && c.provider.toLowerCase().includes(q)) ||
+        (c.contactPerson && c.contactPerson.toLowerCase().includes(q)) ||
+        (c.role && c.role.toLowerCase().includes(q)) ||
+        (c.email && c.email.toLowerCase().includes(q)) ||
+        (c.phone && c.phone.toLowerCase().includes(q)) ||
+        (c.region && c.region.toLowerCase().includes(q))
       );
     });
-  }, [stations, searchStn]);
+  }, [contacts, searchQuery]);
 
-  // Sort stations based on sortField & sortDirection
-  const sortedStations = useMemo(() => {
-    const data = [...filteredStations];
+  // Sort contacts based on sortField & sortDirection
+  const sortedContacts = useMemo(() => {
+    const data = [...filteredContacts];
     data.sort((a, b) => {
       let valA = a[sortField] || '';
       let valB = b[sortField] || '';
@@ -84,18 +94,18 @@ export default function StationsManagement() {
       return 0;
     });
     return data;
-  }, [filteredStations, sortField, sortDirection]);
+  }, [filteredContacts, sortField, sortDirection]);
 
   // Pagination math
-  const totalRecords = sortedStations.length;
+  const totalRecords = sortedContacts.length;
   const totalPages = Math.ceil(totalRecords / pageSize) || 1;
   const safeCurrentPage = Math.min(currentPage, totalPages);
   const startIndex = (safeCurrentPage - 1) * pageSize;
   const endIndex = Math.min(startIndex + pageSize, totalRecords);
 
-  const paginatedStations = useMemo(() => {
-    return sortedStations.slice(startIndex, endIndex);
-  }, [sortedStations, startIndex, endIndex]);
+  const paginatedContacts = useMemo(() => {
+    return sortedContacts.slice(startIndex, endIndex);
+  }, [sortedContacts, startIndex, endIndex]);
 
   // Handle Sort Toggle
   const handleSort = (field) => {
@@ -114,21 +124,21 @@ export default function StationsManagement() {
 
   // Row selection logic
   const isAllPaginatedSelected = useMemo(() => {
-    if (paginatedStations.length === 0) return false;
-    return paginatedStations.every(s => selectedStationIds.includes(s.id));
-  }, [paginatedStations, selectedStationIds]);
+    if (paginatedContacts.length === 0) return false;
+    return paginatedContacts.every(c => selectedIds.includes(c.id));
+  }, [paginatedContacts, selectedIds]);
 
   const toggleSelectAll = () => {
     if (isAllPaginatedSelected) {
-      setSelectedStationIds(prev => prev.filter(id => !paginatedStations.some(ps => ps.id === id)));
+      setSelectedIds(prev => prev.filter(id => !paginatedContacts.some(pc => pc.id === id)));
     } else {
-      const newIds = new Set([...selectedStationIds, ...paginatedStations.map(s => s.id)]);
-      setSelectedStationIds(Array.from(newIds));
+      const newIds = new Set([...selectedIds, ...paginatedContacts.map(c => c.id)]);
+      setSelectedIds(Array.from(newIds));
     }
   };
 
   const toggleSelectRow = (id) => {
-    setSelectedStationIds(prev => 
+    setSelectedIds(prev => 
       prev.includes(id) ? prev.filter(item => item !== id) : [...prev, id]
     );
   };
@@ -137,26 +147,25 @@ export default function StationsManagement() {
   const handleExport = (format) => {
     setIsExportDropdownOpen(false);
 
-    const exportData = selectedStationIds.length > 0
-      ? filteredStations.filter(s => selectedStationIds.includes(s.id))
-      : filteredStations;
+    const exportData = selectedIds.length > 0
+      ? filteredContacts.filter(c => selectedIds.includes(c.id))
+      : filteredContacts;
 
     if (exportData.length === 0) {
-      alert('No station records available to export.');
+      alert('No service provider contact records available to export.');
       return;
     }
 
     if (format === 'csv') {
-      const headers = ['Station Code', 'Station Name', 'Type', 'Parent Site', 'Power Supply', 'Telemetry Link', 'Assigned Engineer', 'Status'];
-      const rows = exportData.map(s => [
-        `"${s.code || ''}"`,
-        `"${s.name || ''}"`,
-        `"${s.type || ''}"`,
-        `"${s.siteName || ''}"`,
-        `"${s.powerSource || ''}"`,
-        `"${s.telemetry || ''}"`,
-        `"${s.assignedEngineer || ''}"`,
-        `"${s.status || ''}"`
+      const headers = ['Service Provider / Company', 'Specialist Role', 'Email', 'Phone Number', 'Support Region', 'Primary Contact Person', 'Status'];
+      const rows = exportData.map(c => [
+        `"${c.provider || ''}"`,
+        `"${c.role || ''}"`,
+        `"${c.email || ''}"`,
+        `"${c.phone || ''}"`,
+        `"${c.region || ''}"`,
+        `"${c.contactPerson || ''}"`,
+        `"${c.status || ''}"`
       ]);
 
       const csvContent = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
@@ -164,7 +173,7 @@ export default function StationsManagement() {
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.setAttribute('href', url);
-      link.setAttribute('download', `Sharjah_EPA_Stations_${exportData.length}_Records.csv`);
+      link.setAttribute('download', `Sharjah_EPA_Service_Providers_${exportData.length}_Records.csv`);
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -174,7 +183,7 @@ export default function StationsManagement() {
         <!DOCTYPE html>
         <html>
           <head>
-            <title>Sharjah EPA - Live Site Management Directory</title>
+            <title>Sharjah EPA - Service Providers & Vendor Directory</title>
             <style>
               body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 24px; color: #1e293b; }
               h1 { color: #00A878; font-size: 20px; margin-bottom: 4px; }
@@ -183,37 +192,32 @@ export default function StationsManagement() {
               th, td { border: 1px solid #e2e8f0; padding: 8px 12px; font-size: 11px; text-align: left; }
               th { background-color: #f8fafc; color: #475569; font-weight: bold; }
               tr:nth-child(even) { background-color: #f1f5f9; }
-              .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-weight: bold; font-size: 10px; }
-              .badge-active, .badge-operational { background: #dcfce7; color: #166534; }
-              .badge-warning { background: #fef3c7; color: #92400e; }
-              .badge-critical, .badge-degraded { background: #fee2e2; color: #991b1b; }
+              .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-weight: bold; font-size: 10px; background: #e0f2fe; color: #0369a1; }
             </style>
           </head>
           <body>
             <h1>Sharjah Environment Protected Authority (Sharjah EPA)</h1>
-            <p>Live Site Management & Station Telemetry Directory — Exported ${new Date().toLocaleDateString()} (${exportData.length} records)</p>
+            <p>Approved Vendor & Technical Service Providers Directory — Exported ${new Date().toLocaleDateString()} (${exportData.length} records)</p>
             <table>
               <thead>
                 <tr>
-                  <th>Station Code</th>
-                  <th>Station Name & Type</th>
-                  <th>Parent Site</th>
-                  <th>Power Supply</th>
-                  <th>Telemetry Link</th>
-                  <th>Engineer</th>
-                  <th>Status</th>
+                  <th>Service Provider / Company</th>
+                  <th>Specialist Role</th>
+                  <th>Email</th>
+                  <th>Phone Number</th>
+                  <th>Support Region</th>
+                  <th>Primary Contact Person</th>
                 </tr>
               </thead>
               <tbody>
-                ${exportData.map(s => `
+                ${exportData.map(c => `
                   <tr>
-                    <td><strong>${s.code || ''}</strong></td>
-                    <td>${s.name || ''}<br/><small style="color:#64748b">${s.type || ''}</small></td>
-                    <td>${s.siteName || ''}</td>
-                    <td>${s.powerSource || ''}</td>
-                    <td>${s.telemetry || ''}</td>
-                    <td>${s.assignedEngineer || ''}</td>
-                    <td><span class="badge badge-${(s.status || 'active').toLowerCase()}">${s.status || 'Active'}</span></td>
+                    <td><strong>${c.provider || ''}</strong><br/><span class="badge">${c.status || 'Active Vendor'}</span></td>
+                    <td>${c.role || ''}</td>
+                    <td>${c.email || ''}</td>
+                    <td>${c.phone || ''}</td>
+                    <td>${c.region || ''}</td>
+                    <td><strong>${c.contactPerson || ''}</strong></td>
                   </tr>
                 `).join('')}
               </tbody>
@@ -233,13 +237,13 @@ export default function StationsManagement() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
 
-      {/* Main Container */}
+      {/* Main Glass Panel Table Container */}
       <div className="glass-panel" style={{ padding: '20px', borderRadius: '16px' }}>
 
-        {/* Top Header Toolbar: Search, Export Dropdown, View Mode Switcher, Add Station CTA */}
+        {/* Top Header Inside Card: Search on Left, Right Aligned Export Dropdown & View Mode Switcher */}
         <div style={{ 
           display: 'flex', 
-          justifyContent: 'space-between', 
+          justify: 'space-between', 
           alignItems: 'center', 
           flexWrap: 'wrap', 
           gap: '12px', 
@@ -249,17 +253,17 @@ export default function StationsManagement() {
           width: '100%'
         }}>
           
-          {/* Left: Search Bar */}
+          {/* Left Aligned Search Input */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flex: '0 1 340px', minWidth: '240px' }}>
             <div className="page-header-search" style={{ margin: 0, width: '100%' }}>
               <Search size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#9CA3AF' }} />
               <input 
                 type="text" 
                 className="input-field" 
-                placeholder="Search station, code, site, engineer..." 
-                value={searchStn}
+                placeholder="Search provider, contact person, role, email..." 
+                value={searchQuery}
                 onChange={(e) => {
-                  setSearchStn(e.target.value);
+                  setSearchQuery(e.target.value);
                   setCurrentPage(1);
                 }}
                 style={{ paddingLeft: '36px', fontSize: '0.8rem', background: '#FFFFFF' }}
@@ -267,7 +271,7 @@ export default function StationsManagement() {
             </div>
           </div>
 
-          {/* Right: Export Dropdown + View Mode Switcher + Add Monitoring Station CTA */}
+          {/* Right Aligned Controls: Export Dropdown + View Mode Switcher (Table View / Map View) */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap', marginLeft: 'auto' }}>
             
             {/* Export Dropdown Button */}
@@ -294,7 +298,7 @@ export default function StationsManagement() {
                 }}
               >
                 <Download size={14} color="#00A878" />
-                <span>Export {selectedStationIds.length > 0 ? `(${selectedStationIds.length})` : ''}</span>
+                <span>Export {selectedIds.length > 0 ? `(${selectedIds.length})` : ''}</span>
                 <ChevronDown size={14} color="#64748B" />
               </button>
 
@@ -313,7 +317,7 @@ export default function StationsManagement() {
                   fontSize: '0.76rem'
                 }}>
                   <div style={{ padding: '6px 12px', fontSize: '0.68rem', fontWeight: 700, color: '#94A3B8', borderBottom: '1px solid #F1F5F9', textTransform: 'uppercase' }}>
-                    {selectedStationIds.length > 0 ? `Selected Stations (${selectedStationIds.length})` : `All Filtered (${filteredStations.length})`}
+                    {selectedIds.length > 0 ? `Selected Contacts (${selectedIds.length})` : `All Filtered (${filteredContacts.length})`}
                   </div>
                   <div 
                     onClick={() => handleExport('csv')} 
@@ -335,7 +339,7 @@ export default function StationsManagement() {
               )}
             </div>
 
-            {/* View Mode Toggle Switch (Table View, Card View, Map View) */}
+            {/* View Mode Toggle Switch (Table View, Map View) */}
             <div style={{ display: 'flex', background: '#F8FAFC', padding: '3px', borderRadius: '8px', border: '1px solid #CBD5E1', height: '36px', boxSizing: 'border-box' }}>
               <button
                 onClick={() => setViewMode('table')}
@@ -356,26 +360,6 @@ export default function StationsManagement() {
                 }}
               >
                 <Table size={15} /> Table View
-              </button>
-              <button
-                onClick={() => setViewMode('cards')}
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '6px',
-                  padding: '0 12px',
-                  borderRadius: '6px',
-                  border: 'none',
-                  fontSize: '0.76rem',
-                  fontWeight: 700,
-                  cursor: 'pointer',
-                  background: viewMode === 'cards' ? '#E6F6F2' : 'transparent',
-                  color: viewMode === 'cards' ? '#00A878' : '#64748B',
-                  transition: 'all 0.15s ease'
-                }}
-              >
-                <LayoutGrid size={15} /> Card View
               </button>
               <button
                 onClick={() => setViewMode('map')}
@@ -399,30 +383,14 @@ export default function StationsManagement() {
               </button>
             </div>
 
-            {/* Add Monitoring Station CTA Button */}
-            <button 
-              className="btn btn-epa" 
-              style={{ 
-                height: '36px', 
-                padding: '0 16px', 
-                fontSize: '0.76rem',
-                display: 'inline-flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                boxSizing: 'border-box'
-              }}
-            >
-              <Plus size={16} /> Add Monitoring Station
-            </button>
-
           </div>
         </div>
 
         {/* Selected Items Counter Bar */}
-        {selectedStationIds.length > 0 && (
+        {selectedIds.length > 0 && (
           <div style={{
             display: 'flex',
-            justifyContent: 'space-between',
+            justify: 'space-between',
             alignItems: 'center',
             padding: '10px 16px',
             marginBottom: '14px',
@@ -435,17 +403,17 @@ export default function StationsManagement() {
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <CheckSquare size={16} color="#00A878" />
-              <span><strong>{selectedStationIds.length}</strong> station records selected out of {filteredStations.length}</span>
+              <span><strong>{selectedIds.length}</strong> service provider contacts selected out of {filteredContacts.length}</span>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
               <button 
                 onClick={() => handleExport('csv')} 
                 style={{ background: '#00A878', color: '#FFF', border: 'none', padding: '4px 10px', borderRadius: '6px', fontSize: '0.74rem', cursor: 'pointer', fontWeight: 700 }}
               >
-                Export Selected ({selectedStationIds.length})
+                Export Selected ({selectedIds.length})
               </button>
               <button 
-                onClick={() => setSelectedStationIds([])} 
+                onClick={() => setSelectedIds([])} 
                 style={{ background: 'transparent', color: '#64748B', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.74rem' }}
               >
                 <X size={14} /> Clear Selection
@@ -474,57 +442,53 @@ export default function StationsManagement() {
                       )}
                     </button>
                   </th>
-                  <th onClick={() => handleSort('code')} style={{ cursor: 'pointer', userSelect: 'none' }}>
+                  <th onClick={() => handleSort('provider')} style={{ cursor: 'pointer', userSelect: 'none' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      Station Code {renderSortIcon('code')}
+                      Service Provider / Company {renderSortIcon('provider')}
                     </div>
                   </th>
-                  <th onClick={() => handleSort('name')} style={{ cursor: 'pointer', userSelect: 'none' }}>
+                  <th onClick={() => handleSort('role')} style={{ cursor: 'pointer', userSelect: 'none' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      Station Name & Type {renderSortIcon('name')}
+                      Specialist Role {renderSortIcon('role')}
                     </div>
                   </th>
-                  <th onClick={() => handleSort('siteName')} style={{ cursor: 'pointer', userSelect: 'none' }}>
+                  <th onClick={() => handleSort('email')} style={{ cursor: 'pointer', userSelect: 'none' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      Parent Site {renderSortIcon('siteName')}
+                      Email {renderSortIcon('email')}
                     </div>
                   </th>
-                  <th onClick={() => handleSort('powerSource')} style={{ cursor: 'pointer', userSelect: 'none' }}>
+                  <th onClick={() => handleSort('phone')} style={{ cursor: 'pointer', userSelect: 'none' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      Power Supply {renderSortIcon('powerSource')}
+                      Phone Number {renderSortIcon('phone')}
                     </div>
                   </th>
-                  <th onClick={() => handleSort('telemetry')} style={{ cursor: 'pointer', userSelect: 'none' }}>
+                  <th onClick={() => handleSort('region')} style={{ cursor: 'pointer', userSelect: 'none' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      Telemetry Link {renderSortIcon('telemetry')}
+                      Support Region {renderSortIcon('region')}
                     </div>
                   </th>
-                  <th onClick={() => handleSort('assignedEngineer')} style={{ cursor: 'pointer', userSelect: 'none' }}>
+                  <th onClick={() => handleSort('contactPerson')} style={{ cursor: 'pointer', userSelect: 'none' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      Assigned Lead Engineer {renderSortIcon('assignedEngineer')}
+                      Primary Contact Person {renderSortIcon('contactPerson')}
                     </div>
                   </th>
-                  <th onClick={() => handleSort('status')} style={{ cursor: 'pointer', userSelect: 'none' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      Status {renderSortIcon('status')}
-                    </div>
-                  </th>
-                  <th style={{ textAlign: 'right' }}>Actions</th>
+                  <th style={{ textAlign: 'right' }}>Call</th>
                 </tr>
               </thead>
               <tbody>
-                {paginatedStations.length === 0 ? (
+                {paginatedContacts.length === 0 ? (
                   <tr>
-                    <td colSpan="9" style={{ textAlign: 'center', padding: '32px 16px', color: '#94A3B8' }}>
-                      No field monitoring station records found matching your search.
+                    <td colSpan="8" style={{ textAlign: 'center', padding: '32px 16px', color: '#94A3B8' }}>
+                      No vendor or service provider contacts found matching your search.
                     </td>
                   </tr>
                 ) : (
-                  paginatedStations.map((stn) => {
-                    const isSelected = selectedStationIds.includes(stn.id);
+                  paginatedContacts.map((c) => {
+                    const isSelected = selectedIds.includes(c.id);
+                    const firstName = c.contactPerson ? c.contactPerson.split(' ')[0] : 'Contact';
                     return (
                       <tr 
-                        key={stn.id}
+                        key={c.id}
                         style={{
                           background: isSelected ? '#F0FDF4' : 'transparent',
                           transition: 'background 0.15s ease'
@@ -533,7 +497,7 @@ export default function StationsManagement() {
                         <td style={{ textAlign: 'center' }}>
                           <button
                             type="button"
-                            onClick={() => toggleSelectRow(stn.id)}
+                            onClick={() => toggleSelectRow(c.id)}
                             style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                           >
                             {isSelected ? (
@@ -544,49 +508,64 @@ export default function StationsManagement() {
                           </button>
                         </td>
 
-                        <td style={{ fontWeight: 700, color: '#00A878', fontFamily: 'monospace' }}>
-                          {stn.code}
+                        <td>
+                          <div style={{ fontWeight: 800, color: '#0F172A', fontSize: '0.88rem' }}>{c.provider}</div>
+                          <span className="badge badge-blue" style={{ marginTop: '3px', display: 'inline-block', fontSize: '0.66rem' }}>{c.status}</span>
+                        </td>
+
+                        <td style={{ fontSize: '0.82rem', color: '#334155' }}>
+                          {c.role}
                         </td>
 
                         <td>
-                          <div style={{ fontWeight: 700, color: '#1F2937' }}>{stn.name}</div>
-                          <div style={{ fontSize: '0.74rem', color: '#6B7280' }}>{stn.type}</div>
+                          <a 
+                            href={`mailto:${c.email}`} 
+                            style={{ fontFamily: 'monospace', color: '#0891B2', fontWeight: 600, fontSize: '0.8rem', textDecoration: 'none' }}
+                          >
+                            {c.email}
+                          </a>
+                        </td>
+
+                        <td style={{ fontSize: '0.82rem', color: '#1F2937', fontWeight: 600, fontFamily: 'monospace' }}>
+                          {c.phone}
                         </td>
 
                         <td style={{ fontSize: '0.82rem', color: '#4B5563' }}>
-                          {stn.siteName}
+                          {c.region}
                         </td>
 
-                        <td style={{ fontSize: '0.8rem', color: '#1F2937' }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                            <Zap size={14} color="#D97706" /> {stn.powerSource}
-                          </div>
-                        </td>
-
-                        <td style={{ fontSize: '0.8rem', color: '#1F2937' }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                            <Wifi size={14} color="#2563EB" /> {stn.telemetry}
-                          </div>
-                        </td>
-
-                        <td style={{ fontSize: '0.82rem', color: '#6B7280' }}>
-                          {stn.assignedEngineer}
-                        </td>
-
+                        {/* Primary Contact Person Column */}
                         <td>
-                          <span className={`badge badge-${stn.status.toLowerCase().replace(' ', '-')}`}>
-                            {stn.status}
-                          </span>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: '#E6F6F2', color: '#00A878', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '0.74rem' }}>
+                              <User size={14} />
+                            </div>
+                            <div>
+                              <div style={{ fontWeight: 700, color: '#0F172A', fontSize: '0.86rem' }}>{c.contactPerson}</div>
+                              <div style={{ fontSize: '0.68rem', color: '#64748B' }}>Primary Representative</div>
+                            </div>
+                          </div>
                         </td>
 
+                        {/* Call Action Button */}
                         <td style={{ textAlign: 'right' }}>
-                          <button 
-                            onClick={() => setIsWoModalOpen(true)}
-                            className="btn btn-secondary" 
-                            style={{ padding: '4px 10px', fontSize: '0.72rem' }}
+                          <a 
+                            href={`tel:${c.phone}`}
+                            className="btn btn-epa"
+                            style={{
+                              padding: '5px 12px',
+                              fontSize: '0.74rem',
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '6px',
+                              textDecoration: 'none',
+                              fontWeight: 700,
+                              borderRadius: '6px'
+                            }}
+                            title={`Call ${c.contactPerson} (${c.phone})`}
                           >
-                            <Wrench size={12} /> Dispatch
-                          </button>
+                            <Phone size={13} /> Call {firstName}
+                          </a>
                         </td>
                       </tr>
                     );
@@ -597,94 +576,7 @@ export default function StationsManagement() {
           </div>
         )}
 
-        {/* VIEW MODE 2: Card View */}
-        {viewMode === 'cards' && (
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))',
-            gap: '16px'
-          }}>
-            {paginatedStations.map((stn) => {
-              const isSelected = selectedStationIds.includes(stn.id);
-              return (
-                <div 
-                  key={stn.id}
-                  style={{
-                    background: isSelected ? '#F0FDF4' : '#FFFFFF',
-                    border: isSelected ? '1px solid #00A878' : '1px solid #E2E8F0',
-                    borderRadius: '12px',
-                    padding: '16px',
-                    boxShadow: '0 2px 8px rgba(0,0,0,0.04)',
-                    transition: 'all 0.2s ease',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'space-between'
-                  }}
-                >
-                  <div>
-                    {/* Top Row: Checkbox, Code, Status */}
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <button
-                          type="button"
-                          onClick={() => toggleSelectRow(stn.id)}
-                          style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
-                        >
-                          {isSelected ? <CheckSquare size={16} color="#00A878" /> : <Square size={16} color="#CBD5E1" />}
-                        </button>
-                        <span style={{ fontSize: '0.76rem', fontWeight: 800, color: '#00A878', fontFamily: 'monospace' }}>
-                          {stn.code}
-                        </span>
-                      </div>
-                      <span className={`badge badge-${stn.status.toLowerCase().replace(' ', '-')}`}>
-                        {stn.status}
-                      </span>
-                    </div>
-
-                    <h4 style={{ fontSize: '0.92rem', fontWeight: 700, color: '#0F172A', marginBottom: '4px' }}>
-                      {stn.name}
-                    </h4>
-                    <div style={{ fontSize: '0.74rem', color: '#64748B', marginBottom: '12px' }}>
-                      Type: {stn.type}
-                    </div>
-
-                    {/* Site & Tech Info */}
-                    <div style={{ background: '#F8FAFC', borderRadius: '8px', padding: '10px', marginBottom: '12px', fontSize: '0.76rem' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-                        <span style={{ color: '#64748B' }}>Parent Site:</span>
-                        <strong style={{ color: '#0F172A' }}>{stn.siteName}</strong>
-                      </div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-                        <span style={{ color: '#64748B' }}>Power:</span>
-                        <strong style={{ color: '#D97706' }}>{stn.powerSource}</strong>
-                      </div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                        <span style={{ color: '#64748B' }}>Telemetry:</span>
-                        <strong style={{ color: '#2563EB' }}>{stn.telemetry}</strong>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Card Footer: Engineer & Action */}
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '10px', borderTop: '1px solid #F1F5F9' }}>
-                    <div style={{ fontSize: '0.74rem', color: '#64748B' }}>
-                      Engineer: <strong style={{ color: '#334155' }}>{stn.assignedEngineer}</strong>
-                    </div>
-                    <button 
-                      onClick={() => setIsWoModalOpen(true)}
-                      className="btn btn-secondary" 
-                      style={{ padding: '4px 10px', fontSize: '0.72rem' }}
-                    >
-                      <Wrench size={12} /> Dispatch
-                    </button>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        )}
-
-        {/* VIEW MODE 3: Map View */}
+        {/* VIEW MODE 2: Map View */}
         {viewMode === 'map' && (
           <div style={{ height: '560px', borderRadius: '12px', overflow: 'hidden', border: '1px solid #CBD5E1' }}>
             <GisMap mode="stations" selectedId={null} />
@@ -694,7 +586,7 @@ export default function StationsManagement() {
         {/* Pagination & Records Footer (Left Records info, Right Page Navigation) */}
         <div style={{ 
           display: 'flex', 
-          justifyContent: 'space-between', 
+          justify: 'space-between', 
           alignItems: 'center', 
           flexWrap: 'wrap', 
           gap: '12px', 
@@ -710,7 +602,7 @@ export default function StationsManagement() {
           
           {/* Bottom Left: View Records (10, 50, 100, 500) Dropdown */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '0.78rem', color: '#64748B', fontWeight: 600 }}>
-            <span>View records:</span>
+            <span>View records per page:</span>
             <select
               value={pageSize}
               onChange={(e) => {
@@ -735,7 +627,7 @@ export default function StationsManagement() {
               <option value={500}>500</option>
             </select>
             <span style={{ color: '#CBD5E1' }}>|</span>
-            <span>Showing <strong style={{ color: '#0F172A' }}>{totalRecords > 0 ? startIndex + 1 : 0}</strong> to <strong style={{ color: '#0F172A' }}>{endIndex}</strong> of <strong style={{ color: '#0F172A' }}>{totalRecords}</strong> station records</span>
+            <span>Showing <strong style={{ color: '#0F172A' }}>{totalRecords > 0 ? startIndex + 1 : 0}</strong> to <strong style={{ color: '#0F172A' }}>{endIndex}</strong> of <strong style={{ color: '#0F172A' }}>{totalRecords}</strong> contact records</span>
           </div>
 
           {/* Bottom Right: Pagination Navigation */}

@@ -15,14 +15,10 @@ export default function UserManagement() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
       
-      <div className="glass-panel page-header-card">
-        <div>
-          <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#1F2937' }}>EPA Staff & User Accounts Directory</h2>
-          <p style={{ fontSize: '0.8rem', color: '#6B7280' }}>Personnel accounts, department assignments, authority badges & operational status</p>
-        </div>
-
-        <div className="page-header-actions">
-          <div className="page-header-search">
+      {/* Top Action Toolbar */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flex: 1, minWidth: '260px' }}>
+          <div className="page-header-search" style={{ margin: 0, maxWidth: '320px', flex: 1 }}>
             <Search size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#9CA3AF' }} />
             <input 
               type="text" 
@@ -30,14 +26,14 @@ export default function UserManagement() {
               placeholder="Search staff, role, email..." 
               value={searchUser}
               onChange={(e) => setSearchUser(e.target.value)}
-              style={{ paddingLeft: '36px', fontSize: '0.8rem', background: '#F8FAFC' }}
+              style={{ paddingLeft: '36px', fontSize: '0.8rem', background: '#FFFFFF' }}
             />
           </div>
-
-          <button className="btn btn-epa">
-            <Plus size={16} /> Add EPA User Account
-          </button>
         </div>
+
+        <button className="btn btn-epa">
+          <Plus size={16} /> Add EPA User Account
+        </button>
       </div>
 
       {/* Users Grid */}

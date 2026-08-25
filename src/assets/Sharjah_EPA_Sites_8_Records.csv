@@ -1,0 +1,9 @@
+Site Code,Site Name,Protected Category,Zone / Location,Latitude,Longitude,Stations Count,Assets Count,Assigned Engineer,Status,Last Maintenance
+"SEPA-SITE-004","Sir Bu Nair Island Marine Reserve","Protected Marine Island","Offshore Marine Sanctuary",25.2312,54.2215,1,5,"Khalid Al-Nuaimi","Critical","2026-06-18"
+"SEPA-SITE-001","Al Majaz Waterfront Site","Urban Reserve","Sharjah City Center",25.3315,55.385,2,6,"Tariq Al-Mansoori","Normal","2026-08-10"
+"SEPA-SITE-002","Wasit Wetland Protected Reserve","Ramsar Wetland Site","Wasit Wetland Ecosystem",25.3611,55.4678,2,8,"Fatima Al-Zahra","Normal","2026-08-14"
+"SEPA-SITE-005","Al Dhaid Hydrological Basin","Aquifer Conservation Area","Central Agricultural Region",25.2843,55.8816,2,6,"Aisha Al-Husseini","Normal","2026-08-01"
+"SEPA-SITE-006","Khorfakkan Port & Coastal Zone","Industrial Marine Buffer","East Coast Port Zone",25.34,56.3533,2,6,"Saeed Al-Mutawa","Normal","2026-08-05"
+"SEPA-SITE-007","Mleiha Archaeological Biosphere","UNESCO Heritage & Desert Reserve","Mleiha Biosphere Reserve",25.125,55.864,1,4,"Omar Al-Qasimi","Normal","2026-07-20"
+"SEPA-SITE-003","Khor Kalba Mangrove Sanctuary","Strict Nature Reserve","Kalba Coastal Region",25.0185,56.3601,2,7,"Rashid Al-Kaitoob","Warning","2026-07-28"
+"SEPA-SITE-008","Al Hamriyah Coastal Buffer Site","Environmental Emission Buffer","Hamriyah Coastal Freezone",25.468,55.518,2,9,"Mohammed Al-Shehhi","Warning","2026-08-11"

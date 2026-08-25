@@ -14,17 +14,11 @@ export default function ConfigurationManagement() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
       
-      <div className="glass-panel page-header-card">
-        <div>
-          <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#1F2937' }}>Enterprise System Configuration</h2>
-          <p style={{ fontSize: '0.8rem', color: '#6B7280' }}>Global platform parameters, telemetry polling rates, SLA thresholds & future domain modules</p>
-        </div>
-
-        <div className="page-header-actions">
-          <button onClick={handleSave} className="btn btn-epa">
-            <Save size={16} /> {saved ? 'Saved Successfully!' : 'Save System Configuration'}
-          </button>
-        </div>
+      {/* Top Action Bar */}
+      <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
+        <button onClick={handleSave} className="btn btn-epa">
+          <Save size={16} /> {saved ? 'Saved Successfully!' : 'Save System Configuration'}
+        </button>
       </div>
 
       <div className="grid-2-responsive">
