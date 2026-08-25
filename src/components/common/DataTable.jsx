@@ -266,8 +266,8 @@ export default function DataTable({
         </div>
       </div>
 
-      {/* Main Table Layout */}
-      <div className="table-responsive" style={{ border: '1px solid #E2E8F0', borderRadius: '8px', overflow: 'hidden' }}>
+      {/* Main Table Layout with Horizontal Scroll */}
+      <div className="table-responsive" style={{ border: '1px solid #CBD5E1', borderRadius: '8px', overflowX: 'auto', overflowY: 'visible', width: '100%', maxWidth: '100%' }}>
         <table className="epa-table">
           <thead>
             <tr>

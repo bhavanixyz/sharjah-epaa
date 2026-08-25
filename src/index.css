@@ -400,13 +400,15 @@ p, span, div, strong, label {
 .table-responsive {
   width: 100%;
   max-width: 100%;
-  overflow-x: auto;
+  overflow-x: auto !important;
+  overflow-y: visible;
   -webkit-overflow-scrolling: touch;
   border-radius: var(--radius-md);
 }
 
 .epa-table {
   width: 100%;
+  min-width: 800px;
   border-collapse: separate;
   border-spacing: 0;
   background: #FFFFFF;
