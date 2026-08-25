@@ -333,6 +333,17 @@ export default function ChatAIWidget() {
     setTimeout(() => setCopiedId(null), 2000);
   };
 
+  const handleClear = () => {
+    setMessages([
+      {
+        id: Date.now(),
+        sender: 'ai',
+        text: 'Conversation cleared. How else may I assist you with Sharjah EPAA operational telemetry?',
+        type: 'text'
+      }
+    ]);
+  };
+
   const handleClose = () => {
     handleClear();
     setIsOpen(false);
