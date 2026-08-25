@@ -535,20 +535,35 @@ p, span, div, strong, label {
 /* Grid Layout Utilities */
 .dashboard-grid-2 {
   display: grid;
-  grid-template-columns: 1.8fr 1.2fr;
+  grid-template-columns: minmax(0, 1fr) 360px;
   gap: 22px;
+  align-items: start;
 }
 
 .grid-2-responsive {
   display: grid;
-  grid-template-columns: 1fr 1.4fr;
+  grid-template-columns: 340px minmax(0, 1fr);
   gap: 20px;
+  align-items: start;
 }
 
 .gis-map-grid {
   display: grid;
-  grid-template-columns: 1fr 360px;
+  grid-template-columns: minmax(0, 1fr) 340px;
   gap: 18px;
+  align-items: start;
+}
+
+/* Independent Sticky Scroll Panels for Left & Right Cards */
+.grid-2-responsive > div,
+.dashboard-grid-2 > div,
+.gis-map-grid > div {
+  position: sticky;
+  top: 86px;
+  align-self: start;
+  max-height: calc(100vh - 105px);
+  overflow-y: auto;
+  scrollbar-width: thin;
 }
 
 .card-grid-responsive {
@@ -825,6 +840,17 @@ p, span, div, strong, label {
   .card-grid-4, .card-grid-3, .card-grid-2, .card-grid-responsive {
     grid-template-columns: 1fr !important;
     gap: 14px !important;
+  }
+
+  .grid-2-responsive, .dashboard-grid-2, .gis-map-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .grid-2-responsive > div, .dashboard-grid-2 > div, .gis-map-grid > div {
+    position: relative !important;
+    top: auto !important;
+    max-height: none !important;
+    overflow-y: visible !important;
   }
 
   .metric-cards-grid {
