@@ -433,45 +433,34 @@ export default function ChatAIWidget() {
               </div>
             </div>
 
-            {/* Controls Header Options */}
+            {/* Controls Header Options (Icon-Only: Clear, Expand/Collapse, Close) */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginLeft: 'auto', flexShrink: 0 }}>
               
-              {/* Clear Chat Button */}
+              {/* 1. Clear Chat Icon Button */}
               <button 
                 onClick={handleClear} 
-                style={{ background: 'rgba(255,255,255,0.08)', border: 'none', color: '#F8FAFC', cursor: 'pointer', padding: '6px 10px', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.72rem', fontWeight: 600, transition: 'all 0.15s ease' }} 
+                style={{ background: 'rgba(255,255,255,0.08)', border: 'none', color: '#F8FAFC', cursor: 'pointer', padding: '6px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.15s ease' }} 
                 title="Clear Chat History"
               >
-                <Trash2 size={15} />
-                <span>Clear</span>
+                <Trash2 size={16} />
               </button>
 
-              {/* Expand / Right Panel Toggle Button */}
+              {/* 2. Expand / Collapse Icon Button */}
               <button 
                 onClick={() => setIsExpanded(!isExpanded)} 
-                style={{ background: 'rgba(255,255,255,0.08)', border: 'none', color: '#F8FAFC', cursor: 'pointer', padding: '6px 10px', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.72rem', fontWeight: 600, transition: 'all 0.15s ease' }}
+                style={{ background: 'rgba(255,255,255,0.08)', border: 'none', color: '#F8FAFC', cursor: 'pointer', padding: '6px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.15s ease' }}
                 title={isExpanded ? "Collapse to Window" : "Expand to Right Panel"}
               >
-                <Maximize2 size={15} />
-                <span>{isExpanded ? 'Collapse' : 'Expand'}</span>
+                {isExpanded ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
               </button>
 
-              {/* Minimize Button */}
-              <button 
-                onClick={() => setIsOpen(false)} 
-                style={{ background: 'rgba(255,255,255,0.08)', border: 'none', color: '#F8FAFC', cursor: 'pointer', padding: '6px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.15s ease' }}
-                title="Minimize Drawer"
-              >
-                <Minimize2 size={15} />
-              </button>
-
-              {/* Close Button (Closes & Clears All Chat) */}
+              {/* 3. Close Icon Button (Closes & Clears All Chat) */}
               <button 
                 onClick={handleClose} 
-                style={{ background: 'rgba(220, 38, 38, 0.25)', border: '1px solid rgba(220, 38, 38, 0.4)', color: '#F87171', cursor: 'pointer', padding: '6px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.15s ease' }}
+                style={{ background: 'rgba(255,255,255,0.08)', border: 'none', color: '#F8FAFC', cursor: 'pointer', padding: '6px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.15s ease' }}
                 title="Close & Clear All Chat"
               >
-                <X size={16} />
+                <X size={18} />
               </button>
 
             </div>
