@@ -241,6 +241,22 @@ p, span, div, strong, label {
   position: relative;
   width: 280px;
   max-width: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.page-header-search svg {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #64748B;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.page-header-search input {
+  padding-left: 36px !important;
 }
 
 /* Modern Gradient Text Highlights */

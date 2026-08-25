@@ -4,17 +4,30 @@ import {
   Search, Plus, Table, LayoutGrid, Map, User, Clock, 
   Download, ChevronDown, ArrowUpDown, ArrowUp, ArrowDown, 
   ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, 
-  FileSpreadsheet, FileText, Phone, UserCheck, X, PhoneCall
+  FileSpreadsheet, FileText, Phone, UserCheck, X, PhoneCall,
+  Filter, RotateCcw
 } from 'lucide-react';
 import GisMap from './GisMap';
 
 export default function MaintenanceManagement() {
-  const { workOrders, setIsWoModalOpen } = useApp();
+  const { workOrders, setIsWoModalOpen, targetSearchResult, isDateInRange, dateFilter, getDateRangeLabel, triggerExportSuccess } = useApp();
 
   // Search & Filter state
   const [searchWO, setSearchWO] = useState('');
   const [filterStatus, setFilterStatus] = useState('ALL');
   const [viewMode, setViewMode] = useState('table'); // 'table' | 'cards' | 'map'
+
+  // Column Filters state
+  const [showColumnFilters, setShowColumnFilters] = useState(false);
+  const [columnFilters, setColumnFilters] = useState({});
+
+  // Auto-fill and filter when navigated from Global Search
+  useEffect(() => {
+    if (targetSearchResult?.module === 'maintenance') {
+      setSearchWO(targetSearchResult.searchTerm || '');
+      setCurrentPage(1);
+    }
+  }, [targetSearchResult]);
 
   // Sorting state
   const [sortField, setSortField] = useState('id');
@@ -45,6 +58,11 @@ export default function MaintenanceManagement() {
   // Filter & Sort work orders
   const filteredWOs = useMemo(() => {
     return workOrders.filter(wo => {
+      // Date filter check (if user is not explicitly searching by keyword)
+      if (!searchWO && dateFilter !== 'ALL') {
+        if (!isDateInRange(wo.createdDate || wo.dueDate)) return false;
+      }
+
       // Search filter
       const q = searchWO.toLowerCase();
       const matchesSearch = 
@@ -60,6 +78,18 @@ export default function MaintenanceManagement() {
 
       // Status filter
       if (filterStatus !== 'ALL' && wo.status !== filterStatus) return false;
+
+      // Individual Column Filters
+      for (const colKey in columnFilters) {
+        const filterVal = columnFilters[colKey]?.trim().toLowerCase();
+        if (filterVal) {
+          let cellVal = '';
+          if (colKey === 'title') cellVal = `${wo.title || ''} ${wo.siteName || ''}`.toLowerCase();
+          else cellVal = String(wo[colKey] || '').toLowerCase();
+          
+          if (!cellVal.includes(filterVal)) return false;
+        }
+      }
 
       return true;
     }).sort((a, b) => {
@@ -114,6 +144,7 @@ export default function MaintenanceManagement() {
     }
 
     if (format === 'csv') {
+      const fileName = `Sharjah_EPA_WorkOrders_${filteredWOs.length}_Records.csv`;
       const headers = ['Ticket ID', 'Maintenance Type', 'Task Title & Station', 'Target Asset', 'Priority', 'Status', 'Assigned Technician', 'SLA Timer', 'Contact Person', 'Phone Number'];
       const rows = filteredWOs.map(w => [
         `"${w.id || ''}"`,
@@ -134,11 +165,28 @@ export default function MaintenanceManagement() {
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.setAttribute('href', url);
-      link.setAttribute('download', `Sharjah_EPA_WorkOrders_${filteredWOs.length}_Records.csv`);
+      link.setAttribute('download', fileName);
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
+
+      if (triggerExportSuccess) {
+        triggerExportSuccess({
+          filename: fileName,
+          format: 'CSV',
+          count: filteredWOs.length,
+          title: 'Work Orders Downloaded Successfully!'
+        });
+      }
     } else if (format === 'pdf') {
+      if (triggerExportSuccess) {
+        triggerExportSuccess({
+          filename: `Sharjah_EPA_WorkOrders_Report.pdf`,
+          format: 'PDF',
+          count: filteredWOs.length,
+          title: 'Work Orders Report Generated Successfully!'
+        });
+      }
       window.print();
     }
   };
@@ -173,6 +221,37 @@ export default function MaintenanceManagement() {
           {/* Right Controls: Export + View Modes + Create Work Order CTA */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap', marginLeft: 'auto' }}>
             
+            {/* Column Filters Toggle Button */}
+            <button
+              type="button"
+              onClick={() => setShowColumnFilters(prev => !prev)}
+              style={{
+                height: '36px',
+                padding: '0 14px',
+                borderRadius: '8px',
+                border: showColumnFilters ? '1.5px solid #00A878' : '1px solid #CBD5E1',
+                background: showColumnFilters ? '#E6F4EA' : '#FFFFFF',
+                color: showColumnFilters ? '#00A878' : '#334155',
+                fontSize: '0.76rem',
+                fontWeight: 700,
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '6px',
+                boxShadow: '0 1px 2px rgba(0,0,0,0.04)',
+                transition: 'all 0.15s ease'
+              }}
+            >
+              <Filter size={14} color={showColumnFilters ? '#00A878' : '#64748B'} />
+              <span>Column Filters</span>
+              {Object.values(columnFilters).some(v => v) && (
+                <span style={{ background: '#00A878', color: '#FFF', borderRadius: '50%', width: '16px', height: '16px', fontSize: '0.62rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  {Object.values(columnFilters).filter(v => v).length}
+                </span>
+              )}
+            </button>
+
             {/* Export Dropdown Button */}
             <div ref={exportDropdownRef} style={{ position: 'relative' }}>
               <button
@@ -331,6 +410,81 @@ export default function MaintenanceManagement() {
           </div>
         </div>
 
+        {/* Cards View Column Filters Panel */}
+        {viewMode === 'cards' && showColumnFilters && (
+          <div style={{
+            background: '#F8FAFC',
+            border: '1px solid #E2E8F0',
+            borderRadius: '10px',
+            padding: '12px 16px',
+            marginBottom: '14px',
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: '10px',
+            alignItems: 'center'
+          }}>
+            <div style={{ fontSize: '0.74rem', fontWeight: 800, color: '#334155', display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <Filter size={14} color="#00A878" /> Filter Work Order Cards:
+            </div>
+            <input
+              type="text"
+              placeholder="Filter Ticket ID..."
+              value={columnFilters.id || ''}
+              onChange={(e) => { setColumnFilters(p => ({ ...p, id: e.target.value })); setCurrentPage(1); }}
+              style={{ padding: '5px 10px', fontSize: '0.74rem', borderRadius: '6px', border: '1px solid #CBD5E1', background: '#FFF' }}
+            />
+            <input
+              type="text"
+              placeholder="Filter Task Title..."
+              value={columnFilters.title || ''}
+              onChange={(e) => { setColumnFilters(p => ({ ...p, title: e.target.value })); setCurrentPage(1); }}
+              style={{ padding: '5px 10px', fontSize: '0.74rem', borderRadius: '6px', border: '1px solid #CBD5E1', background: '#FFF' }}
+            />
+            <input
+              type="text"
+              placeholder="Filter Asset..."
+              value={columnFilters.assetName || ''}
+              onChange={(e) => { setColumnFilters(p => ({ ...p, assetName: e.target.value })); setCurrentPage(1); }}
+              style={{ padding: '5px 10px', fontSize: '0.74rem', borderRadius: '6px', border: '1px solid #CBD5E1', background: '#FFF' }}
+            />
+            <input
+              type="text"
+              placeholder="Filter Assignee..."
+              value={columnFilters.assignedTo || ''}
+              onChange={(e) => { setColumnFilters(p => ({ ...p, assignedTo: e.target.value })); setCurrentPage(1); }}
+              style={{ padding: '5px 10px', fontSize: '0.74rem', borderRadius: '6px', border: '1px solid #CBD5E1', background: '#FFF' }}
+            />
+            <input
+              type="text"
+              placeholder="Filter Status..."
+              value={columnFilters.status || ''}
+              onChange={(e) => { setColumnFilters(p => ({ ...p, status: e.target.value })); setCurrentPage(1); }}
+              style={{ padding: '5px 10px', fontSize: '0.74rem', borderRadius: '6px', border: '1px solid #CBD5E1', background: '#FFF' }}
+            />
+            {Object.values(columnFilters).some(v => v) && (
+              <button
+                type="button"
+                onClick={() => setColumnFilters({})}
+                style={{
+                  background: '#FEE2E2',
+                  border: '1px solid #FECACA',
+                  color: '#DC2626',
+                  borderRadius: '6px',
+                  padding: '5px 10px',
+                  fontSize: '0.72rem',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '4px'
+                }}
+              >
+                <RotateCcw size={12} /> Clear Filters
+              </button>
+            )}
+          </div>
+        )}
+
         {/* View Mode 1: Table View (Now with CONTACT PERSON and CALL columns) */}
         {viewMode === 'table' && (
           <div className="table-responsive" style={{ width: '100%', overflowX: 'auto' }}>
@@ -381,6 +535,96 @@ export default function MaintenanceManagement() {
                     CALL
                   </th>
                 </tr>
+
+                {/* Sub-Header Column Filter Inputs */}
+                {showColumnFilters && (
+                  <tr style={{ background: '#F8FAFC' }}>
+                    <th style={{ padding: '6px 8px' }}>
+                      <input
+                        type="text"
+                        placeholder="Filter ID..."
+                        value={columnFilters.id || ''}
+                        onChange={(e) => { setColumnFilters(p => ({ ...p, id: e.target.value })); setCurrentPage(1); }}
+                        style={{ width: '100%', padding: '4px 8px', fontSize: '0.74rem', borderRadius: '6px', border: '1px solid #CBD5E1', outline: 'none', background: '#FFF' }}
+                      />
+                    </th>
+                    <th style={{ padding: '6px 8px' }}>
+                      <input
+                        type="text"
+                        placeholder="Filter Task..."
+                        value={columnFilters.title || ''}
+                        onChange={(e) => { setColumnFilters(p => ({ ...p, title: e.target.value })); setCurrentPage(1); }}
+                        style={{ width: '100%', padding: '4px 8px', fontSize: '0.74rem', borderRadius: '6px', border: '1px solid #CBD5E1', outline: 'none', background: '#FFF' }}
+                      />
+                    </th>
+                    <th style={{ padding: '6px 8px' }}>
+                      <input
+                        type="text"
+                        placeholder="Filter Asset..."
+                        value={columnFilters.assetName || ''}
+                        onChange={(e) => { setColumnFilters(p => ({ ...p, assetName: e.target.value })); setCurrentPage(1); }}
+                        style={{ width: '100%', padding: '4px 8px', fontSize: '0.74rem', borderRadius: '6px', border: '1px solid #CBD5E1', outline: 'none', background: '#FFF' }}
+                      />
+                    </th>
+                    <th style={{ padding: '6px 8px' }}>
+                      <input
+                        type="text"
+                        placeholder="Filter Priority..."
+                        value={columnFilters.priority || ''}
+                        onChange={(e) => { setColumnFilters(p => ({ ...p, priority: e.target.value })); setCurrentPage(1); }}
+                        style={{ width: '100%', padding: '4px 8px', fontSize: '0.74rem', borderRadius: '6px', border: '1px solid #CBD5E1', outline: 'none', background: '#FFF' }}
+                      />
+                    </th>
+                    <th style={{ padding: '6px 8px' }}>
+                      <input
+                        type="text"
+                        placeholder="Filter Status..."
+                        value={columnFilters.status || ''}
+                        onChange={(e) => { setColumnFilters(p => ({ ...p, status: e.target.value })); setCurrentPage(1); }}
+                        style={{ width: '100%', padding: '4px 8px', fontSize: '0.74rem', borderRadius: '6px', border: '1px solid #CBD5E1', outline: 'none', background: '#FFF' }}
+                      />
+                    </th>
+                    <th style={{ padding: '6px 8px' }}>
+                      <input
+                        type="text"
+                        placeholder="Filter Assignee..."
+                        value={columnFilters.assignedTo || ''}
+                        onChange={(e) => { setColumnFilters(p => ({ ...p, assignedTo: e.target.value })); setCurrentPage(1); }}
+                        style={{ width: '100%', padding: '4px 8px', fontSize: '0.74rem', borderRadius: '6px', border: '1px solid #CBD5E1', outline: 'none', background: '#FFF' }}
+                      />
+                    </th>
+                    <th style={{ padding: '6px 8px' }}>
+                      <input
+                        type="text"
+                        placeholder="Filter SLA..."
+                        value={columnFilters.slaTimeRemaining || ''}
+                        onChange={(e) => { setColumnFilters(p => ({ ...p, slaTimeRemaining: e.target.value })); setCurrentPage(1); }}
+                        style={{ width: '100%', padding: '4px 8px', fontSize: '0.74rem', borderRadius: '6px', border: '1px solid #CBD5E1', outline: 'none', background: '#FFF' }}
+                      />
+                    </th>
+                    <th style={{ padding: '6px 8px' }}>
+                      <input
+                        type="text"
+                        placeholder="Filter Contact..."
+                        value={columnFilters.contactPerson || ''}
+                        onChange={(e) => { setColumnFilters(p => ({ ...p, contactPerson: e.target.value })); setCurrentPage(1); }}
+                        style={{ width: '100%', padding: '4px 8px', fontSize: '0.74rem', borderRadius: '6px', border: '1px solid #CBD5E1', outline: 'none', background: '#FFF' }}
+                      />
+                    </th>
+                    <th style={{ textAlign: 'center' }}>
+                      {Object.values(columnFilters).some(v => v) && (
+                        <button
+                          type="button"
+                          onClick={() => setColumnFilters({})}
+                          title="Clear column filters"
+                          style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#EF4444', padding: 0 }}
+                        >
+                          <RotateCcw size={13} />
+                        </button>
+                      )}
+                    </th>
+                  </tr>
+                )}
               </thead>
               <tbody>
                 {paginatedWOs.length === 0 ? (

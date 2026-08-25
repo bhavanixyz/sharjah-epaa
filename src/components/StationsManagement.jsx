@@ -26,12 +26,14 @@ import {
   CheckSquare, 
   Square, 
   X, 
-  MapPin 
+  MapPin,
+  Filter,
+  RotateCcw
 } from 'lucide-react';
 import GisMap from './GisMap';
 
 export default function StationsManagement() {
-  const { stations, setIsWoModalOpen } = useApp();
+  const { stations, setIsWoModalOpen, targetSearchResult, isDateInRange, dateFilter, triggerExportSuccess } = useApp();
   const [searchStn, setSearchStn] = useState('');
   const [viewMode, setViewMode] = useState('table'); // 'table', 'cards', or 'map'
   const [sortField, setSortField] = useState('code');
@@ -40,9 +42,21 @@ export default function StationsManagement() {
   const [isExportDropdownOpen, setIsExportDropdownOpen] = useState(false);
   const exportDropdownRef = useRef(null);
 
+  // Column Filters state
+  const [showColumnFilters, setShowColumnFilters] = useState(false);
+  const [columnFilters, setColumnFilters] = useState({});
+
   // Pagination state
   const [pageSize, setPageSize] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
+
+  // Auto-fill and filter when navigated from Global Search
+  useEffect(() => {
+    if (targetSearchResult?.module === 'stations') {
+      setSearchStn(targetSearchResult.searchTerm || '');
+      setCurrentPage(1);
+    }
+  }, [targetSearchResult]);
 
   // Close export dropdown when clicking outside
   useEffect(() => {
@@ -55,19 +69,36 @@ export default function StationsManagement() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Filter stations based on search
+  // Filter stations based on search, date & column filters
   const filteredStations = useMemo(() => {
     return stations.filter(s => {
+      // Global Date Filter
+      if (dateFilter !== 'ALL' && !searchStn) {
+        if (!isDateInRange(s.lastInspectionDate || s.date || s.lastMaintenance)) return false;
+      }
+
       const q = searchStn.toLowerCase();
-      return (
+      const matchesSearch = 
+        !searchStn ||
         (s.name && s.name.toLowerCase().includes(q)) ||
         (s.code && s.code.toLowerCase().includes(q)) ||
         (s.siteName && s.siteName.toLowerCase().includes(q)) ||
         (s.type && s.type.toLowerCase().includes(q)) ||
-        (s.assignedEngineer && s.assignedEngineer.toLowerCase().includes(q))
-      );
+        (s.assignedEngineer && s.assignedEngineer.toLowerCase().includes(q));
+      if (!matchesSearch) return false;
+
+      // Individual Column Filters
+      for (const colKey in columnFilters) {
+        const filterVal = columnFilters[colKey]?.trim().toLowerCase();
+        if (filterVal) {
+          const cellVal = String(s[colKey] || '').toLowerCase();
+          if (!cellVal.includes(filterVal)) return false;
+        }
+      }
+
+      return true;
     });
-  }, [stations, searchStn]);
+  }, [stations, searchStn, columnFilters, dateFilter, isDateInRange]);
 
   // Sort stations based on sortField & sortDirection
   const sortedStations = useMemo(() => {
@@ -86,18 +117,29 @@ export default function StationsManagement() {
     return data;
   }, [filteredStations, sortField, sortDirection]);
 
-  // Pagination math
+  // Pagination calculations
   const totalRecords = sortedStations.length;
-  const totalPages = Math.ceil(totalRecords / pageSize) || 1;
-  const safeCurrentPage = Math.min(currentPage, totalPages);
-  const startIndex = (safeCurrentPage - 1) * pageSize;
-  const endIndex = Math.min(startIndex + pageSize, totalRecords);
+  const totalPages = Math.max(1, Math.ceil(totalRecords / pageSize));
+  const startIndex = (currentPage - 1) * pageSize;
+  const paginatedStations = sortedStations.slice(startIndex, startIndex + pageSize);
 
-  const paginatedStations = useMemo(() => {
-    return sortedStations.slice(startIndex, endIndex);
-  }, [sortedStations, startIndex, endIndex]);
+  // Toggle Single Row Selection
+  const handleToggleSelectRow = (id) => {
+    setSelectedStationIds(prev => 
+      prev.includes(id) ? prev.filter(item => item !== id) : [...prev, id]
+    );
+  };
 
-  // Handle Sort Toggle
+  // Toggle All Filtered Rows Selection
+  const handleToggleSelectAll = () => {
+    if (selectedStationIds.length === paginatedStations.length) {
+      setSelectedStationIds([]);
+    } else {
+      setSelectedStationIds(paginatedStations.map(s => s.id));
+    }
+  };
+
+  // Column Sort Toggle Helper
   const handleSort = (field) => {
     if (sortField === field) {
       setSortDirection(prev => prev === 'asc' ? 'desc' : 'asc');
@@ -105,32 +147,6 @@ export default function StationsManagement() {
       setSortField(field);
       setSortDirection('asc');
     }
-  };
-
-  const renderSortIcon = (field) => {
-    if (sortField !== field) return <ArrowUpDown size={12} style={{ color: '#94A3B8', opacity: 0.6 }} />;
-    return sortDirection === 'asc' ? <ArrowUp size={13} style={{ color: '#00A878' }} /> : <ArrowDown size={13} style={{ color: '#00A878' }} />;
-  };
-
-  // Row selection logic
-  const isAllPaginatedSelected = useMemo(() => {
-    if (paginatedStations.length === 0) return false;
-    return paginatedStations.every(s => selectedStationIds.includes(s.id));
-  }, [paginatedStations, selectedStationIds]);
-
-  const toggleSelectAll = () => {
-    if (isAllPaginatedSelected) {
-      setSelectedStationIds(prev => prev.filter(id => !paginatedStations.some(ps => ps.id === id)));
-    } else {
-      const newIds = new Set([...selectedStationIds, ...paginatedStations.map(s => s.id)]);
-      setSelectedStationIds(Array.from(newIds));
-    }
-  };
-
-  const toggleSelectRow = (id) => {
-    setSelectedStationIds(prev => 
-      prev.includes(id) ? prev.filter(item => item !== id) : [...prev, id]
-    );
   };
 
   // Export handler (CSV / PDF)
@@ -147,6 +163,7 @@ export default function StationsManagement() {
     }
 
     if (format === 'csv') {
+      const fileName = `Sharjah_EPA_Stations_${exportData.length}_Records.csv`;
       const headers = ['Station Code', 'Station Name', 'Type', 'Parent Site', 'Power Supply', 'Telemetry Link', 'Assigned Engineer', 'Status'];
       const rows = exportData.map(s => [
         `"${s.code || ''}"`,
@@ -164,11 +181,28 @@ export default function StationsManagement() {
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.setAttribute('href', url);
-      link.setAttribute('download', `Sharjah_EPA_Stations_${exportData.length}_Records.csv`);
+      link.setAttribute('download', fileName);
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
+
+      if (triggerExportSuccess) {
+        triggerExportSuccess({
+          filename: fileName,
+          format: 'CSV',
+          count: exportData.length,
+          title: 'Station Directory Downloaded Successfully!'
+        });
+      }
     } else if (format === 'pdf') {
+      if (triggerExportSuccess) {
+        triggerExportSuccess({
+          filename: `Sharjah_EPA_Stations_Report.pdf`,
+          format: 'PDF',
+          count: exportData.length,
+          title: 'Stations Report Generated Successfully!'
+        });
+      }
       const printWindow = window.open('', '_blank');
       const htmlContent = `
         <!DOCTYPE html>
@@ -182,24 +216,21 @@ export default function StationsManagement() {
               table { width: 100%; border-collapse: collapse; margin-top: 12px; }
               th, td { border: 1px solid #e2e8f0; padding: 8px 12px; font-size: 11px; text-align: left; }
               th { background-color: #f8fafc; color: #475569; font-weight: bold; }
-              tr:nth-child(even) { background-color: #f1f5f9; }
-              .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-weight: bold; font-size: 10px; }
-              .badge-active, .badge-operational { background: #dcfce7; color: #166534; }
-              .badge-warning { background: #fef3c7; color: #92400e; }
-              .badge-critical, .badge-degraded { background: #fee2e2; color: #991b1b; }
+              tr:nth-child(even) { background-color: #f8fafc; }
             </style>
           </head>
           <body>
             <h1>Sharjah Environment Protected Authority (Sharjah EPA)</h1>
-            <p>Live Site Management & Station Telemetry Directory — Exported ${new Date().toLocaleDateString()} (${exportData.length} records)</p>
+            <p>Live Site Management & Remote Telemetry Directory • Generated on ${new Date().toLocaleDateString()}</p>
             <table>
               <thead>
                 <tr>
-                  <th>Station Code</th>
-                  <th>Station Name & Type</th>
-                  <th>Parent Site</th>
-                  <th>Power Supply</th>
-                  <th>Telemetry Link</th>
+                  <th>Code</th>
+                  <th>Station Name</th>
+                  <th>Type</th>
+                  <th>Site</th>
+                  <th>Power Source</th>
+                  <th>Telemetry</th>
                   <th>Engineer</th>
                   <th>Status</th>
                 </tr>
@@ -208,12 +239,13 @@ export default function StationsManagement() {
                 ${exportData.map(s => `
                   <tr>
                     <td><strong>${s.code || ''}</strong></td>
-                    <td>${s.name || ''}<br/><small style="color:#64748b">${s.type || ''}</small></td>
+                    <td>${s.name || ''}</td>
+                    <td>${s.type || ''}</td>
                     <td>${s.siteName || ''}</td>
                     <td>${s.powerSource || ''}</td>
                     <td>${s.telemetry || ''}</td>
                     <td>${s.assignedEngineer || ''}</td>
-                    <td><span class="badge badge-${(s.status || 'active').toLowerCase()}">${s.status || 'Active'}</span></td>
+                    <td>${s.status || ''}</td>
                   </tr>
                 `).join('')}
               </tbody>
@@ -226,7 +258,8 @@ export default function StationsManagement() {
       printWindow.focus();
       setTimeout(() => {
         printWindow.print();
-      }, 500);
+        printWindow.close();
+      }, 250);
     }
   };
 
@@ -267,8 +300,38 @@ export default function StationsManagement() {
             </div>
           </div>
 
-          {/* Right: Export Dropdown + View Mode Switcher + Add Monitoring Station CTA */}
+          {/* Right Controls: Column Filters + Export Dropdown + View Mode Switcher + Add Monitoring Station CTA */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap', marginLeft: 'auto' }}>
+            {/* Column Filters Toggle Button */}
+            <button
+              type="button"
+              onClick={() => setShowColumnFilters(prev => !prev)}
+              style={{
+                height: '36px',
+                padding: '0 14px',
+                borderRadius: '8px',
+                border: showColumnFilters ? '1.5px solid #00A878' : '1px solid #CBD5E1',
+                background: showColumnFilters ? '#E6F4EA' : '#FFFFFF',
+                color: showColumnFilters ? '#00A878' : '#334155',
+                fontSize: '0.76rem',
+                fontWeight: 700,
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '6px',
+                boxShadow: '0 1px 2px rgba(0,0,0,0.04)',
+                transition: 'all 0.15s ease'
+              }}
+            >
+              <Filter size={14} color={showColumnFilters ? '#00A878' : '#64748B'} />
+              <span>Column Filters</span>
+              {Object.values(columnFilters).some(v => v) && (
+                <span style={{ background: '#00A878', color: '#FFF', borderRadius: '50%', width: '16px', height: '16px', fontSize: '0.62rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  {Object.values(columnFilters).filter(v => v).length}
+                </span>
+              )}
+            </button>
             
             {/* Export Dropdown Button */}
             <div ref={exportDropdownRef} style={{ position: 'relative' }}>
@@ -431,16 +494,17 @@ export default function StationsManagement() {
             borderRadius: '10px',
             color: '#00A878',
             fontSize: '0.8rem',
-            fontWeight: 600
+            fontWeight: 700
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <CheckSquare size={16} color="#00A878" />
-              <span><strong>{selectedStationIds.length}</strong> station records selected out of {filteredStations.length}</span>
+              <CheckSquare size={16} />
+              <span>Selected {selectedStationIds.length} station(s) for bulk export or dispatch</span>
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <button 
-                onClick={() => handleExport('csv')} 
-                style={{ background: '#00A878', color: '#FFF', border: 'none', padding: '4px 10px', borderRadius: '6px', fontSize: '0.74rem', cursor: 'pointer', fontWeight: 700 }}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <button
+                type="button"
+                onClick={() => handleExport('csv')}
+                style={{ background: '#00A878', color: '#FFFFFF', border: 'none', borderRadius: '6px', padding: '5px 12px', fontSize: '0.74rem', fontWeight: 700, cursor: 'pointer' }}
               >
                 Export Selected ({selectedStationIds.length})
               </button>
@@ -451,6 +515,81 @@ export default function StationsManagement() {
                 <X size={14} /> Clear Selection
               </button>
             </div>
+          </div>
+        )}
+
+        {/* Cards View Column Filters Panel */}
+        {viewMode === 'cards' && showColumnFilters && (
+          <div style={{
+            background: '#F8FAFC',
+            border: '1px solid #E2E8F0',
+            borderRadius: '10px',
+            padding: '12px 16px',
+            marginBottom: '14px',
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: '10px',
+            alignItems: 'center'
+          }}>
+            <div style={{ fontSize: '0.74rem', fontWeight: 800, color: '#334155', display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <Filter size={14} color="#00A878" /> Filter Station Cards:
+            </div>
+            <input
+              type="text"
+              placeholder="Filter Code..."
+              value={columnFilters.code || ''}
+              onChange={(e) => { setColumnFilters(p => ({ ...p, code: e.target.value })); setCurrentPage(1); }}
+              style={{ padding: '5px 10px', fontSize: '0.74rem', borderRadius: '6px', border: '1px solid #CBD5E1', background: '#FFF' }}
+            />
+            <input
+              type="text"
+              placeholder="Filter Name..."
+              value={columnFilters.name || ''}
+              onChange={(e) => { setColumnFilters(p => ({ ...p, name: e.target.value })); setCurrentPage(1); }}
+              style={{ padding: '5px 10px', fontSize: '0.74rem', borderRadius: '6px', border: '1px solid #CBD5E1', background: '#FFF' }}
+            />
+            <input
+              type="text"
+              placeholder="Filter Parent Site..."
+              value={columnFilters.siteName || ''}
+              onChange={(e) => { setColumnFilters(p => ({ ...p, siteName: e.target.value })); setCurrentPage(1); }}
+              style={{ padding: '5px 10px', fontSize: '0.74rem', borderRadius: '6px', border: '1px solid #CBD5E1', background: '#FFF' }}
+            />
+            <input
+              type="text"
+              placeholder="Filter Power..."
+              value={columnFilters.powerSource || ''}
+              onChange={(e) => { setColumnFilters(p => ({ ...p, powerSource: e.target.value })); setCurrentPage(1); }}
+              style={{ padding: '5px 10px', fontSize: '0.74rem', borderRadius: '6px', border: '1px solid #CBD5E1', background: '#FFF' }}
+            />
+            <input
+              type="text"
+              placeholder="Filter Status..."
+              value={columnFilters.status || ''}
+              onChange={(e) => { setColumnFilters(p => ({ ...p, status: e.target.value })); setCurrentPage(1); }}
+              style={{ padding: '5px 10px', fontSize: '0.74rem', borderRadius: '6px', border: '1px solid #CBD5E1', background: '#FFF' }}
+            />
+            {Object.values(columnFilters).some(v => v) && (
+              <button
+                type="button"
+                onClick={() => setColumnFilters({})}
+                style={{
+                  background: '#FEE2E2',
+                  border: '1px solid #FECACA',
+                  color: '#DC2626',
+                  borderRadius: '6px',
+                  padding: '5px 10px',
+                  fontSize: '0.72rem',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '4px'
+                }}
+              >
+                <RotateCcw size={12} /> Clear Filters
+              </button>
+            )}
           </div>
         )}
 
@@ -511,6 +650,88 @@ export default function StationsManagement() {
                   </th>
                   <th style={{ textAlign: 'right' }}>Actions</th>
                 </tr>
+
+                {/* Sub-Header Column Filter Inputs */}
+                {showColumnFilters && (
+                  <tr style={{ background: '#F8FAFC' }}>
+                    <th style={{ textAlign: 'center' }}>
+                      {Object.values(columnFilters).some(v => v) && (
+                        <button
+                          type="button"
+                          onClick={() => setColumnFilters({})}
+                          title="Clear column filters"
+                          style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#EF4444', padding: 0 }}
+                        >
+                          <RotateCcw size={13} />
+                        </button>
+                      )}
+                    </th>
+                    <th style={{ padding: '6px 8px' }}>
+                      <input
+                        type="text"
+                        placeholder="Filter Code..."
+                        value={columnFilters.code || ''}
+                        onChange={(e) => { setColumnFilters(p => ({ ...p, code: e.target.value })); setCurrentPage(1); }}
+                        style={{ width: '100%', padding: '4px 8px', fontSize: '0.74rem', borderRadius: '6px', border: '1px solid #CBD5E1', outline: 'none', background: '#FFF' }}
+                      />
+                    </th>
+                    <th style={{ padding: '6px 8px' }}>
+                      <input
+                        type="text"
+                        placeholder="Filter Name..."
+                        value={columnFilters.name || ''}
+                        onChange={(e) => { setColumnFilters(p => ({ ...p, name: e.target.value })); setCurrentPage(1); }}
+                        style={{ width: '100%', padding: '4px 8px', fontSize: '0.74rem', borderRadius: '6px', border: '1px solid #CBD5E1', outline: 'none', background: '#FFF' }}
+                      />
+                    </th>
+                    <th style={{ padding: '6px 8px' }}>
+                      <input
+                        type="text"
+                        placeholder="Filter Site..."
+                        value={columnFilters.siteName || ''}
+                        onChange={(e) => { setColumnFilters(p => ({ ...p, siteName: e.target.value })); setCurrentPage(1); }}
+                        style={{ width: '100%', padding: '4px 8px', fontSize: '0.74rem', borderRadius: '6px', border: '1px solid #CBD5E1', outline: 'none', background: '#FFF' }}
+                      />
+                    </th>
+                    <th style={{ padding: '6px 8px' }}>
+                      <input
+                        type="text"
+                        placeholder="Filter Power..."
+                        value={columnFilters.powerSource || ''}
+                        onChange={(e) => { setColumnFilters(p => ({ ...p, powerSource: e.target.value })); setCurrentPage(1); }}
+                        style={{ width: '100%', padding: '4px 8px', fontSize: '0.74rem', borderRadius: '6px', border: '1px solid #CBD5E1', outline: 'none', background: '#FFF' }}
+                      />
+                    </th>
+                    <th style={{ padding: '6px 8px' }}>
+                      <input
+                        type="text"
+                        placeholder="Filter Telemetry..."
+                        value={columnFilters.telemetry || ''}
+                        onChange={(e) => { setColumnFilters(p => ({ ...p, telemetry: e.target.value })); setCurrentPage(1); }}
+                        style={{ width: '100%', padding: '4px 8px', fontSize: '0.74rem', borderRadius: '6px', border: '1px solid #CBD5E1', outline: 'none', background: '#FFF' }}
+                      />
+                    </th>
+                    <th style={{ padding: '6px 8px' }}>
+                      <input
+                        type="text"
+                        placeholder="Filter Engineer..."
+                        value={columnFilters.assignedEngineer || ''}
+                        onChange={(e) => { setColumnFilters(p => ({ ...p, assignedEngineer: e.target.value })); setCurrentPage(1); }}
+                        style={{ width: '100%', padding: '4px 8px', fontSize: '0.74rem', borderRadius: '6px', border: '1px solid #CBD5E1', outline: 'none', background: '#FFF' }}
+                      />
+                    </th>
+                    <th style={{ padding: '6px 8px' }}>
+                      <input
+                        type="text"
+                        placeholder="Filter Status..."
+                        value={columnFilters.status || ''}
+                        onChange={(e) => { setColumnFilters(p => ({ ...p, status: e.target.value })); setCurrentPage(1); }}
+                        style={{ width: '100%', padding: '4px 8px', fontSize: '0.74rem', borderRadius: '6px', border: '1px solid #CBD5E1', outline: 'none', background: '#FFF' }}
+                      />
+                    </th>
+                    <th />
+                  </tr>
+                )}
               </thead>
               <tbody>
                 {paginatedStations.length === 0 ? (

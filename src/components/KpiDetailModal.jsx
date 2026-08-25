@@ -33,7 +33,10 @@ import {
   CartesianGrid 
 } from 'recharts';
 
+import { useApp } from '../context/AppContext';
+
 export default function KpiDetailModal({ kpiData, modalData, onClose, onApplyFilter }) {
+  const { triggerExportSuccess } = useApp();
   const data = kpiData || modalData;
   if (!data) return null;
 
@@ -55,7 +58,7 @@ export default function KpiDetailModal({ kpiData, modalData, onClose, onApplyFil
     (item.status && item.status.toLowerCase().includes(searchQuery.toLowerCase()))
   );
 
-  const handleRefreshData = () => {
+  const handleRefresh = () => {
     setIsRefreshing(true);
     setTimeout(() => {
       setIsRefreshing(false);
@@ -63,7 +66,15 @@ export default function KpiDetailModal({ kpiData, modalData, onClose, onApplyFil
   };
 
   const handleExportFormat = (format) => {
-    alert(`[EXPORT SUCCESS] ${title} KPI analysis exported in ${format.toUpperCase()} format.`);
+    const fileName = `${title.replace(/\s+/g, '_')}_KPI_Analysis.${format.toLowerCase()}`;
+    if (triggerExportSuccess) {
+      triggerExportSuccess({
+        filename: fileName,
+        format: format.toUpperCase(),
+        count: filteredBreakdown.length,
+        title: `${title} Exported Successfully!`
+      });
+    }
   };
 
   // Pie chart colors

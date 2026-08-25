@@ -49,7 +49,10 @@ const createCustomIcon = (loc) => {
   });
 };
 
+import { useApp } from '../../context/AppContext';
+
 export default function MapView({ height = "520px", onSelectSite }) {
+  const { triggerExportSuccess } = useApp();
   const mapRef = useRef(null);
   
   // Interactive Controls State (All Floating Inside Map)
@@ -126,7 +129,14 @@ export default function MapView({ height = "520px", onSelectSite }) {
   };
 
   const handleExportMap = () => {
-    alert('Exporting high-resolution Sharjah GIS spatial map PDF... Download completed.');
+    if (triggerExportSuccess) {
+      triggerExportSuccess({
+        filename: `Sharjah_EPA_GIS_Map_${Date.now()}.png`,
+        format: 'PNG',
+        count: filteredLocations.length,
+        title: 'GIS Map Snapshot Downloaded Successfully!'
+      });
+    }
   };
 
   const tileConfig = getTileConfig();

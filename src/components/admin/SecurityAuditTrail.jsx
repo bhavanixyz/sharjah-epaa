@@ -3,7 +3,7 @@ import { Filter, Download, Search, ChevronUp, ChevronDown, CheckSquare, Square, 
 import { useApp } from '../../context/AppContext';
 
 export default function SecurityAuditTrail() {
-  const { auditLogs: contextAuditLogs } = useApp();
+  const { auditLogs: contextAuditLogs, isDateInRange, dateFilter, triggerExportSuccess } = useApp();
 
   // Multi-Filter State
   const [filterUser, setFilterUser] = useState('ALL');
@@ -27,14 +27,14 @@ export default function SecurityAuditTrail() {
 
   // Full Rich Audit Logs Dataset matching screenshot & reference standards
   const rawAuditLogs = useMemo(() => [
-    { slNo: 1, id: 'aud-101', user: 'Eng. Humaid Al-Suwaidi', role: 'Super Admin', module: 'Equipment Management', action: 'UPDATE_CALIBRATION_SPAN', ipAddress: '192.168.1.45', timestamp: '2026-08-24 14:15:22', status: 'SUCCESS' },
+    { slNo: 1, id: 'aud-101', user: 'Eng. Humaid Al-Suwaidi', role: 'Super Admin', module: 'Equipment Management', action: 'UPDATE_CALIBRATION_SPAN', ipAddress: '192.168.1.45', timestamp: '2026-08-25 10:15:22', status: 'SUCCESS' },
     { slNo: 2, id: 'aud-102', user: 'Dr. Mariam Al-Qasimi', role: 'Director', module: 'Environmental Networks', action: 'EXPORT_NETWORK_TOPOLOGY', ipAddress: '192.168.1.12', timestamp: '2026-08-24 11:46:10', status: 'SUCCESS' },
     { slNo: 3, id: 'aud-103', user: 'Eng. Tariq Al-Mansoori', role: 'Calibration Lead', module: 'Drift & Gas Calibration', action: 'SIGN_OFF_DRIFT_CERT', ipAddress: '192.168.2.88', timestamp: '2026-08-24 09:32:05', status: 'SUCCESS' },
     { slNo: 4, id: 'aud-104', user: 'Fatima Rashid', role: 'Stock Manager', module: 'Inventory & Spare Parts', action: 'ADJUST_SAFETY_THRESHOLD', ipAddress: '192.168.1.99', timestamp: '2026-08-23 16:22:40', status: 'SUCCESS' },
-    { slNo: 5, id: 'aud-105', user: 'Sultan Al-Nuaimi', role: 'Field Technician', module: 'Work Orders & SLA', action: 'CLOSE_WORK_ORDER_WO-89', ipAddress: '192.168.3.14', timestamp: '2026-08-23 14:08:19', status: 'SUCCESS' },
-    { slNo: 6, id: 'aud-106', user: 'System Auto-Engine', role: 'Automated Bot', module: 'Live Site Management', action: 'TELEMETRY_POLL_CYCLE', ipAddress: '127.0.0.1', timestamp: '2026-08-23 12:00:00', status: 'SUCCESS' },
-    { slNo: 7, id: 'aud-107', user: 'Eng. Humaid Al-Suwaidi', role: 'Super Admin', module: 'User Directory', action: 'CREATE_USER_ACCOUNT', ipAddress: '192.168.1.45', timestamp: '2026-08-22 15:10:04', status: 'SUCCESS' },
-    { slNo: 8, id: 'aud-108', user: 'Fatima Rashid', role: 'Stock Manager', module: 'Procurement & Orders', action: 'SUBMIT_REQUISITION_REQ-109', ipAddress: '192.168.1.99', timestamp: '2026-08-22 11:05:30', status: 'SUCCESS' }
+    { slNo: 5, id: 'aud-105', user: 'Sultan Al-Nuaimi', role: 'Field Technician', module: 'Work Orders & SLA', action: 'CLOSE_WORK_ORDER_WO-89', ipAddress: '192.168.3.14', timestamp: '2026-08-21 14:08:19', status: 'SUCCESS' },
+    { slNo: 6, id: 'aud-106', user: 'System Auto-Engine', role: 'Automated Bot', module: 'Live Site Management', action: 'TELEMETRY_POLL_CYCLE', ipAddress: '127.0.0.1', timestamp: '2026-08-16 12:00:00', status: 'SUCCESS' },
+    { slNo: 7, id: 'aud-107', user: 'Eng. Humaid Al-Suwaidi', role: 'Super Admin', module: 'User Directory', action: 'CREATE_USER_ACCOUNT', ipAddress: '192.168.1.45', timestamp: '2026-08-12 15:10:04', status: 'SUCCESS' },
+    { slNo: 8, id: 'aud-108', user: 'Fatima Rashid', role: 'Stock Manager', module: 'Procurement & Orders', action: 'SUBMIT_REQUISITION_REQ-109', ipAddress: '192.168.1.99', timestamp: '2026-07-28 11:05:30', status: 'SUCCESS' }
   ], []);
 
   // Filter Dropdown Options
@@ -46,6 +46,11 @@ export default function SecurityAuditTrail() {
   // Overall & Column Filtering Logic
   const filteredData = useMemo(() => {
     return rawAuditLogs.filter(row => {
+      // Global Date Filter
+      if (dateFilter !== 'ALL' && !searchQuery) {
+        if (!isDateInRange(row.timestamp)) return false;
+      }
+
       // Top Global Multi-Filter Dropdowns
       if (filterUser !== 'ALL' && row.user !== filterUser) return false;
       if (filterModule !== 'ALL' && row.module !== filterModule) return false;
@@ -158,6 +163,7 @@ export default function SecurityAuditTrail() {
       return;
     }
 
+    const fileName = `Sharjah_EPA_Security_Audit_Trail_${dataToExport.length}_Records.csv`;
     const headers = ['SL. NO.', 'User', 'Role', 'Target Module', 'Security Action Event', 'IP Address', 'Event Timestamp', 'Audit Status'];
     const rows = dataToExport.map(r => [
       r.slNo,
@@ -175,15 +181,36 @@ export default function SecurityAuditTrail() {
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.setAttribute('download', `Security_Audit_Trail_${Date.now()}.csv`);
+    link.setAttribute('download', fileName);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+
+    if (triggerExportSuccess) {
+      triggerExportSuccess({
+        filename: fileName,
+        format: 'CSV',
+        count: dataToExport.length,
+        title: 'Security Audit Trail Downloaded Successfully!'
+      });
+    }
   };
 
   // Export to PDF Handler
   const handleExportPDF = () => {
-    alert('Security Audit Log report generated and exported as PDF.');
+    const dataToExport = selectedRows.length > 0
+      ? rawAuditLogs.filter(r => selectedRows.includes(r.id))
+      : sortedData;
+
+    if (triggerExportSuccess) {
+      triggerExportSuccess({
+        filename: `Sharjah_EPA_Security_Audit_Trail_Report.pdf`,
+        format: 'PDF',
+        count: dataToExport.length,
+        title: 'Audit Trail Report Generated Successfully!'
+      });
+    }
+    window.print();
   };
 
   const columns = [
@@ -588,8 +615,8 @@ export default function SecurityAuditTrail() {
             Showing {totalRecords > 0 ? startIndex + 1 : 0} to {Math.min(startIndex + pageSize, totalRecords)} of {totalRecords} records
           </div>
 
-          {/* Navigation Buttons */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+          {/* Navigation Buttons pinned to Right Corner */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginLeft: 'auto' }}>
             <button
               onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
               disabled={currentPage === 1}

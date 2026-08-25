@@ -7,6 +7,7 @@ import {
   BarChart3, AreaChart as AreaIcon, PieChart as PieIcon, Table as TableIcon, 
   Download, Calendar, Sparkles, ChevronDown, Clock, Filter, CheckCircle2
 } from 'lucide-react';
+import { useApp } from '../context/AppContext';
 
 const COLOR_PALETTE = ['#00A878', '#0891B2', '#2563EB', '#8B5CF6', '#F59E0B', '#EF4444'];
 
@@ -14,15 +15,25 @@ export default function InteractiveChartContainer({
   title = "Work Order SLA & Resolution Velocity",
   subtitle = "Field dispatch & SLA performance metrics",
   datasets = {},
-  initialRange = "WEEK",
+  initialRange = "TODAY",
   onPointClick
 }) {
-  const [timeRange, setTimeRange] = useState(initialRange); // 'DAY', 'WEEK', 'MONTH', 'YEAR', 'CUSTOM'
+  const { dateFilter: globalDateFilter, startDate: globalStartDate, endDate: globalEndDate, triggerExportSuccess } = useApp();
+  const [timeRange, setTimeRange] = useState(globalDateFilter || initialRange); // 'TODAY', '7D', '15D', '30D', 'ALL', 'CUSTOM'
   const [chartType, setChartType] = useState('column'); // 'column', 'bar', 'pie', 'table'
   const [exportFormat, setExportFormat] = useState('');
   const [toastMessage, setToastMessage] = useState(null);
-  const [startDate, setStartDate] = useState('2026-08-01');
-  const [endDate, setEndDate] = useState('2026-08-24');
+  const [startDate, setStartDate] = useState(globalStartDate || '2026-08-25');
+  const [endDate, setEndDate] = useState(globalEndDate || '2026-08-25');
+
+  // Synchronize chart data with the global PageHeaderBar date dropdown
+  useEffect(() => {
+    if (globalDateFilter) {
+      setTimeRange(globalDateFilter);
+      if (globalStartDate) setStartDate(globalStartDate);
+      if (globalEndDate) setEndDate(globalEndDate);
+    }
+  }, [globalDateFilter, globalStartDate, globalEndDate]);
 
   const [isDateDropdownOpen, setIsDateDropdownOpen] = useState(false);
   const [isExportDropdownOpen, setIsExportDropdownOpen] = useState(false);
@@ -54,7 +65,7 @@ export default function InteractiveChartContainer({
   if (timeRange === 'CUSTOM') {
     currentData = generateCustomRangeData(startDate, endDate);
   } else {
-    currentData = datasets[timeRange] || defaultDataSets[timeRange] || defaultDataSets['WEEK'];
+    currentData = datasets[timeRange] || defaultDataSets[timeRange] || defaultDataSets['TODAY'];
   }
 
   const toggleSeries = (key) => {
@@ -87,6 +98,8 @@ export default function InteractiveChartContainer({
     else if (format === 'pdf') formatLabel = 'PDF Document';
     else if (format === 'png') formatLabel = 'PNG Image';
 
+    const fileName = `${title.replace(/\s+/g, '_')}_${timeRange}_Data.${format.toLowerCase()}`;
+
     if (format === 'csv') {
       const csvRows = [];
       if (currentData && currentData.length > 0) {
@@ -100,8 +113,17 @@ export default function InteractiveChartContainer({
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.setAttribute('href', url);
-      a.setAttribute('download', `${title.replace(/\s+/g, '_')}_${timeRange}_Data.csv`);
+      a.setAttribute('download', fileName);
       a.click();
+    }
+
+    if (triggerExportSuccess) {
+      triggerExportSuccess({
+        filename: fileName,
+        format: format.toUpperCase(),
+        count: currentData ? currentData.length : 0,
+        title: `${title} Exported Successfully!`
+      });
     }
 
     triggerToast(`Download successfully completed: ${formatLabel}`);
@@ -687,20 +709,65 @@ const generateCustomRangeData = (startStr, endStr) => {
 
 // Datasets categorized by Aggregation
 const defaultDataSets = {
+  TODAY: [
+    { label: '00:00 - 04:00', completedWO: 1, openWO: 0, avgResponseHours: 1.2 },
+    { label: '04:00 - 08:00', completedWO: 0, openWO: 1, avgResponseHours: 2.1 },
+    { label: '08:00 - 12:00', completedWO: 2, openWO: 1, avgResponseHours: 1.5 },
+    { label: '12:00 - 16:00', completedWO: 1, openWO: 0, avgResponseHours: 1.8 },
+    { label: '16:00 - 20:00', completedWO: 1, openWO: 0, avgResponseHours: 2.0 },
+    { label: '20:00 - 24:00', completedWO: 0, openWO: 0, avgResponseHours: 1.4 }
+  ],
+  '7D': [
+    { label: 'Wed (19 Aug)', completedWO: 6, openWO: 1, avgResponseHours: 2.8 },
+    { label: 'Thu (20 Aug)', completedWO: 3, openWO: 2, avgResponseHours: 3.2 },
+    { label: 'Fri (21 Aug)', completedWO: 8, openWO: 1, avgResponseHours: 2.5 },
+    { label: 'Sat (22 Aug)', completedWO: 5, openWO: 2, avgResponseHours: 2.9 },
+    { label: 'Sun (23 Aug)', completedWO: 7, openWO: 1, avgResponseHours: 2.2 },
+    { label: 'Mon (24 Aug)', completedWO: 6, openWO: 2, avgResponseHours: 2.4 },
+    { label: 'Tue (25 Aug)', completedWO: 4, openWO: 2, avgResponseHours: 1.9 }
+  ],
+  '15D': [
+    { label: '11 Aug', completedWO: 4, openWO: 1, avgResponseHours: 3.0 },
+    { label: '13 Aug', completedWO: 5, openWO: 2, avgResponseHours: 2.8 },
+    { label: '15 Aug', completedWO: 7, openWO: 1, avgResponseHours: 2.4 },
+    { label: '17 Aug', completedWO: 6, openWO: 3, avgResponseHours: 3.1 },
+    { label: '19 Aug', completedWO: 8, openWO: 1, avgResponseHours: 2.2 },
+    { label: '21 Aug', completedWO: 9, openWO: 2, avgResponseHours: 2.0 },
+    { label: '23 Aug', completedWO: 7, openWO: 1, avgResponseHours: 2.1 },
+    { label: '25 Aug', completedWO: 5, openWO: 2, avgResponseHours: 1.8 }
+  ],
+  '30D': [
+    { label: 'Week 1 (27 Jul - 2 Aug)', completedWO: 18, openWO: 4, avgResponseHours: 2.6 },
+    { label: 'Week 2 (3 - 9 Aug)', completedWO: 24, openWO: 3, avgResponseHours: 2.2 },
+    { label: 'Week 3 (10 - 16 Aug)', completedWO: 21, openWO: 5, avgResponseHours: 2.9 },
+    { label: 'Week 4 (17 - 25 Aug)', completedWO: 32, openWO: 2, avgResponseHours: 1.8 }
+  ],
+  ALL: [
+    { label: 'Jan', completedWO: 65, openWO: 12, avgResponseHours: 2.8 },
+    { label: 'Feb', completedWO: 72, openWO: 8, avgResponseHours: 2.3 },
+    { label: 'Mar', completedWO: 84, openWO: 10, avgResponseHours: 2.1 },
+    { label: 'Apr', completedWO: 78, openWO: 14, avgResponseHours: 2.6 },
+    { label: 'May', completedWO: 92, openWO: 6, avgResponseHours: 1.8 },
+    { label: 'Jun', completedWO: 88, openWO: 9, avgResponseHours: 2.0 },
+    { label: 'Jul', completedWO: 95, openWO: 7, avgResponseHours: 1.9 },
+    { label: 'Aug', completedWO: 98, openWO: 4, avgResponseHours: 1.7 }
+  ],
   DAY: [
-    { label: 'Mon (Aug 18)', completedWO: 4, openWO: 2, avgResponseHours: 3.1 },
-    { label: 'Tue (Aug 19)', completedWO: 6, openWO: 1, avgResponseHours: 2.8 },
-    { label: 'Wed (Aug 20)', completedWO: 3, openWO: 4, avgResponseHours: 4.2 },
-    { label: 'Thu (Aug 21)', completedWO: 8, openWO: 2, avgResponseHours: 2.5 },
-    { label: 'Fri (Aug 22)', completedWO: 5, openWO: 3, avgResponseHours: 3.0 },
-    { label: 'Sat (Aug 23)', completedWO: 7, openWO: 1, avgResponseHours: 2.2 },
-    { label: 'Sun (Aug 24)', completedWO: 4, openWO: 2, avgResponseHours: 2.7 }
+    { label: '00:00 - 04:00', completedWO: 1, openWO: 0, avgResponseHours: 1.2 },
+    { label: '04:00 - 08:00', completedWO: 0, openWO: 1, avgResponseHours: 2.1 },
+    { label: '08:00 - 12:00', completedWO: 2, openWO: 1, avgResponseHours: 1.5 },
+    { label: '12:00 - 16:00', completedWO: 1, openWO: 0, avgResponseHours: 1.8 },
+    { label: '16:00 - 20:00', completedWO: 1, openWO: 0, avgResponseHours: 2.0 },
+    { label: '20:00 - 24:00', completedWO: 0, openWO: 0, avgResponseHours: 1.4 }
   ],
   WEEK: [
-    { label: 'Week 1 (Aug 1-7)', completedWO: 18, openWO: 4, avgResponseHours: 2.4 },
-    { label: 'Week 2 (Aug 8-14)', completedWO: 24, openWO: 2, avgResponseHours: 2.1 },
-    { label: 'Week 3 (Aug 15-21)', completedWO: 15, openWO: 5, avgResponseHours: 3.2 },
-    { label: 'Week 4 (Aug 22-28)', completedWO: 28, openWO: 3, avgResponseHours: 1.9 }
+    { label: 'Wed (19 Aug)', completedWO: 6, openWO: 1, avgResponseHours: 2.8 },
+    { label: 'Thu (20 Aug)', completedWO: 3, openWO: 2, avgResponseHours: 3.2 },
+    { label: 'Fri (21 Aug)', completedWO: 8, openWO: 1, avgResponseHours: 2.5 },
+    { label: 'Sat (22 Aug)', completedWO: 5, openWO: 2, avgResponseHours: 2.9 },
+    { label: 'Sun (23 Aug)', completedWO: 7, openWO: 1, avgResponseHours: 2.2 },
+    { label: 'Mon (24 Aug)', completedWO: 6, openWO: 2, avgResponseHours: 2.4 },
+    { label: 'Tue (25 Aug)', completedWO: 4, openWO: 2, avgResponseHours: 1.9 }
   ],
   MONTH: [
     { label: 'Jan', completedWO: 65, openWO: 12, avgResponseHours: 2.8 },

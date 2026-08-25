@@ -1,16 +1,31 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
+import { useApp } from '../../context/AppContext';
 import { 
   User, Shield, Mail, Phone, Lock, CheckCircle2, Search, 
   Download, FileSpreadsheet, FileText, ChevronDown, Table, LayoutGrid, Plus,
-  ArrowUpDown, ArrowUp, ArrowDown, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Eye, UserPlus, X
+  ArrowUpDown, ArrowUp, ArrowDown, ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, Eye, UserPlus, X,
+  Filter, RotateCcw
 } from 'lucide-react';
 
 export default function UserDirectory() {
+  const { targetSearchResult, isDateInRange, dateFilter, triggerExportSuccess } = useApp();
   // Default View Mode is LIST/TABLE VIEW per request
   const [viewMode, setViewMode] = useState('table'); // 'table' or 'cards'
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedUserModal, setSelectedUserModal] = useState(null);
   const [isAddUserModalOpen, setIsAddUserModalOpen] = useState(false);
+
+  // Column Filters state
+  const [showColumnFilters, setShowColumnFilters] = useState(false);
+  const [columnFilters, setColumnFilters] = useState({});
+
+  // Auto-fill and filter when navigated from Global Search
+  useEffect(() => {
+    if (targetSearchResult?.module === 'users') {
+      setSearchQuery(targetSearchResult.searchTerm || '');
+      setCurrentPage(1);
+    }
+  }, [targetSearchResult]);
 
   // Sorting state
   const [sortField, setSortField] = useState('code');
@@ -88,27 +103,87 @@ export default function UserDirectory() {
       id: 'usr-5', 
       code: 'EPA-TECH-22',
       name: 'Khalid Al-Nuaimi', 
-      role: 'Field Maintenance Technician', 
-      department: 'Equipment Operations', 
+      role: 'Senior Field Calibration Tech', 
+      department: 'Field Operations & SLA', 
       email: 'k.nuaimi@epa.shj.ae', 
-      phone: '+971 56 771 4432', 
-      domain: 'Sir Bu Nair Island',
+      phone: '+971 50 119 4533', 
+      domain: 'Central Agricultural Belt',
       status: 'Active', 
-      lastLogin: '2026-08-23 14:05' 
+      lastLogin: '2026-08-23 13:15' 
+    },
+    { 
+      id: 'usr-6', 
+      code: 'EPA-INV-03',
+      name: 'Maryam Al-Qasimi', 
+      role: 'Inventory & Procurement Lead', 
+      department: 'Supply Chain & Depot', 
+      email: 'm.qasimi@epa.shj.ae', 
+      phone: '+971 56 774 2209', 
+      domain: 'Central EPA Depot',
+      status: 'Active', 
+      lastLogin: '2026-08-22 17:05' 
+    },
+    { 
+      id: 'usr-7', 
+      code: 'EPA-ADMIN-02',
+      name: 'Aisha Al-Mazrouei', 
+      role: 'Security & Access Administrator', 
+      department: 'IT & Digital Infrastructure', 
+      email: 'a.mazrouei@epa.shj.ae', 
+      phone: '+971 50 882 3411', 
+      domain: 'Central Cloud & RBAC',
+      status: 'Active', 
+      lastLogin: '2026-08-22 10:40' 
+    },
+    { 
+      id: 'usr-8', 
+      code: 'EPA-TECH-19',
+      name: 'Sultan Al-Shamsi', 
+      role: 'Junior Telemetry Technician', 
+      department: 'Field Operations & SLA', 
+      email: 's.shamsi@epa.shj.ae', 
+      phone: '+971 54 990 1288', 
+      domain: 'Khorfakkan Maritime',
+      status: 'Inactive', 
+      lastLogin: '2026-08-15 08:30' 
     }
   ]);
 
-  // Filter & Sort Users
+  // Dynamic search & sorting
   const filteredUsers = useMemo(() => {
     return users.filter(u => {
-      if (!searchQuery) return true;
+      // Global Date Filter
+      if (dateFilter !== 'ALL' && !searchQuery) {
+        if (!isDateInRange(u.lastLogin || u.date)) return false;
+      }
+
       const q = searchQuery.toLowerCase();
-      return u.name.toLowerCase().includes(q) || 
-             u.role.toLowerCase().includes(q) || 
-             u.department.toLowerCase().includes(q) || 
-             u.code.toLowerCase().includes(q) || 
-             u.email.toLowerCase().includes(q) ||
-             u.domain.toLowerCase().includes(q);
+      const matchesSearch = 
+        !searchQuery ||
+        (u.code && u.code.toLowerCase().includes(q)) ||
+        (u.name && u.name.toLowerCase().includes(q)) ||
+        (u.role && u.role.toLowerCase().includes(q)) ||
+        (u.department && u.department.toLowerCase().includes(q)) ||
+        (u.email && u.email.toLowerCase().includes(q)) ||
+        (u.domain && u.domain.toLowerCase().includes(q));
+
+      if (!matchesSearch) return false;
+
+      // Individual Column Filters
+      for (const colKey in columnFilters) {
+        const filterVal = columnFilters[colKey]?.trim().toLowerCase();
+        if (filterVal) {
+          let cellVal = '';
+          if (colKey === 'name') cellVal = `${u.name || ''} ${u.role || ''}`.toLowerCase();
+          else if (colKey === 'department') cellVal = `${u.department || ''} ${u.domain || ''}`.toLowerCase();
+          else if (colKey === 'email') cellVal = `${u.email || ''} ${u.phone || ''}`.toLowerCase();
+          else cellVal = String(u[colKey] || '').toLowerCase();
+          
+          if (!cellVal.includes(filterVal)) return false;
+        }
+      }
+
+      return true;
     }).sort((a, b) => {
       let valA = a[sortField];
       let valB = b[sortField];
@@ -154,7 +229,51 @@ export default function UserDirectory() {
   // Export functionality
   const handleExport = (format) => {
     setIsExportDropdownOpen(false);
-    alert(`Exporting ${filteredUsers.length} user records as ${format.toUpperCase()} dataset...`);
+    
+    if (filteredUsers.length === 0) {
+      alert('No user directory records available to export.');
+      return;
+    }
+
+    const fileName = `Sharjah_EPA_Users_${filteredUsers.length}_Records.${format.toLowerCase()}`;
+
+    if (format === 'csv') {
+      const headers = ['User ID', 'Employee Name', 'EPA Role & Title', 'Department', 'Email Address', 'Phone Number', 'Assigned Territory', 'Status', 'Last Active'];
+      const rows = filteredUsers.map(u => [
+        `"${u.code || u.id || ''}"`,
+        `"${u.name || ''}"`,
+        `"${u.role || ''}"`,
+        `"${u.department || ''}"`,
+        `"${u.email || ''}"`,
+        `"${u.phone || ''}"`,
+        `"${u.domain || ''}"`,
+        `"${u.status || ''}"`,
+        `"${u.lastLogin || ''}"`
+      ]);
+
+      const csvContent = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.setAttribute('href', url);
+      link.setAttribute('download', fileName);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    if (triggerExportSuccess) {
+      triggerExportSuccess({
+        filename: fileName,
+        format: format.toUpperCase(),
+        count: filteredUsers.length,
+        title: 'User Directory Downloaded Successfully!'
+      });
+    }
+
+    if (format === 'pdf') {
+      window.print();
+    }
   };
 
   return (
@@ -185,6 +304,37 @@ export default function UserDirectory() {
           {/* Right Controls: Export Dropdown + View Mode Switcher + Add User CTA */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap', marginLeft: 'auto' }}>
             
+            {/* Column Filters Toggle Button */}
+            <button
+              type="button"
+              onClick={() => setShowColumnFilters(prev => !prev)}
+              style={{
+                height: '36px',
+                padding: '0 14px',
+                borderRadius: '8px',
+                border: showColumnFilters ? '1.5px solid #00A878' : '1px solid #CBD5E1',
+                background: showColumnFilters ? '#E6F4EA' : '#FFFFFF',
+                color: showColumnFilters ? '#00A878' : '#334155',
+                fontSize: '0.76rem',
+                fontWeight: 700,
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '6px',
+                boxShadow: '0 1px 2px rgba(0,0,0,0.04)',
+                transition: 'all 0.15s ease'
+              }}
+            >
+              <Filter size={14} color={showColumnFilters ? '#00A878' : '#64748B'} />
+              <span>Column Filters</span>
+              {Object.values(columnFilters).some(v => v) && (
+                <span style={{ background: '#00A878', color: '#FFF', borderRadius: '50%', width: '16px', height: '16px', fontSize: '0.62rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  {Object.values(columnFilters).filter(v => v).length}
+                </span>
+              )}
+            </button>
+
             {/* Export Dropdown */}
             <div ref={exportDropdownRef} style={{ position: 'relative' }}>
               <button
@@ -319,6 +469,81 @@ export default function UserDirectory() {
 
         </div>
 
+        {/* Cards View Column Filters Panel */}
+        {viewMode === 'cards' && showColumnFilters && (
+          <div style={{
+            background: '#F8FAFC',
+            border: '1px solid #E2E8F0',
+            borderRadius: '10px',
+            padding: '12px 16px',
+            marginBottom: '14px',
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: '10px',
+            alignItems: 'center'
+          }}>
+            <div style={{ fontSize: '0.74rem', fontWeight: 800, color: '#334155', display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <Filter size={14} color="#00A878" /> Filter User Cards:
+            </div>
+            <input
+              type="text"
+              placeholder="Filter User Code..."
+              value={columnFilters.code || ''}
+              onChange={(e) => { setColumnFilters(p => ({ ...p, code: e.target.value })); setCurrentPage(1); }}
+              style={{ padding: '5px 10px', fontSize: '0.74rem', borderRadius: '6px', border: '1px solid #CBD5E1', background: '#FFF' }}
+            />
+            <input
+              type="text"
+              placeholder="Filter Full Name / Role..."
+              value={columnFilters.name || ''}
+              onChange={(e) => { setColumnFilters(p => ({ ...p, name: e.target.value })); setCurrentPage(1); }}
+              style={{ padding: '5px 10px', fontSize: '0.74rem', borderRadius: '6px', border: '1px solid #CBD5E1', background: '#FFF' }}
+            />
+            <input
+              type="text"
+              placeholder="Filter Department..."
+              value={columnFilters.department || ''}
+              onChange={(e) => { setColumnFilters(p => ({ ...p, department: e.target.value })); setCurrentPage(1); }}
+              style={{ padding: '5px 10px', fontSize: '0.74rem', borderRadius: '6px', border: '1px solid #CBD5E1', background: '#FFF' }}
+            />
+            <input
+              type="text"
+              placeholder="Filter Email..."
+              value={columnFilters.email || ''}
+              onChange={(e) => { setColumnFilters(p => ({ ...p, email: e.target.value })); setCurrentPage(1); }}
+              style={{ padding: '5px 10px', fontSize: '0.74rem', borderRadius: '6px', border: '1px solid #CBD5E1', background: '#FFF' }}
+            />
+            <input
+              type="text"
+              placeholder="Filter Status..."
+              value={columnFilters.status || ''}
+              onChange={(e) => { setColumnFilters(p => ({ ...p, status: e.target.value })); setCurrentPage(1); }}
+              style={{ padding: '5px 10px', fontSize: '0.74rem', borderRadius: '6px', border: '1px solid #CBD5E1', background: '#FFF' }}
+            />
+            {Object.values(columnFilters).some(v => v) && (
+              <button
+                type="button"
+                onClick={() => setColumnFilters({})}
+                style={{
+                  background: '#FEE2E2',
+                  border: '1px solid #FECACA',
+                  color: '#DC2626',
+                  borderRadius: '6px',
+                  padding: '5px 10px',
+                  fontSize: '0.72rem',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '4px'
+                }}
+              >
+                <RotateCcw size={12} /> Clear Filters
+              </button>
+            )}
+          </div>
+        )}
+
         {/* View Mode 1: Enterprise Table View (Same design as Work Orders & SLA) */}
         {viewMode === 'table' && (
           <>
@@ -360,6 +585,78 @@ export default function UserDirectory() {
                       ACTIONS
                     </th>
                   </tr>
+
+                  {/* Sub-Header Column Filter Inputs */}
+                  {showColumnFilters && (
+                    <tr style={{ background: '#F8FAFC' }}>
+                      <th style={{ padding: '6px 8px' }}>
+                        <input
+                          type="text"
+                          placeholder="Filter Code..."
+                          value={columnFilters.code || ''}
+                          onChange={(e) => { setColumnFilters(p => ({ ...p, code: e.target.value })); setCurrentPage(1); }}
+                          style={{ width: '100%', padding: '4px 8px', fontSize: '0.74rem', borderRadius: '6px', border: '1px solid #CBD5E1', outline: 'none', background: '#FFF' }}
+                        />
+                      </th>
+                      <th style={{ padding: '6px 8px' }}>
+                        <input
+                          type="text"
+                          placeholder="Filter Name/Role..."
+                          value={columnFilters.name || ''}
+                          onChange={(e) => { setColumnFilters(p => ({ ...p, name: e.target.value })); setCurrentPage(1); }}
+                          style={{ width: '100%', padding: '4px 8px', fontSize: '0.74rem', borderRadius: '6px', border: '1px solid #CBD5E1', outline: 'none', background: '#FFF' }}
+                        />
+                      </th>
+                      <th style={{ padding: '6px 8px' }}>
+                        <input
+                          type="text"
+                          placeholder="Filter Department..."
+                          value={columnFilters.department || ''}
+                          onChange={(e) => { setColumnFilters(p => ({ ...p, department: e.target.value })); setCurrentPage(1); }}
+                          style={{ width: '100%', padding: '4px 8px', fontSize: '0.74rem', borderRadius: '6px', border: '1px solid #CBD5E1', outline: 'none', background: '#FFF' }}
+                        />
+                      </th>
+                      <th style={{ padding: '6px 8px' }}>
+                        <input
+                          type="text"
+                          placeholder="Filter Contact..."
+                          value={columnFilters.email || ''}
+                          onChange={(e) => { setColumnFilters(p => ({ ...p, email: e.target.value })); setCurrentPage(1); }}
+                          style={{ width: '100%', padding: '4px 8px', fontSize: '0.74rem', borderRadius: '6px', border: '1px solid #CBD5E1', outline: 'none', background: '#FFF' }}
+                        />
+                      </th>
+                      <th style={{ padding: '6px 8px' }}>
+                        <input
+                          type="text"
+                          placeholder="Filter Status..."
+                          value={columnFilters.status || ''}
+                          onChange={(e) => { setColumnFilters(p => ({ ...p, status: e.target.value })); setCurrentPage(1); }}
+                          style={{ width: '100%', padding: '4px 8px', fontSize: '0.74rem', borderRadius: '6px', border: '1px solid #CBD5E1', outline: 'none', background: '#FFF' }}
+                        />
+                      </th>
+                      <th style={{ padding: '6px 8px' }}>
+                        <input
+                          type="text"
+                          placeholder="Filter Last Login..."
+                          value={columnFilters.lastLogin || ''}
+                          onChange={(e) => { setColumnFilters(p => ({ ...p, lastLogin: e.target.value })); setCurrentPage(1); }}
+                          style={{ width: '100%', padding: '4px 8px', fontSize: '0.74rem', borderRadius: '6px', border: '1px solid #CBD5E1', outline: 'none', background: '#FFF' }}
+                        />
+                      </th>
+                      <th style={{ textAlign: 'center' }}>
+                        {Object.values(columnFilters).some(v => v) && (
+                          <button
+                            type="button"
+                            onClick={() => setColumnFilters({})}
+                            title="Clear column filters"
+                            style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#EF4444', padding: 0 }}
+                          >
+                            <RotateCcw size={13} />
+                          </button>
+                        )}
+                      </th>
+                    </tr>
+                  )}
                 </thead>
                 <tbody>
                   {paginatedUsers.length === 0 ? (

@@ -134,56 +134,134 @@ export default function DataTable({
   return (
     <div className="glass-panel" style={{ display: 'flex', flexDirection: 'column', gap: '14px', padding: '20px' }}>
       
-      {/* Table Toolbar Controls */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
+      {/* Table Toolbar Controls - Single Row */}
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'space-between', 
+        alignItems: 'center', 
+        flexWrap: 'wrap', 
+        gap: '12px',
+        borderBottom: '1px solid #E2E8F0',
+        paddingBottom: '14px',
+        width: '100%'
+      }}>
         
-        {/* Search & Column Filter Toggle */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
-          <div style={{ position: 'relative', width: '260px' }}>
-            <Search size={16} style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', color: '#94A3B8' }} />
+        {/* Left: Search Input with clearly visible search icon */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flex: '0 1 320px', minWidth: '220px' }}>
+          <div style={{ position: 'relative', width: '100%' }}>
+            <Search 
+              size={16} 
+              style={{ 
+                position: 'absolute', 
+                left: '12px', 
+                top: '50%', 
+                transform: 'translateY(-50%)', 
+                color: '#64748B', 
+                pointerEvents: 'none',
+                zIndex: 2 
+              }} 
+            />
             <input
               type="text"
               placeholder="Search table records..."
               className="input-field"
               value={searchQuery}
               onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1); }}
-              style={{ paddingLeft: '34px', fontSize: '0.8rem', height: '36px' }}
+              style={{ paddingLeft: '36px', fontSize: '0.8rem', height: '36px', background: '#FFFFFF' }}
             />
           </div>
-
-          <button
-            onClick={() => setShowFilterRow(!showFilterRow)}
-            className={`btn ${showFilterRow ? 'btn-epa' : 'btn-secondary'}`}
-            style={{ padding: '6px 12px', fontSize: '0.76rem', display: 'flex', alignItems: 'center', gap: '6px' }}
-          >
-            <Filter size={14} /> {showFilterRow ? 'Hide Column Filters' : 'Column Filters'}
-          </button>
         </div>
 
-        {/* Export & Actions */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+        {/* Right: Column Filters + Export Dropdown */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap', marginLeft: 'auto' }}>
+          
           {selectedRows.length > 0 && (
-            <span style={{ fontSize: '0.76rem', color: '#00A878', fontWeight: 700, background: 'rgba(0, 168, 120, 0.1)', padding: '4px 10px', borderRadius: '6px' }}>
+            <span style={{ fontSize: '0.74rem', color: '#00A878', fontWeight: 700, background: '#E6F4EA', padding: '4px 10px', borderRadius: '6px' }}>
               {selectedRows.length} Selected
             </span>
           )}
 
+          {/* Column Filters Toggle Button */}
           <button
-            onClick={triggerExportCSV}
-            className="btn btn-secondary"
-            style={{ padding: '6px 12px', fontSize: '0.76rem', display: 'flex', alignItems: 'center', gap: '6px' }}
-            title="Export to CSV format"
+            type="button"
+            onClick={() => setShowFilterRow(!showFilterRow)}
+            style={{
+              height: '36px',
+              padding: '0 14px',
+              borderRadius: '8px',
+              border: showFilterRow ? '1.5px solid #00A878' : '1px solid #CBD5E1',
+              background: showFilterRow ? '#E6F4EA' : '#FFFFFF',
+              color: showFilterRow ? '#00A878' : '#334155',
+              fontSize: '0.76rem',
+              fontWeight: 700,
+              cursor: 'pointer',
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '6px',
+              boxShadow: '0 1px 2px rgba(0,0,0,0.04)',
+              transition: 'all 0.15s ease'
+            }}
           >
-            <Download size={14} /> Export CSV
+            <Filter size={14} color={showFilterRow ? '#00A878' : '#64748B'} />
+            <span>Column Filters</span>
+            {Object.values(columnFilters).some(v => v) && (
+              <span style={{ background: '#00A878', color: '#FFF', borderRadius: '50%', width: '16px', height: '16px', fontSize: '0.62rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                {Object.values(columnFilters).filter(v => v).length}
+              </span>
+            )}
           </button>
 
+          {/* Export CSV Button */}
           <button
-            onClick={triggerExportPDF}
-            className="btn btn-secondary"
-            style={{ padding: '6px 12px', fontSize: '0.76rem', display: 'flex', alignItems: 'center', gap: '6px' }}
-            title="Export to PDF document"
+            type="button"
+            onClick={triggerExportCSV}
+            style={{
+              height: '36px',
+              padding: '0 12px',
+              borderRadius: '8px',
+              border: '1px solid #CBD5E1',
+              background: '#FFFFFF',
+              color: '#0F172A',
+              fontSize: '0.76rem',
+              fontWeight: 700,
+              cursor: 'pointer',
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '6px',
+              boxShadow: '0 1px 2px rgba(0,0,0,0.04)'
+            }}
+            title="Export as CSV"
           >
-            <FileText size={14} color="#DC2626" /> Export PDF
+            <Download size={14} color="#00A878" />
+            <span>Export CSV</span>
+          </button>
+
+          {/* Export PDF Button */}
+          <button
+            type="button"
+            onClick={triggerExportPDF}
+            style={{
+              height: '36px',
+              padding: '0 12px',
+              borderRadius: '8px',
+              border: '1px solid #CBD5E1',
+              background: '#FFFFFF',
+              color: '#0F172A',
+              fontSize: '0.76rem',
+              fontWeight: 700,
+              cursor: 'pointer',
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '6px',
+              boxShadow: '0 1px 2px rgba(0,0,0,0.04)'
+            }}
+            title="Export as PDF"
+          >
+            <FileText size={14} color="#EF4444" />
+            <span>Export PDF</span>
           </button>
         </div>
       </div>
@@ -427,47 +505,66 @@ export default function DataTable({
       </div>
 
       {/* Pagination Controls */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px', fontSize: '0.78rem', color: '#64748B' }}>
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'space-between', 
+        alignItems: 'center', 
+        flexWrap: 'wrap', 
+        gap: '12px', 
+        fontSize: '0.78rem', 
+        color: '#64748B',
+        marginTop: '8px'
+      }}>
         
-        {/* Page Size Selector */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <span>View records per page:</span>
-          <select
-            value={pageSize}
-            onChange={(e) => { setPageSize(Number(e.target.value)); setCurrentPage(1); }}
-            style={{
-              padding: '4px 8px',
-              borderRadius: '6px',
-              border: '1px solid #CBD5E1',
-              fontWeight: 700,
-              color: '#0F172A',
-              cursor: 'pointer'
-            }}
-          >
-            <option value={10}>10</option>
-            <option value={50}>50</option>
-            <option value={100}>100</option>
-            <option value={500}>500</option>
-          </select>
+        {/* Left Side: Page Size Selector & Record Counter */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span>View records per page:</span>
+            <select
+              value={pageSize}
+              onChange={(e) => { setPageSize(Number(e.target.value)); setCurrentPage(1); }}
+              style={{
+                padding: '4px 8px',
+                borderRadius: '6px',
+                border: '1px solid #CBD5E1',
+                fontWeight: 700,
+                color: '#0F172A',
+                cursor: 'pointer',
+                background: '#FFFFFF'
+              }}
+            >
+              <option value={10}>10</option>
+              <option value={50}>50</option>
+              <option value={100}>100</option>
+              <option value={500}>500</option>
+            </select>
+          </div>
+
+          <div style={{ color: '#64748B' }}>
+            Showing {totalRecords > 0 ? startIndex + 1 : 0} to {Math.min(startIndex + pageSize, totalRecords)} of {totalRecords} records
+          </div>
         </div>
 
-        {/* Showing Count */}
-        <div>
-          Showing {totalRecords > 0 ? startIndex + 1 : 0} to {Math.min(startIndex + pageSize, totalRecords)} of {totalRecords} records
-        </div>
-
-        {/* Navigation Buttons */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+        {/* Right Corner: Navigation Buttons */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginLeft: 'auto' }}>
           <button
             onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
             disabled={currentPage === 1}
             className="btn btn-secondary"
-            style={{ padding: '4px 8px', fontSize: '0.74rem', opacity: currentPage === 1 ? 0.5 : 1 }}
+            style={{ 
+              padding: '6px 12px', 
+              fontSize: '0.74rem', 
+              opacity: currentPage === 1 ? 0.5 : 1,
+              cursor: currentPage === 1 ? 'not-allowed' : 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '4px'
+            }}
           >
             <ChevronLeft size={14} /> Previous
           </button>
 
-          <span style={{ fontWeight: 700, color: '#0F172A', padding: '0 4px' }}>
+          <span style={{ fontWeight: 700, color: '#0F172A', padding: '0 6px' }}>
             Page {currentPage} of {totalPages}
           </span>
 
@@ -475,7 +572,15 @@ export default function DataTable({
             onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
             disabled={currentPage === totalPages}
             className="btn btn-secondary"
-            style={{ padding: '4px 8px', fontSize: '0.74rem', opacity: currentPage === totalPages ? 0.5 : 1 }}
+            style={{ 
+              padding: '6px 12px', 
+              fontSize: '0.74rem', 
+              opacity: currentPage === totalPages ? 0.5 : 1,
+              cursor: currentPage === totalPages ? 'not-allowed' : 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '4px'
+            }}
           >
             Next <ChevronRight size={14} />
           </button>

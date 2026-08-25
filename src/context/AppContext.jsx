@@ -15,6 +15,7 @@ import {
   NOTIFICATIONS_DATA,
   AUDIT_LOGS_DATA
 } from '../data/mockData';
+import { isDateInRange, getDateRangeLabel, REF_TODAY } from '../utils/dateHelper';
 
 const AppContext = createContext();
 
@@ -23,10 +24,10 @@ export function AppProvider({ children }) {
   const [activeTab, setActiveTab] = useState('Executive Dashboard');
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Global Date Filter State
-  const [dateFilter, setDateFilter] = useState('7D');
-  const [startDate, setStartDate] = useState('2026-08-17');
-  const [endDate, setEndDate] = useState('2026-08-24');
+  // Global Date Filter State (Default: TODAY)
+  const [dateFilter, setDateFilter] = useState('TODAY');
+  const [startDate, setStartDate] = useState('2026-08-25');
+  const [endDate, setEndDate] = useState('2026-08-25');
   
   // Enterprise Core Datasets
   const [networks, setNetworks] = useState(NETWORKS_DATA);
@@ -52,9 +53,58 @@ export function AppProvider({ children }) {
   const [isNotifDrawerOpen, setIsNotifDrawerOpen] = useState(false);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [targetSearchResult, setTargetSearchResult] = useState(null);
+
+  // Global Export Download Success Popup State
+  const [exportToast, setExportToast] = useState(null);
+
+  const triggerExportSuccess = ({ filename, format = 'CSV', count, title = 'Downloaded Successfully!' }) => {
+    setExportToast({
+      isOpen: true,
+      filename: filename || `Sharjah_EPA_Export_${Date.now()}.${(format || 'csv').toLowerCase()}`,
+      format: (format || 'CSV').toUpperCase(),
+      count: count !== undefined ? count : null,
+      title: title || 'Downloaded Successfully!'
+    });
+  };
+
+  const closeExportToast = () => {
+    setExportToast(null);
+  };
 
   const toggleSidebar = () => setIsSidebarCollapsed(prev => !prev);
   const toggleMobileMenu = () => setIsMobileMenuOpen(prev => !prev);
+
+  // Unified global navigation and redirection helper
+  const navigateToTarget = (targetModule, targetTab, searchTerm = '', item = null) => {
+    if (targetModule) setActiveModule(targetModule);
+    if (targetTab) setActiveTab(targetTab);
+    
+    if (item) {
+      if (item.site) setSelectedSite(item.site);
+      else if (targetModule === 'sites') setSelectedSite(item);
+
+      if (item.station) setSelectedStation(item.station);
+      else if (targetModule === 'stations') setSelectedStation(item);
+
+      if (item.asset) setSelectedAsset(item.asset);
+      else if (targetModule === 'assets') setSelectedAsset(item);
+    }
+
+    if (searchTerm) {
+      setSearchQuery(searchTerm);
+    }
+
+    setTargetSearchResult({
+      module: targetModule,
+      tab: targetTab,
+      searchTerm: searchTerm || (item?.name || item?.title || item?.code || item?.id || item?.serialNo || item?.sku || item?.certificateNo || ''),
+      item,
+      timestamp: Date.now()
+    });
+
+    setIsMobileMenuOpen(false);
+  };
 
   // Current User Profile
   const currentUser = {
@@ -134,6 +184,9 @@ export function AppProvider({ children }) {
       setActiveTab,
       searchQuery,
       setSearchQuery,
+      targetSearchResult,
+      setTargetSearchResult,
+      navigateToTarget,
       networks,
       setNetworks,
       sites,
@@ -184,7 +237,13 @@ export function AppProvider({ children }) {
       startDate,
       setStartDate,
       endDate,
-      setEndDate
+      setEndDate,
+      isDateInRange: (dateStr) => isDateInRange(dateStr, dateFilter, startDate, endDate),
+      getDateRangeLabel: () => getDateRangeLabel(dateFilter, startDate, endDate),
+      REF_TODAY,
+      exportToast,
+      triggerExportSuccess,
+      closeExportToast
     }}>
       {children}
     </AppContext.Provider>

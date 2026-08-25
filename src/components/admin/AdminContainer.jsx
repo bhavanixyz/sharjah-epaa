@@ -20,17 +20,16 @@ export default function AdminContainer() {
       setActiveAdminTab('rbac');
     } else if (activeModule === 'audit') {
       setActiveAdminTab('audit');
-    } else if (activeModule === 'users' || activeModule === 'admin') {
+    } else {
       setActiveAdminTab('users');
     }
   }, [activeModule]);
 
   return (
     <>
-      {/* Render Active View directly without top sub-navigation tab container */}
-      {activeAdminTab === 'users' && <UserDirectory />}
       {activeAdminTab === 'rbac' && <RolePermissionManagement />}
       {activeAdminTab === 'audit' && <SecurityAuditTrail />}
+      {activeAdminTab !== 'rbac' && activeAdminTab !== 'audit' && <UserDirectory />}
     </>
   );
 }

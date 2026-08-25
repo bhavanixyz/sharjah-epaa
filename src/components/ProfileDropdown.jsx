@@ -5,7 +5,7 @@ import { useApp } from '../context/AppContext';
 export default function ProfileDropdown() {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
-  const { setActiveTab } = useApp();
+  const { setActiveTab, setActiveModule } = useApp();
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -18,12 +18,14 @@ export default function ProfileDropdown() {
   }, []);
 
   const handleNavigate = (tabName) => {
-    if (setActiveTab) setActiveTab(tabName);
-    if (tabName === 'Admin' && setActiveModule) {
-      setActiveModule('users');
-    }
-    if (tabName === 'Settings' && setActiveModule) {
-      setActiveModule('config');
+    if (tabName === 'Admin') {
+      if (setActiveTab) setActiveTab('User Directory');
+      if (setActiveModule) setActiveModule('users');
+    } else if (tabName === 'Settings') {
+      if (setActiveTab) setActiveTab('Role & RBAC Matrix');
+      if (setActiveModule) setActiveModule('roles');
+    } else {
+      if (setActiveTab) setActiveTab(tabName);
     }
     setIsOpen(false);
   };

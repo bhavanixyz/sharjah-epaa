@@ -3,7 +3,7 @@ import { Bell, Search, Filter, CheckCircle2, AlertTriangle, Info, Clock, Check, 
 import { useApp } from '../context/AppContext';
 
 export default function NotificationsPage() {
-  const { notifications, setNotifications, setActiveModule } = useApp();
+  const { notifications, setNotifications, setActiveModule, isDateInRange, dateFilter } = useApp();
   const [searchQuery, setSearchQuery] = useState('');
   const [filterPriority, setFilterPriority] = useState('ALL');
   const [filterModule, setFilterModule] = useState('ALL');
@@ -11,12 +11,12 @@ export default function NotificationsPage() {
 
   // Initial Sample Notifications if context is empty
   const initialData = notifications && notifications.length > 0 ? notifications : [
-    { id: 'notif-1', title: 'PM2.5 Sensor Threshold Exceeded', desc: 'Sharjah Industrial Zone 3 station logged PM2.5 at 145 µg/m³ (exceeding EPA limit of 50 µg/m³).', module: 'Live Site Management', date: '2026-08-24 14:22', priority: 'HIGH', type: 'ALERT', isRead: false },
+    { id: 'notif-1', title: 'PM2.5 Sensor Threshold Exceeded', desc: 'Sharjah Industrial Zone 3 station logged PM2.5 at 145 µg/m³ (exceeding EPA limit of 50 µg/m³).', module: 'Live Site Management', date: '2026-08-25 10:22', priority: 'HIGH', type: 'ALERT', isRead: false },
     { id: 'notif-2', title: 'SO2 Gas Analyzer Calibration Overdue', desc: 'Teledyne T100 SO2 analyzer at Khorfakkan Harbor has exceeded its 30-day calibration window.', module: 'Drift & Gas Calibration', date: '2026-08-24 11:05', priority: 'CRITICAL', type: 'WARNING', isRead: false },
-    { id: 'notif-3', title: 'Work Order SLA Closure Sign-off Needed', desc: 'Work Order WO-2026-089 (Solar Battery Replacement) marked completed by technician Eng. Rashid.', module: 'Work Orders & SLA', date: '2026-08-24 09:40', priority: 'MEDIUM', type: 'ACTION', isRead: true },
-    { id: 'notif-4', title: 'PTFE Filter Reorder Safety Threshold Hit', desc: 'Central Depot stock for 47mm PTFE Membrane Filters dropped below safety threshold (8 units remaining).', module: 'Inventory & Spare Parts', date: '2026-08-23 16:50', priority: 'HIGH', type: 'INVENTORY', isRead: true },
-    { id: 'notif-5', title: 'Annual Marine AMC Renewal Pending', desc: 'Vendor AMC contract with YSI Xylem for Marine Water Quality Buoys expires in 14 days.', module: 'Contracts & Warranty', date: '2026-08-23 10:15', priority: 'LOW', type: 'CONTRACT', isRead: true },
-    { id: 'notif-6', title: 'ISO 17025 Audit Trail Export Generated', desc: 'System security audit log for Q3 2026 successfully compiled and archived.', module: 'Security Audit Trail', date: '2026-08-22 18:30', priority: 'INFO', type: 'SYSTEM', isRead: true }
+    { id: 'notif-3', title: 'Work Order SLA Closure Sign-off Needed', desc: 'Work Order WO-2026-089 (Solar Battery Replacement) marked completed by technician Eng. Rashid.', module: 'Work Orders & SLA', date: '2026-08-21 09:40', priority: 'MEDIUM', type: 'ACTION', isRead: true },
+    { id: 'notif-4', title: 'PTFE Filter Reorder Safety Threshold Hit', desc: 'Central Depot stock for 47mm PTFE Membrane Filters dropped below safety threshold (8 units remaining).', module: 'Inventory & Spare Parts', date: '2026-08-16 16:50', priority: 'HIGH', type: 'INVENTORY', isRead: true },
+    { id: 'notif-5', title: 'Annual Marine AMC Renewal Pending', desc: 'Vendor AMC contract with YSI Xylem for Marine Water Quality Buoys expires in 14 days.', module: 'Contracts & Warranty', date: '2026-08-12 10:15', priority: 'LOW', type: 'CONTRACT', isRead: true },
+    { id: 'notif-6', title: 'ISO 17025 Audit Trail Export Generated', desc: 'System security audit log for Q3 2026 successfully compiled and archived.', module: 'Security Audit Trail', date: '2026-07-28 18:30', priority: 'INFO', type: 'SYSTEM', isRead: true }
   ];
 
   const [items, setItems] = useState(initialData);
@@ -34,6 +34,11 @@ export default function NotificationsPage() {
   };
 
   const filteredItems = items.filter(item => {
+    // Global Date Filter
+    if (dateFilter !== 'ALL' && !searchQuery) {
+      if (!isDateInRange(item.date)) return false;
+    }
+
     const matchesSearch = item.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
                           item.desc.toLowerCase().includes(searchQuery.toLowerCase()) ||
                           item.module.toLowerCase().includes(searchQuery.toLowerCase());

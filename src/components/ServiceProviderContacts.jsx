@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
+import { useApp } from '../context/AppContext';
 import { 
   Search, 
   Phone, 
@@ -21,11 +22,14 @@ import {
   UserCheck,
   User,
   Table,
-  Map
+  Map,
+  Filter,
+  RotateCcw
 } from 'lucide-react';
 import GisMap from './GisMap';
 
 export default function ServiceProviderContacts() {
+  const { targetSearchResult, isDateInRange, dateFilter, triggerExportSuccess } = useApp();
   const [searchQuery, setSearchQuery] = useState('');
   const [viewMode, setViewMode] = useState('table'); // 'table' or 'map'
   const [sortField, setSortField] = useState('provider');
@@ -34,9 +38,21 @@ export default function ServiceProviderContacts() {
   const [isExportDropdownOpen, setIsExportDropdownOpen] = useState(false);
   const exportDropdownRef = useRef(null);
 
+  // Column Filters state
+  const [showColumnFilters, setShowColumnFilters] = useState(false);
+  const [columnFilters, setColumnFilters] = useState({});
+
   // Pagination state
   const [pageSize, setPageSize] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
+
+  // Auto-fill and filter when navigated from Global Search
+  useEffect(() => {
+    if (targetSearchResult?.module === 'providers') {
+      setSearchQuery(targetSearchResult.searchTerm || '');
+      setCurrentPage(1);
+    }
+  }, [targetSearchResult]);
 
   // Close export dropdown when clicking outside
   useEffect(() => {
@@ -50,34 +66,52 @@ export default function ServiceProviderContacts() {
   }, []);
 
   const contacts = [
-    { id: 'sp-1', provider: 'Teledyne API Environmental', contactPerson: 'Mark Harrison', role: 'Chief Calibration Engineer', email: 'mharrison@teledyne-api.com', phone: '+1 858 657 9800', region: 'North America / Middle East', status: 'Active Vendor' },
-    { id: 'sp-2', provider: 'Horiba Instruments Middle East', contactPerson: 'Eng. Ahmed Al-Standard', role: 'Regional Maintenance Manager', email: 'ahmed.standard@horiba.ae', phone: '+971 4 883 7070', region: 'UAE & GCC Region', status: 'Active Vendor' },
-    { id: 'sp-3', provider: 'Thermo Fisher Scientific', contactPerson: 'David Miller', role: 'Gas Analyzer Specialist', email: 'david.miller@thermofisher.com', phone: '+971 4 457 1100', region: 'Global Field Support', status: 'Active Vendor' },
-    { id: 'sp-4', provider: 'Emirates Calibration Laboratories', contactPerson: 'Mariam Al-Kabi', role: 'ISO 17025 Lead Auditor', email: 'mariam@emicalib.ae', phone: '+971 6 534 2200', region: 'Sharjah Industrial', status: 'Active Vendor' },
-    { id: 'sp-5', provider: 'Vaisala Gulf Meteorological FZE', contactPerson: 'Hassan Al-Zahabi', role: 'Microclimate Technical Lead', email: 'h.alzahabi@vaisala.com', phone: '+971 4 881 9920', region: 'GCC Regional Office', status: 'Active Vendor' },
-    { id: 'sp-6', provider: 'YSI Xylem Water Solutions', contactPerson: 'Dr. Sarah Jenkins', role: 'Marine Sonde Calibration Lead', email: 's.jenkins@xylem.com', phone: '+971 4 347 5588', region: 'Middle East & North Africa', status: 'Active Vendor' },
-    { id: 'sp-7', provider: 'Campbell Scientific Middle East', contactPerson: 'Omar Al-Sabah', role: 'Telemetry & Data Logger Engineer', email: 'o.alsabah@campbellsci.ae', phone: '+971 6 557 4100', region: 'Sharjah Freezone', status: 'Active Vendor' },
-    { id: 'sp-8', provider: 'Endress+Hauser Water Analytics', contactPerson: 'Kambiz Rostami', role: 'Flow Sensor Specialist', email: 'kambiz.rostami@endress.com', phone: '+971 4 810 5000', region: 'UAE Support Hub', status: 'Active Vendor' },
-    { id: 'sp-9', provider: 'Aeroqual Air Monitoring Systems', contactPerson: 'Rachel Adams', role: 'Ambient AQ Sensor Auditor', email: 'r.adams@aeroqual.com', phone: '+971 4 329 1100', region: 'Middle East Division', status: 'Active Vendor' },
-    { id: 'sp-10', provider: 'Tisch Environmental Inc.', contactPerson: 'Michael O\'Connor', role: 'High Volume Air Sampler Lead', email: 'moconnor@tisch-env.com', phone: '+1 513 467 9000', region: 'Global Technical Support', status: 'Active Vendor' },
-    { id: 'sp-11', provider: 'OTT HydroMet GCC', contactPerson: 'Khalifa Al-Hajri', role: 'Hydrological Station Specialist', email: 'k.alhajri@otthydromet.com', phone: '+971 4 338 9090', region: 'GCC & Oman Territory', status: 'Active Vendor' },
-    { id: 'sp-12', provider: 'Hach Water Analytics Middle East', contactPerson: 'Fatima Al-Rumaithi', role: 'Water Quality Chemist', email: 'falrumaithi@hach.com', phone: '+971 4 887 6677', region: 'Sharjah & Northern Emirates', status: 'Active Vendor' }
+    { id: 'sp-1', provider: 'Teledyne API Environmental', contactPerson: 'Mark Harrison', role: 'Chief Calibration Engineer', email: 'mharrison@teledyne-api.com', phone: '+1 858 657 9800', region: 'North America / Middle East', status: 'Active Vendor', date: '2026-08-25', lastAuditDate: '2026-08-25' },
+    { id: 'sp-2', provider: 'Horiba Instruments Middle East', contactPerson: 'Eng. Ahmed Al-Standard', role: 'Regional Maintenance Manager', email: 'ahmed.standard@horiba.ae', phone: '+971 4 883 7070', region: 'UAE & GCC Region', status: 'Active Vendor', date: '2026-08-24', lastAuditDate: '2026-08-24' },
+    { id: 'sp-3', provider: 'Thermo Fisher Scientific', contactPerson: 'David Miller', role: 'Gas Analyzer Specialist', email: 'david.miller@thermofisher.com', phone: '+971 4 457 1100', region: 'Global Field Support', status: 'Active Vendor', date: '2026-08-21', lastAuditDate: '2026-08-21' },
+    { id: 'sp-4', provider: 'Emirates Calibration Laboratories', contactPerson: 'Mariam Al-Kabi', role: 'ISO 17025 Lead Auditor', email: 'mariam@emicalib.ae', phone: '+971 6 534 2200', region: 'Sharjah Industrial', status: 'Active Vendor', date: '2026-08-18', lastAuditDate: '2026-08-18' },
+    { id: 'sp-5', provider: 'Vaisala Gulf Meteorological FZE', contactPerson: 'Hassan Al-Zahabi', role: 'Microclimate Technical Lead', email: 'h.alzahabi@vaisala.com', phone: '+971 4 881 9920', region: 'GCC Regional Office', status: 'Active Vendor', date: '2026-08-12', lastAuditDate: '2026-08-12' },
+    { id: 'sp-6', provider: 'YSI Xylem Water Solutions', contactPerson: 'Dr. Sarah Jenkins', role: 'Marine Sonde Calibration Lead', email: 's.jenkins@xylem.com', phone: '+971 4 347 5588', region: 'Middle East & North Africa', status: 'Active Vendor', date: '2026-08-04', lastAuditDate: '2026-08-04' },
+    { id: 'sp-7', provider: 'Campbell Scientific Middle East', contactPerson: 'Omar Al-Sabah', role: 'Telemetry & Data Logger Engineer', email: 'o.alsabah@campbellsci.ae', phone: '+971 6 557 4100', region: 'Sharjah Freezone', status: 'Active Vendor', date: '2026-07-28', lastAuditDate: '2026-07-28' },
+    { id: 'sp-8', provider: 'Endress+Hauser Water Analytics', contactPerson: 'Kambiz Rostami', role: 'Flow Sensor Specialist', email: 'kambiz.rostami@endress.com', phone: '+971 4 810 5000', region: 'UAE Support Hub', status: 'Active Vendor', date: '2026-07-20', lastAuditDate: '2026-07-20' },
+    { id: 'sp-9', provider: 'Aeroqual Air Monitoring Systems', contactPerson: 'Rachel Adams', role: 'Ambient AQ Sensor Auditor', email: 'r.adams@aeroqual.com', phone: '+971 4 329 1100', region: 'Middle East Division', status: 'Active Vendor', date: '2026-07-15', lastAuditDate: '2026-07-15' },
+    { id: 'sp-10', provider: 'Tisch Environmental Inc.', contactPerson: 'Michael O\'Connor', role: 'High Volume Air Sampler Lead', email: 'moconnor@tisch-env.com', phone: '+1 513 467 9000', region: 'Global Technical Support', status: 'Active Vendor', date: '2026-06-28', lastAuditDate: '2026-06-28' },
+    { id: 'sp-11', provider: 'OTT HydroMet GCC', contactPerson: 'Khalifa Al-Hajri', role: 'Hydrological Station Specialist', email: 'k.alhajri@otthydromet.com', phone: '+971 4 338 9090', region: 'GCC & Oman Territory', status: 'Active Vendor', date: '2026-06-15', lastAuditDate: '2026-06-15' },
+    { id: 'sp-12', provider: 'Hach Water Analytics Middle East', contactPerson: 'Fatima Al-Rumaithi', role: 'Water Quality Chemist', email: 'falrumaithi@hach.com', phone: '+971 4 887 6677', region: 'Sharjah & Northern Emirates', status: 'Active Vendor', date: '2026-05-20', lastAuditDate: '2026-05-20' }
   ];
 
-  // Filter contacts based on search query
+  // Filter contacts based on search query, date filter & column filters
   const filteredContacts = useMemo(() => {
     return contacts.filter(c => {
+      // Global Date Filter
+      if (dateFilter !== 'ALL' && !searchQuery) {
+        if (!isDateInRange(c.lastAuditDate || c.date)) return false;
+      }
+
       const q = searchQuery.toLowerCase();
-      return (
+      const matchesSearch = 
+        !searchQuery ||
         (c.provider && c.provider.toLowerCase().includes(q)) ||
         (c.contactPerson && c.contactPerson.toLowerCase().includes(q)) ||
         (c.role && c.role.toLowerCase().includes(q)) ||
         (c.email && c.email.toLowerCase().includes(q)) ||
         (c.phone && c.phone.toLowerCase().includes(q)) ||
-        (c.region && c.region.toLowerCase().includes(q))
-      );
+        (c.region && c.region.toLowerCase().includes(q));
+
+      if (!matchesSearch) return false;
+
+      // Individual Column Filters
+      for (const colKey in columnFilters) {
+        const filterVal = columnFilters[colKey]?.trim().toLowerCase();
+        if (filterVal) {
+          const cellVal = String(c[colKey] || '').toLowerCase();
+          if (!cellVal.includes(filterVal)) return false;
+        }
+      }
+
+      return true;
     });
-  }, [contacts, searchQuery]);
+  }, [contacts, searchQuery, columnFilters, dateFilter, isDateInRange]);
 
   // Sort contacts based on sortField & sortDirection
   const sortedContacts = useMemo(() => {
@@ -157,6 +191,7 @@ export default function ServiceProviderContacts() {
     }
 
     if (format === 'csv') {
+      const fileName = `Sharjah_EPA_Service_Providers_${exportData.length}_Records.csv`;
       const headers = ['Service Provider / Company', 'Specialist Role', 'Email', 'Phone Number', 'Support Region', 'Primary Contact Person', 'Status'];
       const rows = exportData.map(c => [
         `"${c.provider || ''}"`,
@@ -173,11 +208,28 @@ export default function ServiceProviderContacts() {
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.setAttribute('href', url);
-      link.setAttribute('download', `Sharjah_EPA_Service_Providers_${exportData.length}_Records.csv`);
+      link.setAttribute('download', fileName);
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
+
+      if (triggerExportSuccess) {
+        triggerExportSuccess({
+          filename: fileName,
+          format: 'CSV',
+          count: exportData.length,
+          title: 'Service Providers Downloaded Successfully!'
+        });
+      }
     } else if (format === 'pdf') {
+      if (triggerExportSuccess) {
+        triggerExportSuccess({
+          filename: `Sharjah_EPA_Service_Providers_Report.pdf`,
+          format: 'PDF',
+          count: exportData.length,
+          title: 'Service Providers Report Generated Successfully!'
+        });
+      }
       const printWindow = window.open('', '_blank');
       const htmlContent = `
         <!DOCTYPE html>
@@ -269,11 +321,40 @@ export default function ServiceProviderContacts() {
                 style={{ paddingLeft: '36px', fontSize: '0.8rem', background: '#FFFFFF' }}
               />
             </div>
-          </div>
-
-          {/* Right Aligned Controls: Export Dropdown + View Mode Switcher (Table View / Map View) */}
+          </div>          {/* Right Aligned Controls: Export Dropdown + View Mode Switcher (Table View / Map View) */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap', marginLeft: 'auto' }}>
             
+            {/* Column Filters Toggle Button */}
+            <button
+              type="button"
+              onClick={() => setShowColumnFilters(prev => !prev)}
+              style={{
+                height: '36px',
+                padding: '0 14px',
+                borderRadius: '8px',
+                border: showColumnFilters ? '1.5px solid #00A878' : '1px solid #CBD5E1',
+                background: showColumnFilters ? '#E6F4EA' : '#FFFFFF',
+                color: showColumnFilters ? '#00A878' : '#334155',
+                fontSize: '0.76rem',
+                fontWeight: 700,
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '6px',
+                boxShadow: '0 1px 2px rgba(0,0,0,0.04)',
+                transition: 'all 0.15s ease'
+              }}
+            >
+              <Filter size={14} color={showColumnFilters ? '#00A878' : '#64748B'} />
+              <span>Column Filters</span>
+              {Object.values(columnFilters).some(v => v) && (
+                <span style={{ background: '#00A878', color: '#FFF', borderRadius: '50%', width: '16px', height: '16px', fontSize: '0.62rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  {Object.values(columnFilters).filter(v => v).length}
+                </span>
+              )}
+            </button>
+
             {/* Export Dropdown Button */}
             <div ref={exportDropdownRef} style={{ position: 'relative' }}>
               <button
@@ -390,7 +471,7 @@ export default function ServiceProviderContacts() {
         {selectedIds.length > 0 && (
           <div style={{
             display: 'flex',
-            justify: 'space-between',
+            justifyContent: 'space-between',
             alignItems: 'center',
             padding: '10px 16px',
             marginBottom: '14px',
@@ -474,6 +555,79 @@ export default function ServiceProviderContacts() {
                   </th>
                   <th style={{ textAlign: 'right' }}>Call</th>
                 </tr>
+
+                {/* Sub-Header Column Filter Inputs */}
+                {showColumnFilters && (
+                  <tr style={{ background: '#F8FAFC' }}>
+                    <th style={{ textAlign: 'center' }}>
+                      {Object.values(columnFilters).some(v => v) && (
+                        <button
+                          type="button"
+                          onClick={() => setColumnFilters({})}
+                          title="Clear column filters"
+                          style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#EF4444', padding: 0 }}
+                        >
+                          <RotateCcw size={13} />
+                        </button>
+                      )}
+                    </th>
+                    <th style={{ padding: '6px 8px' }}>
+                      <input
+                        type="text"
+                        placeholder="Filter Provider..."
+                        value={columnFilters.provider || ''}
+                        onChange={(e) => { setColumnFilters(p => ({ ...p, provider: e.target.value })); setCurrentPage(1); }}
+                        style={{ width: '100%', padding: '4px 8px', fontSize: '0.74rem', borderRadius: '6px', border: '1px solid #CBD5E1', outline: 'none', background: '#FFF' }}
+                      />
+                    </th>
+                    <th style={{ padding: '6px 8px' }}>
+                      <input
+                        type="text"
+                        placeholder="Filter Role..."
+                        value={columnFilters.role || ''}
+                        onChange={(e) => { setColumnFilters(p => ({ ...p, role: e.target.value })); setCurrentPage(1); }}
+                        style={{ width: '100%', padding: '4px 8px', fontSize: '0.74rem', borderRadius: '6px', border: '1px solid #CBD5E1', outline: 'none', background: '#FFF' }}
+                      />
+                    </th>
+                    <th style={{ padding: '6px 8px' }}>
+                      <input
+                        type="text"
+                        placeholder="Filter Email..."
+                        value={columnFilters.email || ''}
+                        onChange={(e) => { setColumnFilters(p => ({ ...p, email: e.target.value })); setCurrentPage(1); }}
+                        style={{ width: '100%', padding: '4px 8px', fontSize: '0.74rem', borderRadius: '6px', border: '1px solid #CBD5E1', outline: 'none', background: '#FFF' }}
+                      />
+                    </th>
+                    <th style={{ padding: '6px 8px' }}>
+                      <input
+                        type="text"
+                        placeholder="Filter Phone..."
+                        value={columnFilters.phone || ''}
+                        onChange={(e) => { setColumnFilters(p => ({ ...p, phone: e.target.value })); setCurrentPage(1); }}
+                        style={{ width: '100%', padding: '4px 8px', fontSize: '0.74rem', borderRadius: '6px', border: '1px solid #CBD5E1', outline: 'none', background: '#FFF' }}
+                      />
+                    </th>
+                    <th style={{ padding: '6px 8px' }}>
+                      <input
+                        type="text"
+                        placeholder="Filter Region..."
+                        value={columnFilters.region || ''}
+                        onChange={(e) => { setColumnFilters(p => ({ ...p, region: e.target.value })); setCurrentPage(1); }}
+                        style={{ width: '100%', padding: '4px 8px', fontSize: '0.74rem', borderRadius: '6px', border: '1px solid #CBD5E1', outline: 'none', background: '#FFF' }}
+                      />
+                    </th>
+                    <th style={{ padding: '6px 8px' }}>
+                      <input
+                        type="text"
+                        placeholder="Filter Contact..."
+                        value={columnFilters.contactPerson || ''}
+                        onChange={(e) => { setColumnFilters(p => ({ ...p, contactPerson: e.target.value })); setCurrentPage(1); }}
+                        style={{ width: '100%', padding: '4px 8px', fontSize: '0.74rem', borderRadius: '6px', border: '1px solid #CBD5E1', outline: 'none', background: '#FFF' }}
+                      />
+                    </th>
+                    <th />
+                  </tr>
+                )}
               </thead>
               <tbody>
                 {paginatedContacts.length === 0 ? (

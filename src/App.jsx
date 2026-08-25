@@ -18,29 +18,15 @@ import DocumentReporting from './components/DocumentReporting';
 import ServiceProviderContacts from './components/ServiceProviderContacts';
 import AdminContainer from './components/admin/AdminContainer';
 import WorkOrderModal from './components/WorkOrderModal';
-import GlobalSearchModal from './components/GlobalSearchModal';
 import ChatAIWidget from './components/ChatAIWidget';
 import PageHeaderBar from './components/common/PageHeaderBar';
 import NotificationDrawer from './components/NotificationDrawer';
 import NotificationsPage from './components/NotificationsPage';
+import ExportSuccessToast from './components/common/ExportSuccessToast';
 
 function MainLayout() {
   const { activeModule, activeTab } = useApp();
-  const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-
-  // Keyboard shortcut for Ctrl + F / Cmd + F
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if ((e.ctrlKey || e.metaKey) && (e.key === 'f' || e.key === 'F' || e.code === 'KeyF')) {
-        e.preventDefault();
-        e.stopPropagation();
-        setIsSearchModalOpen(true);
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown, true);
-    return () => window.removeEventListener('keydown', handleKeyDown, true);
-  }, []);
 
   // Update Page Document Title dynamically
   useEffect(() => {
@@ -124,11 +110,24 @@ function MainLayout() {
         <Sidebar />
 
         {/* Main Content Area */}
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0, height: '100vh', overflowY: 'auto' }}>
-          <TopHeader onOpenSearch={() => setIsSearchModalOpen(true)} />
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0, height: '100vh', overflow: 'hidden' }}>
           
-          <main style={{ flex: 1, padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            <PageHeaderBar />
+          {/* Fixed & Sticky Top Navigation Header & Page Header Bar */}
+          <div style={{ 
+            flexShrink: 0, 
+            zIndex: 100, 
+            background: '#F8FAFC', 
+            borderBottom: '1px solid #E2E8F0',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.03)'
+          }}>
+            <TopHeader />
+            <div style={{ padding: '12px 24px 14px 24px' }}>
+              <PageHeaderBar />
+            </div>
+          </div>
+          
+          {/* Scrollable Main Content */}
+          <main style={{ flex: 1, padding: '20px 24px 32px 24px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '16px' }}>
             {renderModule()}
           </main>
         </div>
@@ -136,14 +135,14 @@ function MainLayout() {
         {/* Shared Work Order Dispatch Modal */}
         <WorkOrderModal />
 
-        {/* Global Search Modal (Ctrl+F) */}
-        <GlobalSearchModal isOpen={isSearchModalOpen} onClose={() => setIsSearchModalOpen(false)} />
-
         {/* Sliding Right Notifications Drawer */}
         <NotificationDrawer />
 
         {/* Floating ChatAI Widget */}
         <ChatAIWidget />
+
+        {/* Global Export Download Success Toast Popup */}
+        <ExportSuccessToast />
       </div>
     </>
   );

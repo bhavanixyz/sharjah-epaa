@@ -4,20 +4,32 @@ import {
   Search, Plus, Table, LayoutGrid, Map, MapPin, User, Building2, 
   ShieldCheck, AlertTriangle, CheckCircle2, Download, ChevronDown, 
   ArrowUpDown, ArrowUp, ArrowDown, CheckSquare, Square, X,
-  ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, FileSpreadsheet, FileText
+  ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, FileSpreadsheet, FileText, Filter, RotateCcw
 } from 'lucide-react';
 import InteractiveKpiCard from './InteractiveKpiCard';
 import KpiDetailModal from './KpiDetailModal';
 import MapView from './common/MapView';
 
 export default function SitesManagement() {
-  const { sites, setSelectedSite } = useApp();
+  const { sites, setSelectedSite, targetSearchResult, isDateInRange, dateFilter, triggerExportSuccess } = useApp();
   
   // Search & View Mode states
   const [searchSite, setSearchSite] = useState('');
   const [viewMode, setViewMode] = useState('table'); // 'table' | 'cards' | 'map'
   const [activeKpiFilter, setActiveKpiFilter] = useState(null);
   const [selectedKpiModal, setSelectedKpiModal] = useState(null);
+
+  // Column Filters state
+  const [showColumnFilters, setShowColumnFilters] = useState(false);
+  const [columnFilters, setColumnFilters] = useState({});
+
+  // Auto-fill and filter when navigated from Global Search
+  useEffect(() => {
+    if (targetSearchResult?.module === 'sites') {
+      setSearchSite(targetSearchResult.searchTerm || '');
+      setCurrentPage(1);
+    }
+  }, [targetSearchResult]);
 
   // Sorting states
   const [sortField, setSortField] = useState('code');
@@ -45,15 +57,14 @@ export default function SitesManagement() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Top KPI counts
-  const totalSites = sites.length;
-  const protectedSites = sites.filter(s => s.protectedStatus && (s.protectedStatus.includes('Protected') || s.protectedStatus.includes('Reserve'))).length;
-  const normalSites = sites.filter(s => s.status === 'Normal' || s.status === 'Optimal').length;
-  const actionSites = sites.filter(s => s.status !== 'Normal' && s.status !== 'Optimal').length;
-
   // Dynamic sorting & filtering
   const filteredSites = useMemo(() => {
     return sites.filter(s => {
+      // Global Date Filter
+      if (dateFilter !== 'ALL' && !searchSite) {
+        if (!isDateInRange(s.lastMaintenance || s.date)) return false;
+      }
+
       // Global Search
       const matchesSearch = 
         !searchSite ||
@@ -67,6 +78,18 @@ export default function SitesManagement() {
       if (activeKpiFilter === 'protected' && (!s.protectedStatus || (!s.protectedStatus.includes('Protected') && !s.protectedStatus.includes('Reserve')))) return false;
       if (activeKpiFilter === 'normal' && s.status !== 'Normal' && s.status !== 'Optimal') return false;
       if (activeKpiFilter === 'action' && (s.status === 'Normal' || s.status === 'Optimal')) return false;
+
+      // Individual Column Filters
+      for (const colKey in columnFilters) {
+        const filterVal = columnFilters[colKey]?.trim().toLowerCase();
+        if (filterVal) {
+          let cellVal = '';
+          if (colKey === 'name') cellVal = `${s.name || ''} ${s.protectedStatus || ''}`.toLowerCase();
+          else cellVal = String(s[colKey] || '').toLowerCase();
+          
+          if (!cellVal.includes(filterVal)) return false;
+        }
+      }
 
       return true;
     }).sort((a, b) => {
@@ -83,7 +106,13 @@ export default function SitesManagement() {
       if (valA > valB) return sortDirection === 'asc' ? 1 : -1;
       return 0;
     });
-  }, [sites, searchSite, activeKpiFilter, sortField, sortDirection]);
+  }, [sites, searchSite, activeKpiFilter, sortField, sortDirection, columnFilters, dateFilter, isDateInRange]);
+
+  // Top KPI counts (dynamic from filtered/date range)
+  const totalSites = filteredSites.length;
+  const protectedSites = filteredSites.filter(s => s.protectedStatus && (s.protectedStatus.includes('Protected') || s.protectedStatus.includes('Reserve'))).length;
+  const normalSites = filteredSites.filter(s => s.status === 'Normal' || s.status === 'Optimal').length;
+  const actionSites = filteredSites.filter(s => s.status !== 'Normal' && s.status !== 'Optimal').length;
 
   // Pagination math
   const totalRecords = filteredSites.length;
@@ -147,6 +176,7 @@ export default function SitesManagement() {
     }
 
     if (format === 'csv') {
+      const fileName = `Sharjah_EPA_Sites_${exportData.length}_Records.csv`;
       const headers = ['Site Code', 'Site Name', 'Protected Category', 'Zone / Location', 'Latitude', 'Longitude', 'Stations Count', 'Assets Count', 'Assigned Engineer', 'Status', 'Last Maintenance'];
       const rows = exportData.map(s => [
         `"${s.code || ''}"`,
@@ -167,11 +197,28 @@ export default function SitesManagement() {
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.setAttribute('href', url);
-      link.setAttribute('download', `Sharjah_EPA_Sites_${exportData.length}_Records.csv`);
+      link.setAttribute('download', fileName);
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
+
+      if (triggerExportSuccess) {
+        triggerExportSuccess({
+          filename: fileName,
+          format: 'CSV',
+          count: exportData.length,
+          title: 'Sites Directory Downloaded Successfully!'
+        });
+      }
     } else if (format === 'pdf') {
+      if (triggerExportSuccess) {
+        triggerExportSuccess({
+          filename: `Sharjah_EPA_Sites_Report.pdf`,
+          format: 'PDF',
+          count: exportData.length,
+          title: 'Sites Report Generated Successfully!'
+        });
+      }
       window.print();
     }
   };
@@ -278,9 +325,39 @@ export default function SitesManagement() {
             </div>
           </div>
 
-          {/* Right: Export Dropdown + View Mode Switcher + Register New Site CTA */}
+          {/* Right: Controls */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap', marginLeft: 'auto' }}>
-            
+            {/* Column Filters Toggle Button */}
+            <button
+              type="button"
+              onClick={() => setShowColumnFilters(prev => !prev)}
+              style={{
+                height: '36px',
+                padding: '0 14px',
+                borderRadius: '8px',
+                border: showColumnFilters ? '1.5px solid #00A878' : '1px solid #CBD5E1',
+                background: showColumnFilters ? '#E6F4EA' : '#FFFFFF',
+                color: showColumnFilters ? '#00A878' : '#334155',
+                fontSize: '0.76rem',
+                fontWeight: 700,
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '6px',
+                boxShadow: '0 1px 2px rgba(0,0,0,0.04)',
+                transition: 'all 0.15s ease'
+              }}
+            >
+              <Filter size={14} color={showColumnFilters ? '#00A878' : '#64748B'} />
+              <span>Column Filters</span>
+              {Object.values(columnFilters).some(v => v) && (
+                <span style={{ background: '#00A878', color: '#FFF', borderRadius: '50%', width: '16px', height: '16px', fontSize: '0.62rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  {Object.values(columnFilters).filter(v => v).length}
+                </span>
+              )}
+            </button>
+
             {/* Export Dropdown Button */}
             <div ref={exportDropdownRef} style={{ position: 'relative' }}>
               <button
@@ -432,7 +509,7 @@ export default function SitesManagement() {
         {selectedSiteIds.length > 0 && (
           <div style={{
             display: 'flex',
-            justify: 'space-between',
+            justifyContent: 'space-between',
             alignItems: 'center',
             padding: '10px 16px',
             marginBottom: '14px',
@@ -454,6 +531,81 @@ export default function SitesManagement() {
             >
               <X size={14} /> Clear Selection
             </button>
+          </div>
+        )}
+
+        {/* Cards View Column Filters Panel */}
+        {viewMode === 'cards' && showColumnFilters && (
+          <div style={{
+            background: '#F8FAFC',
+            border: '1px solid #E2E8F0',
+            borderRadius: '10px',
+            padding: '12px 16px',
+            marginBottom: '14px',
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: '10px',
+            alignItems: 'center'
+          }}>
+            <div style={{ fontSize: '0.74rem', fontWeight: 800, color: '#334155', display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <Filter size={14} color="#00A878" /> Filter Cards:
+            </div>
+            <input
+              type="text"
+              placeholder="Filter Code..."
+              value={columnFilters.code || ''}
+              onChange={(e) => { setColumnFilters(p => ({ ...p, code: e.target.value })); setCurrentPage(1); }}
+              style={{ padding: '5px 10px', fontSize: '0.74rem', borderRadius: '6px', border: '1px solid #CBD5E1', background: '#FFF' }}
+            />
+            <input
+              type="text"
+              placeholder="Filter Name..."
+              value={columnFilters.name || ''}
+              onChange={(e) => { setColumnFilters(p => ({ ...p, name: e.target.value })); setCurrentPage(1); }}
+              style={{ padding: '5px 10px', fontSize: '0.74rem', borderRadius: '6px', border: '1px solid #CBD5E1', background: '#FFF' }}
+            />
+            <input
+              type="text"
+              placeholder="Filter Zone..."
+              value={columnFilters.zone || ''}
+              onChange={(e) => { setColumnFilters(p => ({ ...p, zone: e.target.value })); setCurrentPage(1); }}
+              style={{ padding: '5px 10px', fontSize: '0.74rem', borderRadius: '6px', border: '1px solid #CBD5E1', background: '#FFF' }}
+            />
+            <input
+              type="text"
+              placeholder="Filter Engineer..."
+              value={columnFilters.assignedEngineer || ''}
+              onChange={(e) => { setColumnFilters(p => ({ ...p, assignedEngineer: e.target.value })); setCurrentPage(1); }}
+              style={{ padding: '5px 10px', fontSize: '0.74rem', borderRadius: '6px', border: '1px solid #CBD5E1', background: '#FFF' }}
+            />
+            <input
+              type="text"
+              placeholder="Filter Status..."
+              value={columnFilters.status || ''}
+              onChange={(e) => { setColumnFilters(p => ({ ...p, status: e.target.value })); setCurrentPage(1); }}
+              style={{ padding: '5px 10px', fontSize: '0.74rem', borderRadius: '6px', border: '1px solid #CBD5E1', background: '#FFF' }}
+            />
+            {Object.values(columnFilters).some(v => v) && (
+              <button
+                type="button"
+                onClick={() => setColumnFilters({})}
+                style={{
+                  background: '#FEE2E2',
+                  border: '1px solid #FECACA',
+                  color: '#DC2626',
+                  borderRadius: '6px',
+                  padding: '5px 10px',
+                  fontSize: '0.72rem',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '4px'
+                }}
+              >
+                <RotateCcw size={12} /> Clear Filters
+              </button>
+            )}
           </div>
         )}
 
@@ -529,6 +681,96 @@ export default function SitesManagement() {
                     </div>
                   </th>
                 </tr>
+
+                {/* Sub-Header Column Filter Inputs */}
+                {showColumnFilters && (
+                  <tr style={{ background: '#F8FAFC' }}>
+                    <th style={{ textAlign: 'center' }}>
+                      {Object.values(columnFilters).some(v => v) && (
+                        <button
+                          type="button"
+                          onClick={() => setColumnFilters({})}
+                          title="Clear column filters"
+                          style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#EF4444', padding: 0 }}
+                        >
+                          <RotateCcw size={13} />
+                        </button>
+                      )}
+                    </th>
+                    <th style={{ padding: '6px 8px' }}>
+                      <input
+                        type="text"
+                        placeholder="Filter Code..."
+                        value={columnFilters.code || ''}
+                        onChange={(e) => { setColumnFilters(p => ({ ...p, code: e.target.value })); setCurrentPage(1); }}
+                        style={{ width: '100%', padding: '4px 8px', fontSize: '0.74rem', borderRadius: '6px', border: '1px solid #CBD5E1', outline: 'none', background: '#FFF' }}
+                      />
+                    </th>
+                    <th style={{ padding: '6px 8px' }}>
+                      <input
+                        type="text"
+                        placeholder="Filter Name..."
+                        value={columnFilters.name || ''}
+                        onChange={(e) => { setColumnFilters(p => ({ ...p, name: e.target.value })); setCurrentPage(1); }}
+                        style={{ width: '100%', padding: '4px 8px', fontSize: '0.74rem', borderRadius: '6px', border: '1px solid #CBD5E1', outline: 'none', background: '#FFF' }}
+                      />
+                    </th>
+                    <th style={{ padding: '6px 8px' }}>
+                      <input
+                        type="text"
+                        placeholder="Filter Zone..."
+                        value={columnFilters.zone || ''}
+                        onChange={(e) => { setColumnFilters(p => ({ ...p, zone: e.target.value })); setCurrentPage(1); }}
+                        style={{ width: '100%', padding: '4px 8px', fontSize: '0.74rem', borderRadius: '6px', border: '1px solid #CBD5E1', outline: 'none', background: '#FFF' }}
+                      />
+                    </th>
+                    <th style={{ padding: '6px 8px' }}>
+                      <input
+                        type="text"
+                        placeholder="Coordinates..."
+                        value={columnFilters.lat || ''}
+                        onChange={(e) => { setColumnFilters(p => ({ ...p, lat: e.target.value })); setCurrentPage(1); }}
+                        style={{ width: '100%', padding: '4px 8px', fontSize: '0.74rem', borderRadius: '6px', border: '1px solid #CBD5E1', outline: 'none', background: '#FFF' }}
+                      />
+                    </th>
+                    <th style={{ padding: '6px 8px' }}>
+                      <input
+                        type="text"
+                        placeholder="Filter Stations..."
+                        value={columnFilters.stationsCount || ''}
+                        onChange={(e) => { setColumnFilters(p => ({ ...p, stationsCount: e.target.value })); setCurrentPage(1); }}
+                        style={{ width: '100%', padding: '4px 8px', fontSize: '0.74rem', borderRadius: '6px', border: '1px solid #CBD5E1', outline: 'none', background: '#FFF' }}
+                      />
+                    </th>
+                    <th style={{ padding: '6px 8px' }}>
+                      <input
+                        type="text"
+                        placeholder="Filter Engineer..."
+                        value={columnFilters.assignedEngineer || ''}
+                        onChange={(e) => { setColumnFilters(p => ({ ...p, assignedEngineer: e.target.value })); setCurrentPage(1); }}
+                        style={{ width: '100%', padding: '4px 8px', fontSize: '0.74rem', borderRadius: '6px', border: '1px solid #CBD5E1', outline: 'none', background: '#FFF' }}
+                      />
+                    </th>
+                    <th style={{ padding: '6px 8px' }}>
+                      <input
+                        type="text"
+                        placeholder="Filter Status..."
+                        value={columnFilters.status || ''}
+                        onChange={(e) => { setColumnFilters(p => ({ ...p, status: e.target.value })); setCurrentPage(1); }}
+                        style={{ width: '100%', padding: '4px 8px', fontSize: '0.74rem', borderRadius: '6px', border: '1px solid #CBD5E1', outline: 'none', background: '#FFF' }}
+                      />
+                    </th>
+                    <th style={{ padding: '6px 8px' }}>
+                      <input
+                        type="text"
+                        placeholder="Filter Maint..."
+                        value={columnFilters.lastMaintenance || ''}
+                        onChange={(e) => { setColumnFilters(p => ({ ...p, lastMaintenance: e.target.value })); setCurrentPage(1); }}
+                        style={{ width: '100%', padding: '4px 8px', fontSize: '0.74rem', borderRadius: '6px', border: '1px solid #CBD5E1', outline: 'none', background: '#FFF' }}
+                      />
+                    </th>
+                  </tr>
+                )}
               </thead>
               <tbody>
                 {paginatedSites.length === 0 ? (

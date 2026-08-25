@@ -3,15 +3,28 @@ import { useApp } from '../context/AppContext';
 import { 
   Search, Plus, Table, Map, Download, ChevronDown, 
   ArrowUpDown, ArrowUp, ArrowDown, ChevronLeft, ChevronRight, 
-  ChevronsLeft, ChevronsRight, FileSpreadsheet, FileText, X 
+  ChevronsLeft, ChevronsRight, FileSpreadsheet, FileText, X,
+  Filter, RotateCcw
 } from 'lucide-react';
 import GisMap from './GisMap';
 
 export default function ContractsWarranty() {
-  const { contracts, setContracts } = useApp();
+  const { contracts, setContracts, targetSearchResult, isDateInRange, dateFilter, triggerExportSuccess } = useApp();
   const [searchQuery, setSearchQuery] = useState('');
   const [viewMode, setViewMode] = useState('table'); // 'table' | 'map'
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // Column Filters state
+  const [showColumnFilters, setShowColumnFilters] = useState(false);
+  const [columnFilters, setColumnFilters] = useState({});
+
+  // Auto-fill and filter when navigated from Global Search
+  useEffect(() => {
+    if (targetSearchResult?.module === 'contracts') {
+      setSearchQuery(targetSearchResult.searchTerm || '');
+      setCurrentPage(1);
+    }
+  }, [targetSearchResult]);
 
   // Sorting state
   const [sortField, setSortField] = useState('endDate');
@@ -56,7 +69,9 @@ export default function ContractsWarranty() {
       endDate,
       value: value.startsWith('$') ? value : `$${value}`,
       status: 'Active',
-      slaResponseTime
+      slaResponseTime,
+      date: startDate || '2026-08-25',
+      lastAuditDate: '2026-08-25'
     };
 
     if (setContracts) {
@@ -69,16 +84,37 @@ export default function ContractsWarranty() {
   // Filter & Sort Contracts
   const filteredContracts = useMemo(() => {
     return (contracts || []).filter(cnt => {
+      // Global Date Filter
+      if (dateFilter !== 'ALL' && !searchQuery) {
+        if (!isDateInRange(cnt.startDate || cnt.date || cnt.lastAuditDate || cnt.endDate)) return false;
+      }
+
       const q = searchQuery.toLowerCase();
-      return (
+      const matchesSearch = 
         !searchQuery ||
         (cnt.id && cnt.id.toLowerCase().includes(q)) ||
         (cnt.title && cnt.title.toLowerCase().includes(q)) ||
         (cnt.vendor && cnt.vendor.toLowerCase().includes(q)) ||
         (cnt.contractType && cnt.contractType.toLowerCase().includes(q)) ||
         (cnt.status && cnt.status.toLowerCase().includes(q)) ||
-        (cnt.slaResponseTime && cnt.slaResponseTime.toLowerCase().includes(q))
-      );
+        (cnt.slaResponseTime && cnt.slaResponseTime.toLowerCase().includes(q));
+
+      if (!matchesSearch) return false;
+
+      // Individual Column Filters
+      for (const colKey in columnFilters) {
+        const filterVal = columnFilters[colKey]?.trim().toLowerCase();
+        if (filterVal) {
+          let cellVal = '';
+          if (colKey === 'title') cellVal = `${cnt.title || ''} ${cnt.vendor || ''}`.toLowerCase();
+          else if (colKey === 'startDate') cellVal = `${cnt.startDate || ''} ${cnt.endDate || ''}`.toLowerCase();
+          else cellVal = String(cnt[colKey] || '').toLowerCase();
+          
+          if (!cellVal.includes(filterVal)) return false;
+        }
+      }
+
+      return true;
     }).sort((a, b) => {
       let valA = a[sortField];
       let valB = b[sortField];
@@ -131,6 +167,7 @@ export default function ContractsWarranty() {
     }
 
     if (format === 'csv') {
+      const fileName = `Sharjah_EPA_Contracts_${filteredContracts.length}_Records.csv`;
       const headers = ['Contract ID', 'Contract Title', 'Vendor', 'Type', 'Start Date', 'End Date', 'Value', 'SLA Response', 'Status'];
       const rows = filteredContracts.map(cnt => [
         `"${cnt.id || ''}"`,
@@ -149,11 +186,28 @@ export default function ContractsWarranty() {
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.setAttribute('href', url);
-      link.setAttribute('download', `Sharjah_EPA_Contracts_${filteredContracts.length}_Records.csv`);
+      link.setAttribute('download', fileName);
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
+
+      if (triggerExportSuccess) {
+        triggerExportSuccess({
+          filename: fileName,
+          format: 'CSV',
+          count: filteredContracts.length,
+          title: 'Contracts & Warranty Downloaded Successfully!'
+        });
+      }
     } else if (format === 'pdf') {
+      if (triggerExportSuccess) {
+        triggerExportSuccess({
+          filename: `Sharjah_EPA_Contracts_Report.pdf`,
+          format: 'PDF',
+          count: filteredContracts.length,
+          title: 'Contracts Report Generated Successfully!'
+        });
+      }
       window.print();
     }
   };
@@ -188,6 +242,37 @@ export default function ContractsWarranty() {
           {/* Right Controls: Export + View Modes + Register Contract CTA */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap', marginLeft: 'auto' }}>
             
+            {/* Column Filters Toggle Button */}
+            <button
+              type="button"
+              onClick={() => setShowColumnFilters(prev => !prev)}
+              style={{
+                height: '36px',
+                padding: '0 14px',
+                borderRadius: '8px',
+                border: showColumnFilters ? '1.5px solid #00A878' : '1px solid #CBD5E1',
+                background: showColumnFilters ? '#E6F4EA' : '#FFFFFF',
+                color: showColumnFilters ? '#00A878' : '#334155',
+                fontSize: '0.76rem',
+                fontWeight: 700,
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '6px',
+                boxShadow: '0 1px 2px rgba(0,0,0,0.04)',
+                transition: 'all 0.15s ease'
+              }}
+            >
+              <Filter size={14} color={showColumnFilters ? '#00A878' : '#64748B'} />
+              <span>Column Filters</span>
+              {Object.values(columnFilters).some(v => v) && (
+                <span style={{ background: '#00A878', color: '#FFF', borderRadius: '50%', width: '16px', height: '16px', fontSize: '0.62rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  {Object.values(columnFilters).filter(v => v).length}
+                </span>
+              )}
+            </button>
+
             {/* Export Dropdown Button */}
             <div ref={exportDropdownRef} style={{ position: 'relative' }}>
               <button
@@ -366,7 +451,89 @@ export default function ContractsWarranty() {
                       STATUS {renderSortIcon('status')}
                     </div>
                   </th>
+                  <th style={{ width: '40px', textAlign: 'center' }}>
+                    {Object.values(columnFilters).some(v => v) && (
+                      <button
+                        type="button"
+                        onClick={() => setColumnFilters({})}
+                        title="Clear column filters"
+                        style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#EF4444', padding: 0 }}
+                      >
+                        <RotateCcw size={13} />
+                      </button>
+                    )}
+                  </th>
                 </tr>
+
+                {/* Sub-Header Column Filter Inputs */}
+                {showColumnFilters && (
+                  <tr style={{ background: '#F8FAFC' }}>
+                    <th style={{ padding: '6px 8px' }}>
+                      <input
+                        type="text"
+                        placeholder="Filter ID..."
+                        value={columnFilters.id || ''}
+                        onChange={(e) => { setColumnFilters(p => ({ ...p, id: e.target.value })); setCurrentPage(1); }}
+                        style={{ width: '100%', padding: '4px 8px', fontSize: '0.74rem', borderRadius: '6px', border: '1px solid #CBD5E1', outline: 'none', background: '#FFF' }}
+                      />
+                    </th>
+                    <th style={{ padding: '6px 8px' }}>
+                      <input
+                        type="text"
+                        placeholder="Filter Title/Vendor..."
+                        value={columnFilters.title || ''}
+                        onChange={(e) => { setColumnFilters(p => ({ ...p, title: e.target.value })); setCurrentPage(1); }}
+                        style={{ width: '100%', padding: '4px 8px', fontSize: '0.74rem', borderRadius: '6px', border: '1px solid #CBD5E1', outline: 'none', background: '#FFF' }}
+                      />
+                    </th>
+                    <th style={{ padding: '6px 8px' }}>
+                      <input
+                        type="text"
+                        placeholder="Filter Type..."
+                        value={columnFilters.contractType || ''}
+                        onChange={(e) => { setColumnFilters(p => ({ ...p, contractType: e.target.value })); setCurrentPage(1); }}
+                        style={{ width: '100%', padding: '4px 8px', fontSize: '0.74rem', borderRadius: '6px', border: '1px solid #CBD5E1', outline: 'none', background: '#FFF' }}
+                      />
+                    </th>
+                    <th style={{ padding: '6px 8px' }}>
+                      <input
+                        type="text"
+                        placeholder="Filter Duration..."
+                        value={columnFilters.startDate || ''}
+                        onChange={(e) => { setColumnFilters(p => ({ ...p, startDate: e.target.value })); setCurrentPage(1); }}
+                        style={{ width: '100%', padding: '4px 8px', fontSize: '0.74rem', borderRadius: '6px', border: '1px solid #CBD5E1', outline: 'none', background: '#FFF' }}
+                      />
+                    </th>
+                    <th style={{ padding: '6px 8px' }}>
+                      <input
+                        type="text"
+                        placeholder="Filter Value..."
+                        value={columnFilters.value || ''}
+                        onChange={(e) => { setColumnFilters(p => ({ ...p, value: e.target.value })); setCurrentPage(1); }}
+                        style={{ width: '100%', padding: '4px 8px', fontSize: '0.74rem', borderRadius: '6px', border: '1px solid #CBD5E1', outline: 'none', background: '#FFF' }}
+                      />
+                    </th>
+                    <th style={{ padding: '6px 8px' }}>
+                      <input
+                        type="text"
+                        placeholder="Filter SLA..."
+                        value={columnFilters.slaResponseTime || ''}
+                        onChange={(e) => { setColumnFilters(p => ({ ...p, slaResponseTime: e.target.value })); setCurrentPage(1); }}
+                        style={{ width: '100%', padding: '4px 8px', fontSize: '0.74rem', borderRadius: '6px', border: '1px solid #CBD5E1', outline: 'none', background: '#FFF' }}
+                      />
+                    </th>
+                    <th style={{ padding: '6px 8px' }}>
+                      <input
+                        type="text"
+                        placeholder="Filter Status..."
+                        value={columnFilters.status || ''}
+                        onChange={(e) => { setColumnFilters(p => ({ ...p, status: e.target.value })); setCurrentPage(1); }}
+                        style={{ width: '100%', padding: '4px 8px', fontSize: '0.74rem', borderRadius: '6px', border: '1px solid #CBD5E1', outline: 'none', background: '#FFF' }}
+                      />
+                    </th>
+                    <th />
+                  </tr>
+                )}
               </thead>
               <tbody>
                 {paginatedContracts.length === 0 ? (

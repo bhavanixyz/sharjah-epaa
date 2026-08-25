@@ -3,13 +3,14 @@ import { useApp } from '../context/AppContext';
 import { 
   Search, Plus, Table, LayoutGrid, Map, Award, CheckCircle2, AlertTriangle, Clock, 
   Download, ChevronDown, ArrowUpDown, ArrowUp, ArrowDown, CheckSquare, Square, X, 
-  ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, FileSpreadsheet, FileText, QrCode
+  ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight, FileSpreadsheet, FileText, QrCode,
+  Filter, RotateCcw
 } from 'lucide-react';
 import GisMap from './GisMap';
 import QRCodeDialog from './QRCodeDialog';
 
 export default function CalibrationManagement() {
-  const { calibrations, setCalibrations } = useApp();
+  const { calibrations, setCalibrations, targetSearchResult, isDateInRange, dateFilter, triggerExportSuccess } = useApp();
 
   // Search & Filter state
   const [searchCal, setSearchCal] = useState('');
@@ -17,9 +18,28 @@ export default function CalibrationManagement() {
   const [viewMode, setViewMode] = useState('table'); // 'table' | 'cards' | 'map'
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  // Column Filters state
+  const [showColumnFilters, setShowColumnFilters] = useState(false);
+  const [columnFilters, setColumnFilters] = useState({});
+
+  // Auto-fill and filter when navigated from Global Search
+  useEffect(() => {
+    if (targetSearchResult?.module === 'calibration') {
+      setSearchCal(targetSearchResult.searchTerm || '');
+      setCurrentPage(1);
+    }
+  }, [targetSearchResult]);
+
+  // Form state
+  const [assetName, setAssetName] = useState('');
+  const [siteName, setSiteName] = useState('Al Majaz Waterfront Site');
+  const [calibrationType, setCalibrationType] = useState('Zero/Span Gas Standard');
+  const [performedBy, setPerformedBy] = useState('Tariq Al-Mansoori');
+  const [resultStatus, setResultStatus] = useState('Passed (Drift < 1.0%)');
+
   // Sorting state
   const [sortField, setSortField] = useState('certificateNo');
-  const [sortDirection, setSortDirection] = useState('asc');
+  const [sortDirection, setSortDirection] = useState('desc');
 
   // Row Selection state
   const [selectedCalIds, setSelectedCalIds] = useState([]);
@@ -35,12 +55,8 @@ export default function CalibrationManagement() {
   const [isExportDropdownOpen, setIsExportDropdownOpen] = useState(false);
   const exportDropdownRef = useRef(null);
 
-  // Modal Form State
-  const [assetName, setAssetName] = useState('');
-  const [siteName, setSiteName] = useState('Al Majaz Urban Station');
-  const [calibrationType, setCalibrationType] = useState('Zero & Span Gas Standard');
-  const [performedBy, setPerformedBy] = useState('Eng. Humaid Al-Suwaidi');
-  const [resultStatus, setResultStatus] = useState('Passed (0.02% Drift)');
+  // QR Code Modal State
+  const [selectedQrRecord, setSelectedQrRecord] = useState(null);
 
   // Close export dropdown when clicking outside
   useEffect(() => {
@@ -74,6 +90,11 @@ export default function CalibrationManagement() {
   // Filter & Sort calibrations
   const filteredCalibrations = useMemo(() => {
     return calibrations.filter(c => {
+      // Date filter check (when not searching explicitly)
+      if (!searchCal && dateFilter !== 'ALL') {
+        if (!isDateInRange(c.date || c.dueDate)) return false;
+      }
+
       // Search filter
       const q = searchCal.toLowerCase();
       const matchesSearch = 
@@ -87,9 +108,16 @@ export default function CalibrationManagement() {
       if (!matchesSearch) return false;
 
       // Status filter
-      if (filterStatus === 'Passed' && !c.result.includes('Passed')) return false;
-      if (filterStatus === 'Failed' && !c.result.includes('Failed')) return false;
-      if (filterStatus === 'Overdue' && c.status === 'Valid') return false;
+      if (filterStatus !== 'ALL' && c.status !== filterStatus) return false;
+
+      // Individual Column Filters
+      for (const colKey in columnFilters) {
+        const filterVal = columnFilters[colKey]?.trim().toLowerCase();
+        if (filterVal) {
+          const cellVal = String(c[colKey] || '').toLowerCase();
+          if (!cellVal.includes(filterVal)) return false;
+        }
+      }
 
       return true;
     }).sort((a, b) => {
@@ -168,6 +196,7 @@ export default function CalibrationManagement() {
     }
 
     if (format === 'csv') {
+      const fileName = `Sharjah_EPA_Calibrations_${exportData.length}_Records.csv`;
       const headers = ['Certificate No', 'Target Asset', 'Station Site', 'Calibration Standard', 'Performed By', 'Result', 'Due Date'];
       const rows = exportData.map(c => [
         `"${c.certificateNo || ''}"`,
@@ -184,11 +213,28 @@ export default function CalibrationManagement() {
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.setAttribute('href', url);
-      link.setAttribute('download', `Sharjah_EPA_Calibrations_${exportData.length}_Records.csv`);
+      link.setAttribute('download', fileName);
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
+
+      if (triggerExportSuccess) {
+        triggerExportSuccess({
+          filename: fileName,
+          format: 'CSV',
+          count: exportData.length,
+          title: 'Calibration Certificates Downloaded Successfully!'
+        });
+      }
     } else if (format === 'pdf') {
+      if (triggerExportSuccess) {
+        triggerExportSuccess({
+          filename: `Sharjah_EPA_Calibrations_Report.pdf`,
+          format: 'PDF',
+          count: exportData.length,
+          title: 'Calibration Report Generated Successfully!'
+        });
+      }
       window.print();
     }
   };
@@ -234,7 +280,36 @@ export default function CalibrationManagement() {
           {/* Right Controls */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap', marginLeft: 'auto' }}>
             
-
+            {/* Column Filters Toggle Button */}
+            <button
+              type="button"
+              onClick={() => setShowColumnFilters(prev => !prev)}
+              style={{
+                height: '36px',
+                padding: '0 14px',
+                borderRadius: '8px',
+                border: showColumnFilters ? '1.5px solid #00A878' : '1px solid #CBD5E1',
+                background: showColumnFilters ? '#E6F4EA' : '#FFFFFF',
+                color: showColumnFilters ? '#00A878' : '#334155',
+                fontSize: '0.76rem',
+                fontWeight: 700,
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '6px',
+                boxShadow: '0 1px 2px rgba(0,0,0,0.04)',
+                transition: 'all 0.15s ease'
+              }}
+            >
+              <Filter size={14} color={showColumnFilters ? '#00A878' : '#64748B'} />
+              <span>Column Filters</span>
+              {Object.values(columnFilters).some(v => v) && (
+                <span style={{ background: '#00A878', color: '#FFF', borderRadius: '50%', width: '16px', height: '16px', fontSize: '0.62rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  {Object.values(columnFilters).filter(v => v).length}
+                </span>
+              )}
+            </button>
 
             {/* Export Dropdown */}
             <div ref={exportDropdownRef} style={{ position: 'relative' }}>
@@ -427,6 +502,87 @@ export default function CalibrationManagement() {
                     </div>
                   </th>
                 </tr>
+
+                {/* Sub-Header Column Filter Inputs */}
+                {showColumnFilters && (
+                  <tr style={{ background: '#F8FAFC' }}>
+                    <th style={{ textAlign: 'center' }}>
+                      {Object.values(columnFilters).some(v => v) && (
+                        <button
+                          type="button"
+                          onClick={() => setColumnFilters({})}
+                          title="Clear column filters"
+                          style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#EF4444', padding: 0 }}
+                        >
+                          <RotateCcw size={13} />
+                        </button>
+                      )}
+                    </th>
+                    <th style={{ padding: '6px 8px' }}>
+                      <input
+                        type="text"
+                        placeholder="Filter Certificate..."
+                        value={columnFilters.certificateNo || ''}
+                        onChange={(e) => { setColumnFilters(p => ({ ...p, certificateNo: e.target.value })); setCurrentPage(1); }}
+                        style={{ width: '100%', padding: '4px 8px', fontSize: '0.74rem', borderRadius: '6px', border: '1px solid #CBD5E1', outline: 'none', background: '#FFF' }}
+                      />
+                    </th>
+                    <th style={{ padding: '6px 8px' }}>
+                      <input
+                        type="text"
+                        placeholder="Filter Sensor / Analyzer..."
+                        value={columnFilters.assetName || ''}
+                        onChange={(e) => { setColumnFilters(p => ({ ...p, assetName: e.target.value })); setCurrentPage(1); }}
+                        style={{ width: '100%', padding: '4px 8px', fontSize: '0.74rem', borderRadius: '6px', border: '1px solid #CBD5E1', outline: 'none', background: '#FFF' }}
+                      />
+                    </th>
+                    <th style={{ padding: '6px 8px' }}>
+                      <input
+                        type="text"
+                        placeholder="Filter Station..."
+                        value={columnFilters.siteName || ''}
+                        onChange={(e) => { setColumnFilters(p => ({ ...p, siteName: e.target.value })); setCurrentPage(1); }}
+                        style={{ width: '100%', padding: '4px 8px', fontSize: '0.74rem', borderRadius: '6px', border: '1px solid #CBD5E1', outline: 'none', background: '#FFF' }}
+                      />
+                    </th>
+                    <th style={{ padding: '6px 8px' }}>
+                      <input
+                        type="text"
+                        placeholder="Filter Standard..."
+                        value={columnFilters.calibrationType || ''}
+                        onChange={(e) => { setColumnFilters(p => ({ ...p, calibrationType: e.target.value })); setCurrentPage(1); }}
+                        style={{ width: '100%', padding: '4px 8px', fontSize: '0.74rem', borderRadius: '6px', border: '1px solid #CBD5E1', outline: 'none', background: '#FFF' }}
+                      />
+                    </th>
+                    <th style={{ padding: '6px 8px' }}>
+                      <input
+                        type="text"
+                        placeholder="Filter Engineer..."
+                        value={columnFilters.performedBy || ''}
+                        onChange={(e) => { setColumnFilters(p => ({ ...p, performedBy: e.target.value })); setCurrentPage(1); }}
+                        style={{ width: '100%', padding: '4px 8px', fontSize: '0.74rem', borderRadius: '6px', border: '1px solid #CBD5E1', outline: 'none', background: '#FFF' }}
+                      />
+                    </th>
+                    <th style={{ padding: '6px 8px' }}>
+                      <input
+                        type="text"
+                        placeholder="Filter Result..."
+                        value={columnFilters.result || ''}
+                        onChange={(e) => { setColumnFilters(p => ({ ...p, result: e.target.value })); setCurrentPage(1); }}
+                        style={{ width: '100%', padding: '4px 8px', fontSize: '0.74rem', borderRadius: '6px', border: '1px solid #CBD5E1', outline: 'none', background: '#FFF' }}
+                      />
+                    </th>
+                    <th style={{ padding: '6px 8px' }}>
+                      <input
+                        type="text"
+                        placeholder="Filter Expiry..."
+                        value={columnFilters.dueDate || ''}
+                        onChange={(e) => { setColumnFilters(p => ({ ...p, dueDate: e.target.value })); setCurrentPage(1); }}
+                        style={{ width: '100%', padding: '4px 8px', fontSize: '0.74rem', borderRadius: '6px', border: '1px solid #CBD5E1', outline: 'none', background: '#FFF' }}
+                      />
+                    </th>
+                  </tr>
+                )}
               </thead>
               <tbody>
                 {paginatedCalibrations.length === 0 ? (

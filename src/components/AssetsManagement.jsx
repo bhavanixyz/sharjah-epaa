@@ -22,13 +22,15 @@ import {
   Square, 
   X, 
   Plus,
-  Cpu
+  Cpu,
+  Filter,
+  RotateCcw
 } from 'lucide-react';
 import GisMap from './GisMap';
 import QRCodeDialog from './QRCodeDialog';
 
 export default function AssetsManagement() {
-  const { assets, setIsWoModalOpen } = useApp();
+  const { assets, setIsWoModalOpen, targetSearchResult, isDateInRange, dateFilter, triggerExportSuccess } = useApp();
   const [searchAsset, setSearchAsset] = useState('');
   const [viewMode, setViewMode] = useState('cards'); // 'table', 'cards', or 'map'
   const [sortField, setSortField] = useState('serialNo');
@@ -38,9 +40,21 @@ export default function AssetsManagement() {
   const [isExportDropdownOpen, setIsExportDropdownOpen] = useState(false);
   const exportDropdownRef = useRef(null);
 
+  // Column Filters state
+  const [showColumnFilters, setShowColumnFilters] = useState(false);
+  const [columnFilters, setColumnFilters] = useState({});
+
   // Pagination state
   const [pageSize, setPageSize] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
+
+  // Auto-fill and filter when navigated from Global Search
+  useEffect(() => {
+    if (targetSearchResult?.module === 'assets') {
+      setSearchAsset(targetSearchResult.searchTerm || '');
+      setCurrentPage(1);
+    }
+  }, [targetSearchResult]);
 
   // Close export dropdown when clicking outside
   useEffect(() => {
@@ -53,19 +67,36 @@ export default function AssetsManagement() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Filter assets based on search query
+  // Filter assets based on search query, date filter & column filters
   const filteredAssets = useMemo(() => {
     return assets.filter(a => {
+      // Global Date Filter
+      if (dateFilter !== 'ALL' && !searchAsset) {
+        if (!isDateInRange(a.lastCalibrated || a.date || a.installDate)) return false;
+      }
+
       const q = searchAsset.toLowerCase();
-      return (
+      const matchesSearch = 
+        !searchAsset ||
         (a.name && a.name.toLowerCase().includes(q)) ||
         (a.serialNo && a.serialNo.toLowerCase().includes(q)) ||
         (a.siteName && a.siteName.toLowerCase().includes(q)) ||
         (a.category && a.category.toLowerCase().includes(q)) ||
-        (a.manufacturer && a.manufacturer.toLowerCase().includes(q))
-      );
+        (a.manufacturer && a.manufacturer.toLowerCase().includes(q));
+      if (!matchesSearch) return false;
+
+      // Individual Column Filters
+      for (const colKey in columnFilters) {
+        const filterVal = columnFilters[colKey]?.trim().toLowerCase();
+        if (filterVal) {
+          const cellVal = String(a[colKey] || '').toLowerCase();
+          if (!cellVal.includes(filterVal)) return false;
+        }
+      }
+
+      return true;
     });
-  }, [assets, searchAsset]);
+  }, [assets, searchAsset, columnFilters, dateFilter, isDateInRange]);
 
   // Sort assets based on sortField & sortDirection
   const sortedAssets = useMemo(() => {
@@ -145,6 +176,7 @@ export default function AssetsManagement() {
     }
 
     if (format === 'csv') {
+      const fileName = `Sharjah_EPA_Assets_${exportData.length}_Records.csv`;
       const headers = ['Serial Number', 'Asset Name', 'Category', 'Location / Site', 'Manufacturer', 'Health Score (%)', 'Last Calibrated', 'Next Due', 'Status'];
       const rows = exportData.map(a => [
         `"${a.serialNo || ''}"`,
@@ -163,11 +195,28 @@ export default function AssetsManagement() {
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.setAttribute('href', url);
-      link.setAttribute('download', `Sharjah_EPA_Assets_${exportData.length}_Records.csv`);
+      link.setAttribute('download', fileName);
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
+
+      if (triggerExportSuccess) {
+        triggerExportSuccess({
+          filename: fileName,
+          format: 'CSV',
+          count: exportData.length,
+          title: 'Equipment Catalog Downloaded Successfully!'
+        });
+      }
     } else if (format === 'pdf') {
+      if (triggerExportSuccess) {
+        triggerExportSuccess({
+          filename: `Sharjah_EPA_Assets_Report.pdf`,
+          format: 'PDF',
+          count: exportData.length,
+          title: 'Equipment Report Generated Successfully!'
+        });
+      }
       const printWindow = window.open('', '_blank');
       const htmlContent = `
         <!DOCTYPE html>
@@ -267,8 +316,39 @@ export default function AssetsManagement() {
             </div>
           </div>
 
-          {/* Right Aligned Controls: Export Dropdown + View Mode Switcher + Register New Asset CTA */}
+          {/* Right Aligned Controls: Column Filters + Export Dropdown + View Mode Switcher + Register New Asset CTA */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap', marginLeft: 'auto' }}>
+            
+            {/* Column Filters Toggle Button */}
+            <button
+              type="button"
+              onClick={() => setShowColumnFilters(prev => !prev)}
+              style={{
+                height: '36px',
+                padding: '0 14px',
+                borderRadius: '8px',
+                border: showColumnFilters ? '1.5px solid #00A878' : '1px solid #CBD5E1',
+                background: showColumnFilters ? '#E6F4EA' : '#FFFFFF',
+                color: showColumnFilters ? '#00A878' : '#334155',
+                fontSize: '0.76rem',
+                fontWeight: 700,
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '6px',
+                boxShadow: '0 1px 2px rgba(0,0,0,0.04)',
+                transition: 'all 0.15s ease'
+              }}
+            >
+              <Filter size={14} color={showColumnFilters ? '#00A878' : '#64748B'} />
+              <span>Column Filters</span>
+              {Object.values(columnFilters).some(v => v) && (
+                <span style={{ background: '#00A878', color: '#FFF', borderRadius: '50%', width: '16px', height: '16px', fontSize: '0.62rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  {Object.values(columnFilters).filter(v => v).length}
+                </span>
+              )}
+            </button>
             
             {/* Export Dropdown Button */}
             <div ref={exportDropdownRef} style={{ position: 'relative' }}>
@@ -432,11 +512,11 @@ export default function AssetsManagement() {
             borderRadius: '10px',
             color: '#00A878',
             fontSize: '0.8rem',
-            fontWeight: 600
+            fontWeight: 700
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <CheckSquare size={16} color="#00A878" />
-              <span><strong>{selectedAssetIds.length}</strong> equipment assets selected out of {filteredAssets.length}</span>
+              <span>Selected {selectedAssetIds.length} equipment asset(s) for bulk calibration/maintenance</span>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
               <button 
@@ -452,6 +532,88 @@ export default function AssetsManagement() {
                 <X size={14} /> Clear Selection
               </button>
             </div>
+          </div>
+        )}
+
+        {/* Cards View Column Filters Panel */}
+        {viewMode === 'cards' && showColumnFilters && (
+          <div style={{
+            background: '#F8FAFC',
+            border: '1px solid #E2E8F0',
+            borderRadius: '10px',
+            padding: '12px 16px',
+            marginBottom: '14px',
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: '10px',
+            alignItems: 'center'
+          }}>
+            <div style={{ fontSize: '0.74rem', fontWeight: 800, color: '#334155', display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <Filter size={14} color="#00A878" /> Filter Asset Cards:
+            </div>
+            <input
+              type="text"
+              placeholder="Filter Tag / Serial..."
+              value={columnFilters.serialNo || ''}
+              onChange={(e) => { setColumnFilters(p => ({ ...p, serialNo: e.target.value })); setCurrentPage(1); }}
+              style={{ padding: '5px 10px', fontSize: '0.74rem', borderRadius: '6px', border: '1px solid #CBD5E1', background: '#FFF' }}
+            />
+            <input
+              type="text"
+              placeholder="Filter Name..."
+              value={columnFilters.name || ''}
+              onChange={(e) => { setColumnFilters(p => ({ ...p, name: e.target.value })); setCurrentPage(1); }}
+              style={{ padding: '5px 10px', fontSize: '0.74rem', borderRadius: '6px', border: '1px solid #CBD5E1', background: '#FFF' }}
+            />
+            <input
+              type="text"
+              placeholder="Filter Category..."
+              value={columnFilters.category || ''}
+              onChange={(e) => { setColumnFilters(p => ({ ...p, category: e.target.value })); setCurrentPage(1); }}
+              style={{ padding: '5px 10px', fontSize: '0.74rem', borderRadius: '6px', border: '1px solid #CBD5E1', background: '#FFF' }}
+            />
+            <input
+              type="text"
+              placeholder="Filter Site Location..."
+              value={columnFilters.siteName || ''}
+              onChange={(e) => { setColumnFilters(p => ({ ...p, siteName: e.target.value })); setCurrentPage(1); }}
+              style={{ padding: '5px 10px', fontSize: '0.74rem', borderRadius: '6px', border: '1px solid #CBD5E1', background: '#FFF' }}
+            />
+            <input
+              type="text"
+              placeholder="Filter Manufacturer..."
+              value={columnFilters.manufacturer || ''}
+              onChange={(e) => { setColumnFilters(p => ({ ...p, manufacturer: e.target.value })); setCurrentPage(1); }}
+              style={{ padding: '5px 10px', fontSize: '0.74rem', borderRadius: '6px', border: '1px solid #CBD5E1', background: '#FFF' }}
+            />
+            <input
+              type="text"
+              placeholder="Filter Status..."
+              value={columnFilters.status || ''}
+              onChange={(e) => { setColumnFilters(p => ({ ...p, status: e.target.value })); setCurrentPage(1); }}
+              style={{ padding: '5px 10px', fontSize: '0.74rem', borderRadius: '6px', border: '1px solid #CBD5E1', background: '#FFF' }}
+            />
+            {Object.values(columnFilters).some(v => v) && (
+              <button
+                type="button"
+                onClick={() => setColumnFilters({})}
+                style={{
+                  background: '#FEE2E2',
+                  border: '1px solid #FECACA',
+                  color: '#DC2626',
+                  borderRadius: '6px',
+                  padding: '5px 10px',
+                  fontSize: '0.72rem',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '4px'
+                }}
+              >
+                <RotateCcw size={12} /> Clear Filters
+              </button>
+            )}
           </div>
         )}
 
@@ -477,7 +639,7 @@ export default function AssetsManagement() {
                   </th>
                   <th onClick={() => handleSort('serialNo')} style={{ cursor: 'pointer', userSelect: 'none' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      Serial Number {renderSortIcon('serialNo')}
+                      Asset Tag / Serial {renderSortIcon('serialNo')}
                     </div>
                   </th>
                   <th onClick={() => handleSort('name')} style={{ cursor: 'pointer', userSelect: 'none' }}>
@@ -487,7 +649,7 @@ export default function AssetsManagement() {
                   </th>
                   <th onClick={() => handleSort('siteName')} style={{ cursor: 'pointer', userSelect: 'none' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      Station / Site Location {renderSortIcon('siteName')}
+                      Site Location {renderSortIcon('siteName')}
                     </div>
                   </th>
                   <th onClick={() => handleSort('manufacturer')} style={{ cursor: 'pointer', userSelect: 'none' }}>
@@ -518,6 +680,98 @@ export default function AssetsManagement() {
                   <th style={{ textAlign: 'center' }}>QR Tag</th>
                   <th style={{ textAlign: 'right' }}>Actions</th>
                 </tr>
+
+                {/* Sub-Header Column Filter Inputs */}
+                {showColumnFilters && (
+                  <tr style={{ background: '#F8FAFC' }}>
+                    <th style={{ textAlign: 'center' }}>
+                      {Object.values(columnFilters).some(v => v) && (
+                        <button
+                          type="button"
+                          onClick={() => setColumnFilters({})}
+                          title="Clear column filters"
+                          style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#EF4444', padding: 0 }}
+                        >
+                          <RotateCcw size={13} />
+                        </button>
+                      )}
+                    </th>
+                    <th style={{ padding: '6px 8px' }}>
+                      <input
+                        type="text"
+                        placeholder="Filter Serial..."
+                        value={columnFilters.serialNo || ''}
+                        onChange={(e) => { setColumnFilters(p => ({ ...p, serialNo: e.target.value })); setCurrentPage(1); }}
+                        style={{ width: '100%', padding: '4px 8px', fontSize: '0.74rem', borderRadius: '6px', border: '1px solid #CBD5E1', outline: 'none', background: '#FFF' }}
+                      />
+                    </th>
+                    <th style={{ padding: '6px 8px' }}>
+                      <input
+                        type="text"
+                        placeholder="Filter Name..."
+                        value={columnFilters.name || ''}
+                        onChange={(e) => { setColumnFilters(p => ({ ...p, name: e.target.value })); setCurrentPage(1); }}
+                        style={{ width: '100%', padding: '4px 8px', fontSize: '0.74rem', borderRadius: '6px', border: '1px solid #CBD5E1', outline: 'none', background: '#FFF' }}
+                      />
+                    </th>
+                    <th style={{ padding: '6px 8px' }}>
+                      <input
+                        type="text"
+                        placeholder="Filter Site..."
+                        value={columnFilters.siteName || ''}
+                        onChange={(e) => { setColumnFilters(p => ({ ...p, siteName: e.target.value })); setCurrentPage(1); }}
+                        style={{ width: '100%', padding: '4px 8px', fontSize: '0.74rem', borderRadius: '6px', border: '1px solid #CBD5E1', outline: 'none', background: '#FFF' }}
+                      />
+                    </th>
+                    <th style={{ padding: '6px 8px' }}>
+                      <input
+                        type="text"
+                        placeholder="Filter Mfr..."
+                        value={columnFilters.manufacturer || ''}
+                        onChange={(e) => { setColumnFilters(p => ({ ...p, manufacturer: e.target.value })); setCurrentPage(1); }}
+                        style={{ width: '100%', padding: '4px 8px', fontSize: '0.74rem', borderRadius: '6px', border: '1px solid #CBD5E1', outline: 'none', background: '#FFF' }}
+                      />
+                    </th>
+                    <th style={{ padding: '6px 8px' }}>
+                      <input
+                        type="text"
+                        placeholder="Filter Health..."
+                        value={columnFilters.healthScore || ''}
+                        onChange={(e) => { setColumnFilters(p => ({ ...p, healthScore: e.target.value })); setCurrentPage(1); }}
+                        style={{ width: '100%', padding: '4px 8px', fontSize: '0.74rem', borderRadius: '6px', border: '1px solid #CBD5E1', outline: 'none', background: '#FFF' }}
+                      />
+                    </th>
+                    <th style={{ padding: '6px 8px' }}>
+                      <input
+                        type="text"
+                        placeholder="Filter Last..."
+                        value={columnFilters.lastCalibrated || ''}
+                        onChange={(e) => { setColumnFilters(p => ({ ...p, lastCalibrated: e.target.value })); setCurrentPage(1); }}
+                        style={{ width: '100%', padding: '4px 8px', fontSize: '0.74rem', borderRadius: '6px', border: '1px solid #CBD5E1', outline: 'none', background: '#FFF' }}
+                      />
+                    </th>
+                    <th style={{ padding: '6px 8px' }}>
+                      <input
+                        type="text"
+                        placeholder="Filter Due..."
+                        value={columnFilters.nextCalibration || ''}
+                        onChange={(e) => { setColumnFilters(p => ({ ...p, nextCalibration: e.target.value })); setCurrentPage(1); }}
+                        style={{ width: '100%', padding: '4px 8px', fontSize: '0.74rem', borderRadius: '6px', border: '1px solid #CBD5E1', outline: 'none', background: '#FFF' }}
+                      />
+                    </th>
+                    <th style={{ padding: '6px 8px' }}>
+                      <input
+                        type="text"
+                        placeholder="Filter Status..."
+                        value={columnFilters.status || ''}
+                        onChange={(e) => { setColumnFilters(p => ({ ...p, status: e.target.value })); setCurrentPage(1); }}
+                        style={{ width: '100%', padding: '4px 8px', fontSize: '0.74rem', borderRadius: '6px', border: '1px solid #CBD5E1', outline: 'none', background: '#FFF' }}
+                      />
+                    </th>
+                    <th />
+                    <th />
+                  </tr>
+                )}
               </thead>
               <tbody>
                 {paginatedAssets.length === 0 ? (

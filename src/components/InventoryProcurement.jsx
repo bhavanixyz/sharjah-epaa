@@ -4,16 +4,29 @@ import {
   Search, Plus, Table, Map, Download, ChevronDown, 
   ArrowUpDown, ArrowUp, ArrowDown, ChevronLeft, ChevronRight, 
   ChevronsLeft, ChevronsRight, FileSpreadsheet, FileText, 
-  ArrowUpRight, ArrowDownLeft, X, AlertTriangle, Package, Layers 
+  ArrowUpRight, ArrowDownLeft, X, AlertTriangle, Package, Layers,
+  Filter, RotateCcw
 } from 'lucide-react';
 import GisMap from './GisMap';
 
 export default function InventoryProcurement() {
-  const { inventory, setInventory } = useApp();
+  const { inventory, setInventory, targetSearchResult, isDateInRange, dateFilter, triggerExportSuccess } = useApp();
   const [searchQuery, setSearchQuery] = useState('');
   const [filterCategory, setFilterCategory] = useState('ALL');
   const [viewMode, setViewMode] = useState('table'); // 'table' | 'cards'
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // Column Filters state
+  const [showColumnFilters, setShowColumnFilters] = useState(false);
+  const [columnFilters, setColumnFilters] = useState({});
+
+  // Auto-fill and filter when navigated from Global Search
+  useEffect(() => {
+    if (targetSearchResult?.module === 'inventory') {
+      setSearchQuery(targetSearchResult.searchTerm || '');
+      setCurrentPage(1);
+    }
+  }, [targetSearchResult]);
 
   // Sorting state
   const [sortField, setSortField] = useState('name');
@@ -59,7 +72,9 @@ export default function InventoryProcurement() {
       minThreshold: parseInt(minThreshold) || 10,
       unitCost,
       supplier,
-      siteLocation
+      siteLocation,
+      date: '2026-08-25',
+      lastStockAudit: '2026-08-25'
     };
     setInventory([newItem, ...inventory]);
     setIsModalOpen(false);
@@ -80,6 +95,11 @@ export default function InventoryProcurement() {
   // Filter & Sort Inventory items
   const filteredInventory = useMemo(() => {
     return inventory.filter(item => {
+      // Global Date Filter
+      if (dateFilter !== 'ALL' && !searchQuery) {
+        if (!isDateInRange(item.lastStockAudit || item.date || item.lastRestockDate)) return false;
+      }
+
       // Search filter
       const q = searchQuery.toLowerCase();
       const matchesSearch = 
@@ -94,6 +114,18 @@ export default function InventoryProcurement() {
 
       // Category filter
       if (filterCategory !== 'ALL' && item.category !== filterCategory) return false;
+
+      // Individual Column Filters
+      for (const colKey in columnFilters) {
+        const filterVal = columnFilters[colKey]?.trim().toLowerCase();
+        if (filterVal) {
+          let cellVal = '';
+          if (colKey === 'name') cellVal = `${item.name || ''} ${item.siteLocation || ''}`.toLowerCase();
+          else cellVal = String(item[colKey] || '').toLowerCase();
+          
+          if (!cellVal.includes(filterVal)) return false;
+        }
+      }
 
       return true;
     }).sort((a, b) => {
@@ -148,6 +180,7 @@ export default function InventoryProcurement() {
     }
 
     if (format === 'csv') {
+      const fileName = `Sharjah_EPA_Inventory_${filteredInventory.length}_Items.csv`;
       const headers = ['SKU Code', 'Item Description', 'Category', 'Current Stock', 'Min Safety Threshold', 'Unit Cost', 'Depot Location', 'Supplier'];
       const rows = filteredInventory.map(item => [
         `"${item.sku || ''}"`,
@@ -165,11 +198,28 @@ export default function InventoryProcurement() {
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.setAttribute('href', url);
-      link.setAttribute('download', `Sharjah_EPA_Inventory_${filteredInventory.length}_Items.csv`);
+      link.setAttribute('download', fileName);
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
+
+      if (triggerExportSuccess) {
+        triggerExportSuccess({
+          filename: fileName,
+          format: 'CSV',
+          count: filteredInventory.length,
+          title: 'Inventory Catalog Downloaded Successfully!'
+        });
+      }
     } else if (format === 'pdf') {
+      if (triggerExportSuccess) {
+        triggerExportSuccess({
+          filename: `Sharjah_EPA_Inventory_Report.pdf`,
+          format: 'PDF',
+          count: filteredInventory.length,
+          title: 'Inventory Report Generated Successfully!'
+        });
+      }
       window.print();
     }
   };
@@ -204,6 +254,37 @@ export default function InventoryProcurement() {
           {/* Right Controls: Export + View Modes + Register Stock CTA */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap', marginLeft: 'auto' }}>
             
+            {/* Column Filters Toggle Button */}
+            <button
+              type="button"
+              onClick={() => setShowColumnFilters(prev => !prev)}
+              style={{
+                height: '36px',
+                padding: '0 14px',
+                borderRadius: '8px',
+                border: showColumnFilters ? '1.5px solid #00A878' : '1px solid #CBD5E1',
+                background: showColumnFilters ? '#E6F4EA' : '#FFFFFF',
+                color: showColumnFilters ? '#00A878' : '#334155',
+                fontSize: '0.76rem',
+                fontWeight: 700,
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '6px',
+                boxShadow: '0 1px 2px rgba(0,0,0,0.04)',
+                transition: 'all 0.15s ease'
+              }}
+            >
+              <Filter size={14} color={showColumnFilters ? '#00A878' : '#64748B'} />
+              <span>Column Filters</span>
+              {Object.values(columnFilters).some(v => v) && (
+                <span style={{ background: '#00A878', color: '#FFF', borderRadius: '50%', width: '16px', height: '16px', fontSize: '0.62rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  {Object.values(columnFilters).filter(v => v).length}
+                </span>
+              )}
+            </button>
+
             {/* Export Dropdown Button */}
             <div ref={exportDropdownRef} style={{ position: 'relative' }}>
               <button
@@ -381,6 +462,78 @@ export default function InventoryProcurement() {
                     STOCK ADJUSTMENT
                   </th>
                 </tr>
+
+                {/* Sub-Header Column Filter Inputs */}
+                {showColumnFilters && (
+                  <tr style={{ background: '#F8FAFC' }}>
+                    <th style={{ padding: '6px 8px' }}>
+                      <input
+                        type="text"
+                        placeholder="Filter SKU..."
+                        value={columnFilters.sku || ''}
+                        onChange={(e) => { setColumnFilters(p => ({ ...p, sku: e.target.value })); setCurrentPage(1); }}
+                        style={{ width: '100%', padding: '4px 8px', fontSize: '0.74rem', borderRadius: '6px', border: '1px solid #CBD5E1', outline: 'none', background: '#FFF' }}
+                      />
+                    </th>
+                    <th style={{ padding: '6px 8px' }}>
+                      <input
+                        type="text"
+                        placeholder="Filter Item Name..."
+                        value={columnFilters.name || ''}
+                        onChange={(e) => { setColumnFilters(p => ({ ...p, name: e.target.value })); setCurrentPage(1); }}
+                        style={{ width: '100%', padding: '4px 8px', fontSize: '0.74rem', borderRadius: '6px', border: '1px solid #CBD5E1', outline: 'none', background: '#FFF' }}
+                      />
+                    </th>
+                    <th style={{ padding: '6px 8px' }}>
+                      <input
+                        type="text"
+                        placeholder="Filter Category..."
+                        value={columnFilters.category || ''}
+                        onChange={(e) => { setColumnFilters(p => ({ ...p, category: e.target.value })); setCurrentPage(1); }}
+                        style={{ width: '100%', padding: '4px 8px', fontSize: '0.74rem', borderRadius: '6px', border: '1px solid #CBD5E1', outline: 'none', background: '#FFF' }}
+                      />
+                    </th>
+                    <th style={{ padding: '6px 8px' }}>
+                      <input
+                        type="text"
+                        placeholder="Filter Qty..."
+                        value={columnFilters.quantity || ''}
+                        onChange={(e) => { setColumnFilters(p => ({ ...p, quantity: e.target.value })); setCurrentPage(1); }}
+                        style={{ width: '100%', padding: '4px 8px', fontSize: '0.74rem', borderRadius: '6px', border: '1px solid #CBD5E1', outline: 'none', background: '#FFF' }}
+                      />
+                    </th>
+                    <th style={{ padding: '6px 8px' }}>
+                      <input
+                        type="text"
+                        placeholder="Filter Price..."
+                        value={columnFilters.unitCost || ''}
+                        onChange={(e) => { setColumnFilters(p => ({ ...p, unitCost: e.target.value })); setCurrentPage(1); }}
+                        style={{ width: '100%', padding: '4px 8px', fontSize: '0.74rem', borderRadius: '6px', border: '1px solid #CBD5E1', outline: 'none', background: '#FFF' }}
+                      />
+                    </th>
+                    <th style={{ padding: '6px 8px' }}>
+                      <input
+                        type="text"
+                        placeholder="Filter Supplier..."
+                        value={columnFilters.supplier || ''}
+                        onChange={(e) => { setColumnFilters(p => ({ ...p, supplier: e.target.value })); setCurrentPage(1); }}
+                        style={{ width: '100%', padding: '4px 8px', fontSize: '0.74rem', borderRadius: '6px', border: '1px solid #CBD5E1', outline: 'none', background: '#FFF' }}
+                      />
+                    </th>
+                    <th style={{ textAlign: 'center' }}>
+                      {Object.values(columnFilters).some(v => v) && (
+                        <button
+                          type="button"
+                          onClick={() => setColumnFilters({})}
+                          title="Clear column filters"
+                          style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#EF4444', padding: 0 }}
+                        >
+                          <RotateCcw size={13} />
+                        </button>
+                      )}
+                    </th>
+                  </tr>
+                )}
               </thead>
               <tbody>
                 {paginatedInventory.length === 0 ? (

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
 import { 
   Network, MapPin, Cpu, ChevronRight, ChevronDown, Layers, 
@@ -11,7 +11,7 @@ import DataTable from './common/DataTable';
 import MapView from './common/MapView';
 
 export default function EnvironmentalNetworks() {
-  const { networks, setNetworks, sites, assets } = useApp();
+  const { networks, setNetworks, sites, assets, targetSearchResult, isDateInRange, dateFilter } = useApp();
   const [expandedNetwork, setExpandedNetwork] = useState('net-aqmn');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [netName, setNetName] = useState('');
@@ -24,6 +24,35 @@ export default function EnvironmentalNetworks() {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
 
+  // Filtered networks based on dateFilter
+  const filteredNetworks = React.useMemo(() => {
+    return networks.filter(net => {
+      if (dateFilter !== 'ALL') {
+        if (!isDateInRange(net.lastAuditDate || net.date)) return false;
+      }
+      return true;
+    });
+  }, [networks, dateFilter, isDateInRange]);
+
+  // Keep expandedNetwork valid
+  useEffect(() => {
+    if (filteredNetworks.length > 0 && !filteredNetworks.some(n => n.id === expandedNetwork)) {
+      setExpandedNetwork(filteredNetworks[0].id);
+    }
+  }, [filteredNetworks, expandedNetwork]);
+
+  // Auto-expand network if navigated from global search
+  useEffect(() => {
+    if (targetSearchResult?.module === 'networks' && targetSearchResult.searchTerm) {
+      const q = targetSearchResult.searchTerm.toLowerCase();
+      const matched = filteredNetworks.find(n => n.name.toLowerCase().includes(q) || n.code.toLowerCase().includes(q) || n.id.toLowerCase().includes(q));
+      if (matched) {
+        setExpandedNetwork(matched.id);
+        setCurrentPage(1);
+      }
+    }
+  }, [targetSearchResult, filteredNetworks]);
+
   const handleCreateNetwork = (e) => {
     e.preventDefault();
     if (!netName) return;
@@ -35,7 +64,9 @@ export default function EnvironmentalNetworks() {
       healthScore: 100,
       sitesCount: 0,
       assetsCount: 0,
-      status: 'Operational'
+      status: 'Operational',
+      date: '2026-08-25',
+      lastAuditDate: '2026-08-25'
     };
     setNetworks([newNet, ...networks]);
     setExpandedNetwork(newNet.id);
@@ -44,8 +75,10 @@ export default function EnvironmentalNetworks() {
     setNetCode('');
   };
 
-  const avgHealth = Math.round(networks.reduce((acc, n) => acc + (n.healthScore || 90), 0) / networks.length);
-  const operationalCount = networks.filter(n => n.status === 'Operational').length;
+  const avgHealth = filteredNetworks.length > 0 
+    ? Math.round(filteredNetworks.reduce((acc, n) => acc + (n.healthScore || 90), 0) / filteredNetworks.length)
+    : 100;
+  const operationalCount = filteredNetworks.filter(n => n.status === 'Operational').length;
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
@@ -67,7 +100,7 @@ export default function EnvironmentalNetworks() {
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-            {networks.map((net) => {
+            {filteredNetworks.map((net) => {
               const isExpanded = expandedNetwork === net.id;
               const netSites = sites.filter(s => s.networkId === net.id);
               return (
@@ -288,48 +321,68 @@ export default function EnvironmentalNetworks() {
                         </div>
 
                         {/* Bottom Pagination & Records Dropdown */}
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px', marginTop: '16px', paddingTop: '14px', borderTop: '1px solid #E2E8F0', fontSize: '0.78rem', color: '#64748B' }}>
+                        <div style={{ 
+                          display: 'flex', 
+                          justifyContent: 'space-between', 
+                          alignItems: 'center', 
+                          flexWrap: 'wrap', 
+                          gap: '12px', 
+                          marginTop: '16px', 
+                          paddingTop: '14px', 
+                          borderTop: '1px solid #E2E8F0', 
+                          fontSize: '0.78rem', 
+                          color: '#64748B' 
+                        }}>
                           
-                          {/* Bottom-left: View records per page dropdown */}
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                            <span>View records per page:</span>
-                            <select
-                              value={pageSize}
-                              onChange={(e) => { setPageSize(Number(e.target.value)); setCurrentPage(1); }}
-                              style={{
-                                padding: '4px 8px',
-                                borderRadius: '6px',
-                                border: '1px solid #CBD5E1',
-                                fontWeight: 700,
-                                color: '#0F172A',
-                                cursor: 'pointer',
-                                background: '#FFFFFF'
-                              }}
-                            >
-                              <option value={10}>10</option>
-                              <option value={50}>50</option>
-                              <option value={100}>100</option>
-                              <option value={500}>500</option>
-                            </select>
+                          {/* Left Group: Records Per Page & Counter */}
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                              <span>View records per page:</span>
+                              <select
+                                value={pageSize}
+                                onChange={(e) => { setPageSize(Number(e.target.value)); setCurrentPage(1); }}
+                                style={{
+                                  padding: '4px 8px',
+                                  borderRadius: '6px',
+                                  border: '1px solid #CBD5E1',
+                                  fontWeight: 700,
+                                  color: '#0F172A',
+                                  cursor: 'pointer',
+                                  background: '#FFFFFF'
+                                }}
+                              >
+                                <option value={10}>10</option>
+                                <option value={50}>50</option>
+                                <option value={100}>100</option>
+                                <option value={500}>500</option>
+                              </select>
+                            </div>
+
+                            <div>
+                              Showing {totalRecords > 0 ? startIndex + 1 : 0} to {Math.min(startIndex + pageSize, totalRecords)} of {totalRecords} records
+                            </div>
                           </div>
 
-                          {/* Showing records count */}
-                          <div>
-                            Showing {totalRecords > 0 ? startIndex + 1 : 0} to {Math.min(startIndex + pageSize, totalRecords)} of {totalRecords} records
-                          </div>
-
-                          {/* Bottom-right: Pagination navigation */}
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                          {/* Right Corner: Pagination Navigation */}
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginLeft: 'auto' }}>
                             <button
                               onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
                               disabled={currentPage === 1}
                               className="btn btn-secondary"
-                              style={{ padding: '4px 8px', fontSize: '0.74rem', opacity: currentPage === 1 ? 0.5 : 1 }}
+                              style={{ 
+                                padding: '6px 12px', 
+                                fontSize: '0.74rem', 
+                                opacity: currentPage === 1 ? 0.5 : 1,
+                                cursor: currentPage === 1 ? 'not-allowed' : 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '4px'
+                              }}
                             >
                               <ChevronLeft size={14} /> Previous
                             </button>
 
-                            <span style={{ fontWeight: 700, color: '#0F172A', padding: '0 4px' }}>
+                            <span style={{ fontWeight: 700, color: '#0F172A', padding: '0 6px' }}>
                               Page {currentPage} of {totalPages}
                             </span>
 
@@ -337,7 +390,15 @@ export default function EnvironmentalNetworks() {
                               onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
                               disabled={currentPage === totalPages}
                               className="btn btn-secondary"
-                              style={{ padding: '4px 8px', fontSize: '0.74rem', opacity: currentPage === totalPages ? 0.5 : 1 }}
+                              style={{ 
+                                padding: '6px 12px', 
+                                fontSize: '0.74rem', 
+                                opacity: currentPage === totalPages ? 0.5 : 1,
+                                cursor: currentPage === totalPages ? 'not-allowed' : 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '4px'
+                              }}
                             >
                               Next <ChevronRight size={14} />
                             </button>

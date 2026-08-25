@@ -3,15 +3,28 @@ import { useApp } from '../context/AppContext';
 import { 
   Search, Plus, Table, Map, Download, ChevronDown, 
   ArrowUpDown, ArrowUp, ArrowDown, ChevronLeft, ChevronRight, 
-  ChevronsLeft, ChevronsRight, FileSpreadsheet, FileText, X 
+  ChevronsLeft, ChevronsRight, FileSpreadsheet, FileText, X,
+  Filter, RotateCcw
 } from 'lucide-react';
 import GisMap from './GisMap';
 
 export default function ProcurementManagement() {
-  const { procurement, createRequisition } = useApp();
+  const { procurement, createRequisition, targetSearchResult, isDateInRange, dateFilter, triggerExportSuccess } = useApp();
   const [searchQuery, setSearchQuery] = useState('');
   const [viewMode, setViewMode] = useState('table'); // 'table' | 'map'
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // Column Filters state
+  const [showColumnFilters, setShowColumnFilters] = useState(false);
+  const [columnFilters, setColumnFilters] = useState({});
+
+  // Auto-fill and filter when navigated from Global Search
+  useEffect(() => {
+    if (targetSearchResult?.module === 'procurement') {
+      setSearchQuery(targetSearchResult.searchTerm || '');
+      setCurrentPage(1);
+    }
+  }, [targetSearchResult]);
 
   // Sorting state
   const [sortField, setSortField] = useState('dateRequested');
@@ -21,14 +34,15 @@ export default function ProcurementManagement() {
   const [pageSize, setPageSize] = useState(10);
   const [currentPage, setCurrentPage] = useState(1);
 
+  // Form State
+  const [title, setTitle] = useState('');
+  const [vendor, setVendor] = useState('Horiba Scientific UAE');
+  const [department, setDepartment] = useState('Air Quality Operations');
+  const [amount, setAmount] = useState('');
+
   // Export dropdown ref & state
   const [isExportDropdownOpen, setIsExportDropdownOpen] = useState(false);
   const exportDropdownRef = useRef(null);
-
-  // Form State
-  const [title, setTitle] = useState('');
-  const [vendor, setVendor] = useState('Thermo Fisher Scientific');
-  const [amount, setAmount] = useState('');
 
   // Close export dropdown when clicking outside
   useEffect(() => {
@@ -41,13 +55,13 @@ export default function ProcurementManagement() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const handleSubmit = (e) => {
+  const handleCreateRequisition = (e) => {
     e.preventDefault();
     createRequisition({
       title,
       vendor,
-      totalAmount: `$${amount || '4,500.00'}`,
-      department: 'Air Quality Operations',
+      department,
+      totalAmount: amount.startsWith('$') ? amount : `$${amount}`,
       requestedBy: 'Eng. Humaid Al-Suwaidi'
     });
     setIsModalOpen(false);
@@ -58,8 +72,13 @@ export default function ProcurementManagement() {
   // Filter & Sort Procurement items
   const filteredProcurement = useMemo(() => {
     return (procurement || []).filter(pr => {
+      // Date filter check
+      if (!searchQuery && dateFilter !== 'ALL') {
+        if (!isDateInRange(pr.dateRequested)) return false;
+      }
+
       const q = searchQuery.toLowerCase();
-      return (
+      const matchesSearch = 
         !searchQuery ||
         (pr.id && pr.id.toLowerCase().includes(q)) ||
         (pr.requisitionNo && pr.requisitionNo.toLowerCase().includes(q)) ||
@@ -67,8 +86,24 @@ export default function ProcurementManagement() {
         (pr.requestedBy && pr.requestedBy.toLowerCase().includes(q)) ||
         (pr.department && pr.department.toLowerCase().includes(q)) ||
         (pr.vendor && pr.vendor.toLowerCase().includes(q)) ||
-        (pr.status && pr.status.toLowerCase().includes(q))
-      );
+        (pr.status && pr.status.toLowerCase().includes(q));
+
+      if (!matchesSearch) return false;
+
+      // Individual Column Filters
+      for (const colKey in columnFilters) {
+        const filterVal = columnFilters[colKey]?.trim().toLowerCase();
+        if (filterVal) {
+          let cellVal = '';
+          if (colKey === 'id') cellVal = `${pr.id || ''} ${pr.requisitionNo || ''}`.toLowerCase();
+          else if (colKey === 'title') cellVal = `${pr.title || ''} ${pr.requestedBy || ''}`.toLowerCase();
+          else cellVal = String(pr[colKey] || '').toLowerCase();
+          
+          if (!cellVal.includes(filterVal)) return false;
+        }
+      }
+
+      return true;
     }).sort((a, b) => {
       let valA = a[sortField];
       let valB = b[sortField];
@@ -121,6 +156,7 @@ export default function ProcurementManagement() {
     }
 
     if (format === 'csv') {
+      const fileName = `Sharjah_EPA_Procurement_${filteredProcurement.length}_Requisitions.csv`;
       const headers = ['PR ID', 'Req No', 'Title', 'Requested By', 'Department', 'Vendor', 'Total Amount', 'Date Requested', 'Status'];
       const rows = filteredProcurement.map(pr => [
         `"${pr.id || ''}"`,
@@ -139,11 +175,28 @@ export default function ProcurementManagement() {
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.setAttribute('href', url);
-      link.setAttribute('download', `Sharjah_EPA_Procurement_${filteredProcurement.length}_Requisitions.csv`);
+      link.setAttribute('download', fileName);
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
+
+      if (triggerExportSuccess) {
+        triggerExportSuccess({
+          filename: fileName,
+          format: 'CSV',
+          count: filteredProcurement.length,
+          title: 'Procurement Requisitions Downloaded Successfully!'
+        });
+      }
     } else if (format === 'pdf') {
+      if (triggerExportSuccess) {
+        triggerExportSuccess({
+          filename: `Sharjah_EPA_Procurement_Report.pdf`,
+          format: 'PDF',
+          count: filteredProcurement.length,
+          title: 'Procurement Report Generated Successfully!'
+        });
+      }
       window.print();
     }
   };
@@ -178,6 +231,37 @@ export default function ProcurementManagement() {
           {/* Right Controls: Export + View Modes + New Requisition CTA */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap', marginLeft: 'auto' }}>
             
+            {/* Column Filters Toggle Button */}
+            <button
+              type="button"
+              onClick={() => setShowColumnFilters(prev => !prev)}
+              style={{
+                height: '36px',
+                padding: '0 14px',
+                borderRadius: '8px',
+                border: showColumnFilters ? '1.5px solid #00A878' : '1px solid #CBD5E1',
+                background: showColumnFilters ? '#E6F4EA' : '#FFFFFF',
+                color: showColumnFilters ? '#00A878' : '#334155',
+                fontSize: '0.76rem',
+                fontWeight: 700,
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '6px',
+                boxShadow: '0 1px 2px rgba(0,0,0,0.04)',
+                transition: 'all 0.15s ease'
+              }}
+            >
+              <Filter size={14} color={showColumnFilters ? '#00A878' : '#64748B'} />
+              <span>Column Filters</span>
+              {Object.values(columnFilters).some(v => v) && (
+                <span style={{ background: '#00A878', color: '#FFF', borderRadius: '50%', width: '16px', height: '16px', fontSize: '0.62rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  {Object.values(columnFilters).filter(v => v).length}
+                </span>
+              )}
+            </button>
+
             {/* Export Dropdown Button */}
             <div ref={exportDropdownRef} style={{ position: 'relative' }}>
               <button
@@ -357,6 +441,85 @@ export default function ProcurementManagement() {
                     </div>
                   </th>
                 </tr>
+
+                {/* Sub-Header Column Filter Inputs */}
+                {showColumnFilters && (
+                  <tr style={{ background: '#F8FAFC' }}>
+                    <th style={{ padding: '6px 8px' }}>
+                      <input
+                        type="text"
+                        placeholder="Filter PR/Req..."
+                        value={columnFilters.id || ''}
+                        onChange={(e) => { setColumnFilters(p => ({ ...p, id: e.target.value })); setCurrentPage(1); }}
+                        style={{ width: '100%', padding: '4px 8px', fontSize: '0.74rem', borderRadius: '6px', border: '1px solid #CBD5E1', outline: 'none', background: '#FFF' }}
+                      />
+                    </th>
+                    <th style={{ padding: '6px 8px' }}>
+                      <input
+                        type="text"
+                        placeholder="Filter Title/User..."
+                        value={columnFilters.title || ''}
+                        onChange={(e) => { setColumnFilters(p => ({ ...p, title: e.target.value })); setCurrentPage(1); }}
+                        style={{ width: '100%', padding: '4px 8px', fontSize: '0.74rem', borderRadius: '6px', border: '1px solid #CBD5E1', outline: 'none', background: '#FFF' }}
+                      />
+                    </th>
+                    <th style={{ padding: '6px 8px' }}>
+                      <input
+                        type="text"
+                        placeholder="Filter Department..."
+                        value={columnFilters.department || ''}
+                        onChange={(e) => { setColumnFilters(p => ({ ...p, department: e.target.value })); setCurrentPage(1); }}
+                        style={{ width: '100%', padding: '4px 8px', fontSize: '0.74rem', borderRadius: '6px', border: '1px solid #CBD5E1', outline: 'none', background: '#FFF' }}
+                      />
+                    </th>
+                    <th style={{ padding: '6px 8px' }}>
+                      <input
+                        type="text"
+                        placeholder="Filter Vendor..."
+                        value={columnFilters.vendor || ''}
+                        onChange={(e) => { setColumnFilters(p => ({ ...p, vendor: e.target.value })); setCurrentPage(1); }}
+                        style={{ width: '100%', padding: '4px 8px', fontSize: '0.74rem', borderRadius: '6px', border: '1px solid #CBD5E1', outline: 'none', background: '#FFF' }}
+                      />
+                    </th>
+                    <th style={{ padding: '6px 8px' }}>
+                      <input
+                        type="text"
+                        placeholder="Filter Amount..."
+                        value={columnFilters.totalAmount || ''}
+                        onChange={(e) => { setColumnFilters(p => ({ ...p, totalAmount: e.target.value })); setCurrentPage(1); }}
+                        style={{ width: '100%', padding: '4px 8px', fontSize: '0.74rem', borderRadius: '6px', border: '1px solid #CBD5E1', outline: 'none', background: '#FFF' }}
+                      />
+                    </th>
+                    <th style={{ padding: '6px 8px' }}>
+                      <input
+                        type="text"
+                        placeholder="Filter Date..."
+                        value={columnFilters.dateRequested || ''}
+                        onChange={(e) => { setColumnFilters(p => ({ ...p, dateRequested: e.target.value })); setCurrentPage(1); }}
+                        style={{ width: '100%', padding: '4px 8px', fontSize: '0.74rem', borderRadius: '6px', border: '1px solid #CBD5E1', outline: 'none', background: '#FFF' }}
+                      />
+                    </th>
+                    <th style={{ padding: '6px 8px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      <input
+                        type="text"
+                        placeholder="Filter Status..."
+                        value={columnFilters.status || ''}
+                        onChange={(e) => { setColumnFilters(p => ({ ...p, status: e.target.value })); setCurrentPage(1); }}
+                        style={{ flex: 1, padding: '4px 8px', fontSize: '0.74rem', borderRadius: '6px', border: '1px solid #CBD5E1', outline: 'none', background: '#FFF' }}
+                      />
+                      {Object.values(columnFilters).some(v => v) && (
+                        <button
+                          type="button"
+                          onClick={() => setColumnFilters({})}
+                          title="Clear column filters"
+                          style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#EF4444', padding: 0 }}
+                        >
+                          <RotateCcw size={13} />
+                        </button>
+                      )}
+                    </th>
+                  </tr>
+                )}
               </thead>
               <tbody>
                 {paginatedProcurement.length === 0 ? (
