@@ -200,28 +200,45 @@ export default function ChatAIWidget() {
               color: '#FFFFFF',
               padding: '16px 20px',
               display: 'flex',
-              justify: 'space-between',
-              alignItems: 'center'
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              width: '100%'
             }}
           >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <div style={{ padding: '8px', background: 'rgba(0,168,120,0.2)', borderRadius: '10px', color: '#00A878' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flex: 1, minWidth: 0 }}>
+              <div style={{ padding: '8px', background: 'rgba(0,168,120,0.25)', borderRadius: '10px', color: '#34D399', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <Bot size={20} />
               </div>
-              <div>
-                <h3 style={{ fontSize: '0.95rem', fontWeight: 800, margin: 0 }}>Sharjah EPAA Intelligence AI</h3>
-                <span style={{ fontSize: '0.7rem', color: '#00A878', fontWeight: 600 }}>● Connected to EPA Telemetry Engine</span>
+              <div style={{ overflow: 'hidden', minWidth: 0 }}>
+                <h3 style={{ fontSize: '0.95rem', fontWeight: 800, margin: 0, color: '#FFFFFF', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>
+                  Sharjah EPAA Intelligence AI
+                </h3>
+                <span style={{ fontSize: '0.72rem', color: '#34D399', fontWeight: 600, display: 'block', marginTop: '2px' }}>
+                  ● Connected to EPA Telemetry Engine
+                </span>
               </div>
             </div>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <button onClick={() => setIsExpanded(!isExpanded)} style={{ background: 'none', border: 'none', color: '#94A3B8', cursor: 'pointer', padding: '4px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginLeft: 'auto', flexShrink: 0 }}>
+              <button 
+                onClick={() => setIsExpanded(!isExpanded)} 
+                style={{ background: 'rgba(255,255,255,0.08)', border: 'none', color: '#F8FAFC', cursor: 'pointer', padding: '6px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.15s ease' }}
+                title={isExpanded ? "Collapse Widget" : "Expand Widget"}
+              >
                 {isExpanded ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
               </button>
-              <button onClick={handleClear} style={{ background: 'none', border: 'none', color: '#94A3B8', cursor: 'pointer', padding: '4px' }} title="Clear Chat">
+              <button 
+                onClick={handleClear} 
+                style={{ background: 'rgba(255,255,255,0.08)', border: 'none', color: '#F8FAFC', cursor: 'pointer', padding: '6px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.15s ease' }} 
+                title="Clear Chat History"
+              >
                 <Trash2 size={16} />
               </button>
-              <button onClick={() => setIsOpen(false)} style={{ background: 'none', border: 'none', color: '#94A3B8', cursor: 'pointer', padding: '4px' }}>
+              <button 
+                onClick={() => setIsOpen(false)} 
+                style={{ background: 'rgba(255,255,255,0.08)', border: 'none', color: '#F8FAFC', cursor: 'pointer', padding: '6px', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.15s ease' }}
+                title="Close Assistant"
+              >
                 <X size={18} />
               </button>
             </div>
